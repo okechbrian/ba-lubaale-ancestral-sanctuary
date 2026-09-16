@@ -42,9 +42,9 @@ export default function TheHostPage() {
                 given.
               </p>
               <p className="mt-4 text-ink/70">
-                The cave work comes from the women who kept this place before me.
-                The bark cloth comes from a craft older than any written record
-                on these islands. The cowrie comes from the lake.
+                The work I carry comes from the women who kept this place before
+                me. It is old, it is living, and it is not mine to sell — only
+                to hold and share.
               </p>
               <p className="mt-4 text-ink/70">
                 I do not offer guarantees. I offer time, silence, and the
