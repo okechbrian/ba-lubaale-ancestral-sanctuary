@@ -1,64 +1,53 @@
-# Phase 1 report
+# Phase 2 report
 
 Status: complete
-Branch: phase-1-foundation
+Branch: phase-2-home
 Build: pass
 Lint: pass
 
 What shipped
-- Next.js 16 App Router scaffolded in repo root (TypeScript, Tailwind CSS v4, ESLint)
-- Fraunces (display) + Figtree (UI) loaded via next/font
-- Design tokens as CSS variables on :root: cream, ink, canopy, dusk, bark, ember, mist
-- `app/layout.tsx` with fonts, tokens, metadata template `%s — Ba Lubaale Ancestral Sanctuary Kiwamirembe`
-- `app/globals.css` with tokens, cream page ground, ink body text
-- `components/Header.tsx` — sticky, solid after scroll, desktop nav + mobile full-screen drawer
-- `components/Footer.tsx` — blessing line, secondary links, WhatsApp/email slots, both legal lines
-- `components/LanguageStub.tsx` — EN | LG, LG is no-op with aria-label "Luganda coming"
-- `content/site.ts` — typed content module with name, subtitle, nav, footer links, placeholder contacts
-- 10 route stubs (one sentence placeholder each): /, /the-land, /the-cave, /the-host, /immersions, /practices, /atelier, /prepare, /apply, /policies
-- Branded not-found.tsx in sanctuary voice ("The path you walked does not lead here")
-- .env.example with FORMSPREE_ENDPOINT=
-- .gitignore extended with /public/images and /public/video
+- Phase 1 fixes applied:
+  - .env.example already contained FORMSPREE_ENDPOINT=
+  - Request Immersion button changed from ember to bark fill + cream type (desktop + mobile)
+  - backdrop-blur removed from sticky header
+- Homepage built with exact 11-section order from AGENT_INSTRUCTIONS.md:
+  1. Full-viewport hero — dusk overlay, overline (Ssese Islands · Lake Victoria · Uganda), H1, H2, deck, support line, dual CTAs, microcopy
+  2. Host invitation — first-person quote, cowrie portrait
+  3. Four land gateways — Cave, Lake House, Forest Spring, Herd & Fire cards linking to /the-land hashes
+  4. Who is welcomed — three columns (Solo, Couples, Families) + exclusion sentence
+  5. Three acts — Arrival / Work / Return with roman numerals, link to /immersions
+  6. Craft as healing — bark, dresses, cowrie trio + "You do not only speak the intention" line, link to /atelier
+  7. Host block — Queen Nalubaale / Mama Nalubaale, first-person bio, link to /the-host
+  8. Three stay cards — Essential (3-day), Master (5-day), Whole-island buyout, links to /immersions
+  9. Readiness strip — "Ready to sit with what needs sitting with?" + dual CTAs
+  10. Neighbouring sacred geography — Wanema's Shrine (Bubeke), Nanziri Waterfalls (Bukasa), Buswa Forest (regional), clearly labelled off-property
+  11. Closing full-bleed — closing-shore.jpg + "Leave the noise" line + Request an Immersion CTA
 
 What was not done (and why)
-- No real homepage design (Phase 2)
-- No images copied (Phase 5)
+- No real inner-page copy beyond what the home already links to (Phase 3)
 - No form wiring (Phase 4)
-- No inner page content beyond placeholders (Phase 3)
-- No i18n library installed (EN | LG stub only, per decisions)
+- No images copied — all paths are labelled placeholders (Phase 5)
+- No SEO audit beyond homepage metadata (Phase 6)
 
 Files created or changed
-- app/layout.tsx
-- app/globals.css
-- app/page.tsx
-- app/not-found.tsx
-- app/the-land/page.tsx
-- app/the-cave/page.tsx
-- app/the-host/page.tsx
-- app/immersions/page.tsx
-- app/practices/page.tsx
-- app/atelier/page.tsx
-- app/prepare/page.tsx
-- app/apply/page.tsx
-- app/policies/page.tsx
-- components/Header.tsx
-- components/Footer.tsx
-- components/LanguageStub.tsx
-- content/site.ts
-- .env.example
-- .gitignore (modified)
-- package.json
-- tsconfig.json
-- next.config.ts
-- postcss.config.mjs
-- eslint.config.mjs
+- app/page.tsx (full homepage rewrite, 11 sections)
+- components/Header.tsx (bark button, no backdrop-blur)
 
-Images used (public names)
-- None (placeholder phase)
+Images used (public names — all placeholders, files not yet copied)
+- hero-shore-gathering.jpg
+- host-portrait-cowrie.jpg
+- og-cave-shore.jpg
+- arrival-boat.jpg
+- forest-roots.jpg
+- fire-night.jpg
+- host-measuring-bark.jpg
+- bark-dresses-stand.jpg
+- cowrie-four.jpg
+- closing-shore.jpg
 
 Blockers for the owner / Grok
-- None — all Phase 1 gates passed
+- None — Phase 2 gates passed
 
 How to preview
 - npm run dev
-- routes checked: /, /the-land, /the-cave, /the-host, /immersions, /practices, /atelier, /prepare, /apply, /policies, 404
+- routes checked: / (11 sections), all inner stubs still return 200

@@ -29,7 +29,7 @@ export function Header() {
   return (
     <header
       className={`sticky top-0 z-50 transition-colors duration-300 ${
-        scrolled ? "bg-cream shadow-sm" : "bg-cream/90 backdrop-blur-sm"
+        scrolled ? "bg-cream shadow-sm" : "bg-cream"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
@@ -56,7 +56,7 @@ export function Header() {
           ))}
           <Link
             href="/apply"
-            className="rounded-md bg-ember px-4 py-2 text-sm font-semibold text-cream transition-colors hover:bg-ember/90"
+            className="rounded-md bg-bark px-4 py-2 text-sm font-semibold text-cream transition-colors hover:bg-bark/90"
           >
             Request Immersion
           </Link>
@@ -123,7 +123,7 @@ export function Header() {
             ))}
             <Link
               href="/apply"
-              className="rounded-md bg-ember px-6 py-3 text-lg font-semibold text-cream transition-colors hover:bg-ember/90"
+              className="rounded-md bg-bark px-6 py-3 text-lg font-semibold text-cream transition-colors hover:bg-bark/90"
               onClick={() => setMobileOpen(false)}
             >
               Request Immersion
