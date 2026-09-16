@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,9 +14,11 @@ export default function AtelierPage() {
       {/* Hero */}
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
-        <img
+        <Image
           src="/images/cowrie-four.jpg"
           alt="Four women wearing cowrie strand necklaces"
+          fill
+          priority
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />
@@ -52,9 +55,11 @@ export default function AtelierPage() {
               </p>
             </div>
             <div className="relative overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/host-measuring-bark.jpg"
                 alt="Queen Nalubaale measuring bark cloth with tape"
+                width={600}
+                height={450}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
@@ -70,44 +75,56 @@ export default function AtelierPage() {
           </h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/bark-circle.jpg"
                 alt="Workshop circle with sheets of olubugo bark cloth"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/bark-dresses-stand.jpg"
                 alt="Finished bark-cloth dresses on a stand"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/bark-dresses-detail.jpg"
                 alt="Waist and cowrie detail on bark-cloth garments"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/cowrie-necklace-still.jpg"
                 alt="Finished cowrie and stone necklace"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/braided-bead-set.jpg"
                 alt="Braided bead necklace and bracelet set"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/cowrie-seed-necklace.jpg"
                 alt="Cowrie, seed, and white bead strand"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
@@ -127,23 +144,29 @@ export default function AtelierPage() {
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/cowrie-two.jpg"
                 alt="Two women wearing cowrie necklaces"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/kente-shore-two.jpg"
                 alt="Two women in striped cloth by the lake"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/kente-water-rite.jpg"
                 alt="Water blessing at the shore"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>

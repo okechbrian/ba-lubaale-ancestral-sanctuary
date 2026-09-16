@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,9 +15,11 @@ export default function HomePage() {
       <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
         {/* Image placeholder */}
         <div className="absolute inset-0 bg-dusk" />
-        <img
+        <Image
           src="/images/hero-shore-gathering.jpg"
           alt="Women in rust bark-cloth dresses standing on the Lake Victoria shore"
+          fill
+          priority
           className="absolute inset-0 h-full w-full object-cover"
         />
         {/* Dusk overlay */}
@@ -63,9 +66,11 @@ export default function HomePage() {
       {/* ─── Section 2: Host Invitation ─── */}
       <section className="bg-cream py-20 sm:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
-          <img
+          <Image
             src="/images/host-portrait-cowrie.jpg"
             alt="Queen Nalubaale wearing cowrie earrings and blue beads"
+            width={160}
+            height={160}
             className="h-32 w-32 rounded-full object-cover sm:h-40 sm:w-40"
           />
           <blockquote className="text-center sm:text-left">
@@ -100,9 +105,11 @@ export default function HomePage() {
             {/* Cave */}
             <Link href="/the-cave#cave" className="group block">
               <div className="relative overflow-hidden rounded-md">
-                <img
+                <Image
                   src="/images/og-cave-shore.jpg"
                   alt="Mossed rock mouth of Nalubaale Cave seen from the water"
+                  width={400}
+                  height={300}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-dusk/60 to-transparent" />
@@ -115,9 +122,11 @@ export default function HomePage() {
             {/* Lake House */}
             <Link href="/the-land#lake-house" className="group block">
               <div className="relative overflow-hidden rounded-md">
-                <img
+                <Image
                   src="/images/arrival-boat.jpg"
                   alt="The water the Lake House sits on"
+                  width={400}
+                  height={300}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-dusk/60 to-transparent" />
@@ -130,9 +139,11 @@ export default function HomePage() {
             {/* Forest Spring */}
             <Link href="/the-land#spring" className="group block">
               <div className="relative overflow-hidden rounded-md">
-                <img
+                <Image
                   src="/images/forest-roots.jpg"
                   alt="Buttress roots in the forest fed by an ancestral spring"
+                  width={400}
+                  height={300}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-dusk/60 to-transparent" />
@@ -145,9 +156,11 @@ export default function HomePage() {
             {/* Herd & Fire */}
             <Link href="/the-land#herd" className="group block">
               <div className="relative overflow-hidden rounded-md">
-                <img
+                <Image
                   src="/images/fire-night.jpg"
                   alt="Night bonfire on the shore with free-roaming herd nearby"
+                  width={400}
+                  height={300}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-dusk/60 to-transparent" />
@@ -255,23 +268,29 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-8 sm:grid-cols-2 lg:grid-cols-3">
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/host-measuring-bark.jpg"
                 alt="Queen Nalubaale measuring bark cloth with tape in the banana grove"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/bark-dresses-stand.jpg"
                 alt="Finished bark-cloth dresses hanging on a stand among banana trees"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md sm:col-span-2 lg:col-span-1">
-              <img
+              <Image
                 src="/images/cowrie-four.jpg"
                 alt="Four women wearing cowrie strand necklaces"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
@@ -303,9 +322,11 @@ export default function HomePage() {
       {/* ─── Section 7: Host Block ─── */}
       <section className="bg-mist py-20 sm:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
-          <img
+          <Image
             src="/images/host-portrait-cowrie.jpg"
             alt="Queen Nalubaale, Mama Nalubaale — seer, healer, and master artisan"
+            width={224}
+            height={224}
             className="h-48 w-48 rounded-full object-cover sm:h-56 sm:w-56"
           />
           <div>
@@ -472,9 +493,11 @@ export default function HomePage() {
       {/* ─── Section 11: Closing Full-Bleed ─── */}
       <section className="relative flex min-h-[60vh] items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
-        <img
+        <Image
           src="/images/closing-shore.jpg"
           alt="Shore gathering on Lake Victoria at sunset"
+          fill
+          priority
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-dusk/60" />

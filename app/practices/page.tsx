@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,9 +14,11 @@ export default function PracticesPage() {
       {/* Hero */}
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
-        <img
+        <Image
           src="/images/fire-night.jpg"
           alt="Night bonfire on the shore"
+          fill
+          priority
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />

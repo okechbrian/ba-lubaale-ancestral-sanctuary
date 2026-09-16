@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,9 +14,11 @@ export default function TheLandPage() {
       {/* Hero */}
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
-        <img
+        <Image
           src="/images/forest-roots.jpg"
           alt="Buttress roots in the forest fed by an ancestral spring"
+          fill
+          priority
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />
@@ -51,9 +54,11 @@ export default function TheLandPage() {
               </p>
             </div>
             <div className="relative overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/arrival-boat.jpg"
                 alt="The water the Lake House sits on"
+                width={600}
+                height={450}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
@@ -125,9 +130,11 @@ export default function TheLandPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-8 lg:grid-cols-2">
             <div className="relative overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/arrival-canoe.jpg"
                 alt="Wooden canoe crossing to the sanctuary island"
+                width={600}
+                height={450}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>

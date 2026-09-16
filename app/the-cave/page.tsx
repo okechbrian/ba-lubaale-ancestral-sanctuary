@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,9 +14,11 @@ export default function TheCavePage() {
       {/* Hero */}
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
-        <img
+        <Image
           src="/images/og-cave-shore.jpg"
           alt="Mossed rock mouth of Nalubaale Cave seen from the water"
+          fill
+          priority
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />
@@ -52,9 +55,11 @@ export default function TheCavePage() {
             </div>
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-md">
-                <img
+                <Image
                   src="/images/cave-silhouette.jpg"
                   alt="Silhouette in the mouth of Nalubaale Cave"
+                  width={600}
+                  height={338}
                   className="aspect-[16/9] w-full object-cover"
                 />
               </div>
@@ -121,23 +126,29 @@ export default function TheCavePage() {
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/cave-threshold-hay.jpg"
                 alt="First chamber of Nalubaale Cave with hay on the floor"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/cave-mouth-congregation.jpg"
                 alt="Looking out toward the light from inside the cave"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/cave-kneeling.jpg"
                 alt="White cloth kneeling work inside the cave"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>

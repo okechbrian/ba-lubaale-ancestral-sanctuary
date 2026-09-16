@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   },
   description:
     "A screened ancestral sanctuary on the Ssese Islands of Lake Victoria, Uganda — cave work, root-water cleansing, bark cloth and fibre craft, and quiet time with land and herd.",
+  openGraph: {
+    images: ["/og.jpg"],
+  },
 };
 
 export default function RootLayout({

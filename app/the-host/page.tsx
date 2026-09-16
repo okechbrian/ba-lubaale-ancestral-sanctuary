@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,9 +14,11 @@ export default function TheHostPage() {
       {/* Hero */}
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
-        <img
+        <Image
           src="/images/host-portrait-cowrie.jpg"
           alt="Queen Nalubaale wearing cowrie earrings and blue beads"
+          fill
+          priority
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />
@@ -53,9 +56,11 @@ export default function TheHostPage() {
               </p>
             </div>
             <div className="relative overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/host-measuring-bark.jpg"
                 alt="Queen Nalubaale measuring bark cloth with tape in the banana grove"
+                width={600}
+                height={450}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
@@ -71,23 +76,29 @@ export default function TheHostPage() {
           </h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/host-compound-walk.jpg"
                 alt="Queen Nalubaale walking through the compound in blue wax print"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/host-night-fire.jpg"
                 alt="Queen Nalubaale at night by the fire in bark cloth and cowrie"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
-              <img
+              <Image
                 src="/images/host-lake-scarf.jpg"
                 alt="Queen Nalubaale with green scarf, lake behind"
+                width={400}
+                height={300}
                 className="aspect-[4/3] w-full object-cover"
               />
             </div>

@@ -38,9 +38,9 @@ yarn-error.log*
 # vercel
 .vercel
 
-# raw photo dump (copy into /public/images in Phase 5)
-/public/images
-/public/video
+# media (Phase 5 complete — tracked)
+# /public/images
+# /public/video
 
 # typescript
 *.tsbuildinfo

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,9 +14,11 @@ export default function PreparePage() {
       {/* Hero */}
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
-        <img
+        <Image
           src="/images/arrival-boat.jpg"
           alt="The water the Lake House sits on"
+          fill
+          priority
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />
@@ -51,9 +54,11 @@ export default function PreparePage() {
             </div>
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-md">
-                <img
+                <Image
                   src="/images/arrival-canoe.jpg"
                   alt="Wooden canoe crossing to the sanctuary"
+                  width={600}
+                  height={338}
                   className="aspect-[16/9] w-full object-cover"
                 />
               </div>
