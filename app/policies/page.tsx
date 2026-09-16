@@ -122,10 +122,15 @@ export default function PoliciesPage() {
             Safety &amp; Privacy
           </h2>
           <p className="mt-4 text-ink/70">
-            Guest information is kept private and never shared. The sanctuary
-            does not provide medical or emergency services. If you have severe
-            allergies, mobility limits, or mental health conditions, disclose
-            them on the application form so we can prepare.
+            Guest information is kept private and never shared. We do not sell,
+            rent, or distribute your data to any third party. Application
+            details are used solely to prepare for your stay and are retained
+            only as long as necessary.
+          </p>
+          <p className="mt-4 text-ink/70">
+            The sanctuary does not provide medical or emergency services. If you
+            have severe allergies, mobility limits, or mental health conditions,
+            disclose them on the application form so we can prepare.
           </p>
         </div>
       </section>
