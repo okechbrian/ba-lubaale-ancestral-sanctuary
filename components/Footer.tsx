@@ -28,7 +28,7 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-cream/70 transition-colors hover:text-bark"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
                   >
                     {item.label}
                   </Link>
@@ -51,7 +51,7 @@ export function Footer() {
                 <span className="text-bark">Email</span>{" "}
                 <a
                   href={`mailto:${site.contact.email}`}
-                  className="transition-colors hover:text-bark"
+                  className="transition-colors hover:text-leaf"
                 >
                   {site.contact.email}
                 </a>

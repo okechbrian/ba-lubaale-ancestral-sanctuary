@@ -435,7 +435,7 @@ export default function ApplyPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-md bg-bark px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-bark/90 disabled:opacity-60"
+                className="w-full rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80 disabled:opacity-60"
               >
                 {submitting ? "Submitting..." : "Submit Request"}
               </button>

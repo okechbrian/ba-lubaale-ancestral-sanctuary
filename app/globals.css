@@ -8,6 +8,8 @@
   --bark: #C4A574;
   --ember: #B45A2A;
   --mist: #E7E1D4;
+  --lake: #1565C0;
+  --leaf: #22E36A;
 }
 
 @theme inline {
@@ -18,6 +20,8 @@
   --color-bark: var(--bark);
   --color-ember: var(--ember);
   --color-mist: var(--mist);
+  --color-lake: var(--lake);
+  --color-leaf: var(--leaf);
   --font-display: var(--font-fraunces);
   --font-ui: var(--font-figtree);
 }
