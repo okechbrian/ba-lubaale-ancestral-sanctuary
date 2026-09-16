@@ -45,7 +45,7 @@ export default function HomePage() {
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/apply"
-              className="rounded-md bg-bark px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-bark/90"
+              className="rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
             >
               Request an Immersion
             </Link>
@@ -255,7 +255,7 @@ export default function HomePage() {
           <div className="mt-12 text-center">
             <Link
               href="/immersions"
-              className="text-sm font-semibold text-bark transition-colors hover:text-bark/80"
+              className="text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
             >
               View immersions →
             </Link>
@@ -311,7 +311,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/atelier"
-              className="mt-6 inline-block text-sm font-semibold text-ember transition-colors hover:text-ember/80"
+              className="mt-6 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
             >
               Visit the Atelier →
             </Link>
@@ -341,7 +341,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/the-host"
-              className="mt-4 inline-block text-sm font-semibold text-ember transition-colors hover:text-ember/80"
+              className="mt-4 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
             >
               Meet the Host →
             </Link>
@@ -372,7 +372,7 @@ export default function HomePage() {
               </p>
               <Link
                 href="/immersions"
-                className="mt-6 inline-block text-sm font-semibold text-ember transition-colors hover:text-ember/80"
+                className="mt-6 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
               >
                 View details →
               </Link>
@@ -391,7 +391,7 @@ export default function HomePage() {
               </p>
               <Link
                 href="/immersions"
-                className="mt-6 inline-block text-sm font-semibold text-ember transition-colors hover:text-ember/80"
+                className="mt-6 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
               >
                 View details →
               </Link>
@@ -410,7 +410,7 @@ export default function HomePage() {
               </p>
               <Link
                 href="/immersions"
-                className="mt-6 inline-block text-sm font-semibold text-ember transition-colors hover:text-ember/80"
+                className="mt-6 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
               >
                 View details →
               </Link>
@@ -428,7 +428,7 @@ export default function HomePage() {
           <div className="flex gap-4">
             <Link
               href="/apply"
-              className="rounded-md bg-bark px-6 py-2 text-sm font-semibold text-cream transition-colors hover:bg-bark/90"
+              className="rounded-md bg-lake px-6 py-2 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
             >
               Request Immersion
             </Link>
@@ -508,7 +508,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/apply"
-            className="mt-8 inline-block rounded-md bg-bark px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-bark/90"
+            className="mt-8 inline-block rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
           >
             Request an Immersion
           </Link>

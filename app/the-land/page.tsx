@@ -189,7 +189,7 @@ export default function TheLandPage() {
           </p>
           <Link
             href="/apply"
-            className="mt-8 inline-block rounded-md bg-bark px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-bark/90"
+            className="mt-8 inline-block rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
           >
             Request an Immersion
           </Link>

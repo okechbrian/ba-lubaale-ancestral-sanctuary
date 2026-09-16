@@ -49,14 +49,14 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-ink/80 transition-colors hover:text-ember"
+              className="text-sm font-medium text-ink/80 transition-colors hover:text-leaf"
             >
               {item.label}
             </Link>
           ))}
           <Link
             href="/apply"
-            className="rounded-md bg-bark px-4 py-2 text-sm font-semibold text-cream transition-colors hover:bg-bark/90"
+            className="rounded-md bg-lake px-4 py-2 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
           >
             Request Immersion
           </Link>
@@ -115,7 +115,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-2xl font-medium text-ink transition-colors hover:text-ember"
+                className="text-2xl font-medium text-ink transition-colors hover:text-leaf"
                 onClick={() => setMobileOpen(false)}
               >
                 {item.label}
@@ -123,7 +123,7 @@ export function Header() {
             ))}
             <Link
               href="/apply"
-              className="rounded-md bg-bark px-6 py-3 text-lg font-semibold text-cream transition-colors hover:bg-bark/90"
+              className="rounded-md bg-lake px-6 py-3 text-lg font-semibold text-cream transition-colors hover:bg-lake/80"
               onClick={() => setMobileOpen(false)}
             >
               Request Immersion

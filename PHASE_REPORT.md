@@ -1,44 +1,40 @@
-# Phase 7 report — Vercel Deploy
+# Phase 8 report — Colour pass (palette-lake-leaf)
 
 Status: complete
-Branch: main (production)
-Build: pass (15/15 routes static)
+Branch: palette-lake-leaf
+Build: pass (15/15 routes)
 Lint: pass (zero warnings)
 
-Production URL
-- https://ba-lubaale-ancestral-sanctuary.vercel.app
+Palette changes
+- Added --lake: #1565C0 and --leaf: #22E36A tokens to globals.css + Tailwind @theme
+- Primary buttons (all pages): bg-bark → bg-lake, hover:bg-bark/90 → hover:bg-lake/80
+- Nav hover (desktop + mobile): hover:text-ember → hover:text-leaf
+- EN active in LanguageStub: text-ink → text-leaf
+- Footer link hovers: hover:text-bark → hover:text-leaf
+- Secondary text links (View immersions, Visit the Atelier, Meet the Host, View details, Practices link): ember/bark → leaf
+- Readiness strip button: bg-bark → bg-lake
+- 404 button: bg-ember → bg-lake
+- Apply submit button: bg-bark → bg-lake
 
-Project
-- Name: ba-lubaale-ancestral-sanctuary
-- Vercel team: okechbrian-5599s-projects
-- Project ID: prj_o9V6q0DAbi8WC3nxn6B9EJKxY3mW
-- Git linked: yes — okechbrian/ba-lubaale-ancestral-sanctuary connected
-- Production branch: main
-- Framework: Next.js (Turbopack)
-- Root directory: ./
+What stayed the same
+- Bark: overlines, captions, subtitles, craft labels, duration labels, cave etiquette headings, hero subtitle, host honorific, citation text, sacred geography island labels
+- Ember: validation error text on /apply only
+- Copy, routes, prices, photos: unchanged
+- Hero overlay: unchanged (dusk gradient)
+- No new domain, no second Vercel project
 
-Deploy behaviour
-- Push to main → production deploy (automatic)
-- Push to any other branch or open PR → preview deploy (automatic)
-
-Environment variables
-- NEXT_PUBLIC_FORMSPREE_ENDPOINT: not set (form uses mailto:hello@ fallback)
-- No other env vars configured
-
-Build result
-- 13 page routes + robots.txt + sitemap.xml = 15 static outputs
-- All pages prerendered as static content
-- No build errors, no lint warnings
-
-Blockers for the owner
-- None
-
-What was not done (and why)
-- Custom domain not attached — owner did not request one
-- Formspree endpoint not set — owner does not yet have one
-- No preview of individual route URLs — all routes confirmed via build output
-
-How to verify
-- Production: https://ba-lubaale-ancestral-sanctuary.vercel.app
-- /the-land, /the-cave, /the-host, /immersions, /practices, /atelier, /prepare, /apply, /policies
-- /robots.txt, /sitemap.xml
+Files changed
+- app/globals.css (added --lake, --leaf tokens + Tailwind theme)
+- components/Header.tsx (nav hover → leaf, buttons → lake)
+- components/LanguageStub.tsx (EN active → leaf)
+- components/Footer.tsx (link hovers → leaf)
+- app/not-found.tsx (button → lake)
+- app/page.tsx (CTAs → lake, text links → leaf)
+- app/the-land/page.tsx (CTA → lake)
+- app/the-cave/page.tsx (CTA → lake)
+- app/the-host/page.tsx (CTA → lake)
+- app/immersions/page.tsx (CTA → lake, Practices link → leaf)
+- app/practices/page.tsx (CTA → lake)
+- app/atelier/page.tsx (CTA → lake)
+- app/prepare/page.tsx (CTA → lake)
+- app/apply/page.tsx (submit → lake)

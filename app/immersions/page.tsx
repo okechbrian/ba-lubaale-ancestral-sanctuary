@@ -132,7 +132,7 @@ export default function ImmersionsPage() {
           <p className="mt-8 text-sm text-ink/60">
             East Africa resident rates are offered on conversation and listed
             with day sessions on{" "}
-            <Link href="/practices" className="text-ember hover:underline">
+            <Link href="/practices" className="text-leaf hover:underline">
               Practices
             </Link>
             .
@@ -152,7 +152,7 @@ export default function ImmersionsPage() {
           </p>
           <Link
             href="/apply"
-            className="mt-8 inline-block rounded-md bg-bark px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-bark/90"
+            className="mt-8 inline-block rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
           >
             Request an Immersion
           </Link>
