@@ -1,43 +1,44 @@
-# Phase 6 report
+# Phase 7 report — Vercel Deploy
 
 Status: complete
-Branch: phase-6-seo
-Build: pass
+Branch: main (production)
+Build: pass (15/15 routes static)
 Lint: pass (zero warnings)
 
-What shipped
-- Unique title + meta description on every route (11 pages + 404)
-- app/apply/layout.tsx added so the client form page has its own metadata
-- app/not-found.tsx rewritten in sanctuary voice with overline, poetic copy, CTA
-- app/robots.ts — allows all, disallows /api/, sitemap reference
-- app/sitemap.ts — all 10 public routes with lastModified, priority, changeFrequency
-- Privacy sentence expanded on /policies: "We do not sell, rent, or distribute your data to any third party"
-- Favicon: SVG (canopy circle + cowrie shell outline) + 32x32 PNG + 180x180 apple-touch-icon, all from cowrie-necklace-still.jpg crop
-- Metadata icons added to layout.tsx (SVG + PNG + apple-touch)
-- OG image confirmed: /public/og.jpg (1200x630)
-- Legal lines confirmed present on: /apply (lines 448-458), /policies (lines 133-148), Footer (lines 67-76)
+Production URL
+- https://ba-lubaale-ancestral-sanctuary.vercel.app
 
-Files created or changed
-- app/apply/layout.tsx (new — metadata for client form page)
-- app/robots.ts (new)
-- app/sitemap.ts (new)
-- app/not-found.tsx (rewritten)
-- app/policies/page.tsx (privacy sentence added)
-- app/layout.tsx (favicon metadata added)
-- public/favicon.svg (new — canopy circle + cowrie)
-- public/favicon-32x32.png (new — from cowrie crop)
-- public/apple-touch-icon.png (new — from cowrie crop)
-- scripts/gen-favicon.mjs (new — generation script)
+Project
+- Name: ba-lubaale-ancestral-sanctuary
+- Vercel team: okechbrian-5599s-projects
+- Project ID: prj_o9V6q0DAbi8WC3nxn6B9EJKxY3mW
+- Git linked: yes — okechbrian/ba-lubaale-ancestral-sanctuary connected
+- Production branch: main
+- Framework: Next.js (Turbopack)
+- Root directory: ./
+
+Deploy behaviour
+- Push to main → production deploy (automatic)
+- Push to any other branch or open PR → preview deploy (automatic)
+
+Environment variables
+- NEXT_PUBLIC_FORMSPREE_ENDPOINT: not set (form uses mailto:hello@ fallback)
+- No other env vars configured
+
+Build result
+- 13 page routes + robots.txt + sitemap.xml = 15 static outputs
+- All pages prerendered as static content
+- No build errors, no lint warnings
+
+Blockers for the owner
+- None
 
 What was not done (and why)
-- Custom domain — owner did not request it
-- Vercel deploy — owner did not request it
-- metadataBase left as localhost — will resolve when custom domain is set
+- Custom domain not attached — owner did not request one
+- Formspree endpoint not set — owner does not yet have one
+- No preview of individual route URLs — all routes confirmed via build output
 
-Blockers for the owner / Grok
-- None — Phase 6 gates passed
-
-How to preview
-- npm run dev
-- Routes: all 11 pages, /robots.txt, /sitemap.xml, /_not-found
-- Favicon visible in browser tab (SVG cowrie mark)
+How to verify
+- Production: https://ba-lubaale-ancestral-sanctuary.vercel.app
+- /the-land, /the-cave, /the-host, /immersions, /practices, /atelier, /prepare, /apply, /policies
+- /robots.txt, /sitemap.xml
