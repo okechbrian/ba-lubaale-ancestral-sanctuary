@@ -2,16 +2,17 @@
 
 You are implementing the public website for **Ba Lubaale Ancestral Sanctuary Kiwamirembe**.
 
-This repository is the source of truth. The owner’s CLI agent works here. Grok reviews commits and pull requests against these files. Do not invent a second brief.
+The owner only monitors. After each phase they report to Grok. You execute **one named phase** from `AGENT_INSTRUCTIONS.md`, write `PHASE_REPORT.md`, and STOP.
 
 ## Read in this order
 
-1. `DECISIONS.md` — locked owner answers. Do not reopen them.
-2. `MASTER_PROMPT.md` — constitution. Everything between START and END is binding.
-3. `WEBSITE_MASTER_PLAN.md` — architecture, homepage section order, page map, build sequence.
-4. `PHOTO_INVENTORY.md` — every image, rename map, and page-by-page inclusion plan.
+1. `AGENT_INSTRUCTIONS.md` — what to build, exact copy, stop gates
+2. `DECISIONS.md` — locked owner answers. Do not reopen them.
+3. `MASTER_PROMPT.md` — constitution. Everything between START and END is binding.
+4. `WEBSITE_MASTER_PLAN.md` — architecture
+5. `PHOTO_INVENTORY.md` — image map and page placement
 
-If two files appear to conflict, `DECISIONS.md` plus the START/END block in `MASTER_PROMPT.md` win.
+If two files appear to conflict, `DECISIONS.md` plus the START/END block in `MASTER_PROMPT.md` win. Execution detail lives in `AGENT_INSTRUCTIONS.md`.
 
 ## How to start
 
@@ -24,24 +25,20 @@ Scaffold Next.js App Router + TypeScript + Tailwind into this same repo. Do not 
 
 ## Images
 
-Do not commit the raw photo dump if it is large; copy and rename locally:
+Owner PC, images only:
 
-`C:\Users\y\OneDrive\Desktop\New folder\Maama Nalubaale`
+`C:\\Users\\y\\OneDrive\\Desktop\\New folder\\Maama Nalubaale`
 
-→ `/public/images` and `/public/video` using names in `PHOTO_INVENTORY.md`.
+Copy during Phase 5 using `PHOTO_INVENTORY.md`. Mute video. Skip the “Do not use” list.
 
-Skip the “Do not use” list. Strip TikTok watermarks before publish. Mute video.
+## Phases (one at a time)
 
-## Work in phases. Stop after each phase for review.
-
-1. Scaffold + tokens + layout chrome + empty routes
-2. Home in the exact 11-section order
-3. Inner pages: land → cave → host → immersions → practices → atelier → prepare → policies → apply
+1. Foundation
+2. Home
+3. Inner pages
 4. Apply form wiring
 5. Media pass
 6. SEO, 404, build check
-
-Commit after each phase. Prefer a pull request named `phase-N-…` so Grok can review before the next phase.
 
 ## Do not
 
@@ -50,7 +47,7 @@ Commit after each phase. Prefer a pull request named `phase-N-…` so Grok can r
 - Add a shop, booking engine, blog, or database
 - Use Inter + Playfair
 - Dump all 87 photos on the homepage
-- Claim neighbouring waterfalls as the 10-acre spring unless the owner confirms
+- Start the next phase without a new owner message that names it
 
 ## Host title
 
