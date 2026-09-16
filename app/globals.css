@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+:root {
+  --cream: #F4EDE0;
+  --ink: #1A1814;
+  --canopy: #2F4A3C;
+  --dusk: #1B2A28;
+  --bark: #C4A574;
+  --ember: #B45A2A;
+  --mist: #E7E1D4;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-canopy: var(--canopy);
+  --color-dusk: var(--dusk);
+  --color-bark: var(--bark);
+  --color-ember: var(--ember);
+  --color-mist: var(--mist);
+  --font-display: var(--font-fraunces);
+  --font-ui: var(--font-figtree);
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+}
