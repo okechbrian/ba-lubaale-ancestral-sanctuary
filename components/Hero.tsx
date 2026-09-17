@@ -47,31 +47,30 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      {/* Poster still (visible when video not playing or reduced motion) */}
-      <Image
-        src="/images/hero-shore-gathering.jpg"
-        alt="Women in rust bark-cloth dresses standing on the Lake Victoria shore"
-        fill
-        priority
-        className={`absolute inset-0 h-full w-full object-cover ${
-          videoPlaying ? "hidden" : "block"
-        }`}
-      />
+      {/* Poster still — only for reduced motion */}
+      {reducedMotion && (
+        <Image
+          src="/images/hero-shore-gathering.jpg"
+          alt="Women in rust bark-cloth dresses standing on the Lake Victoria shore"
+          fill
+          priority
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
 
       {/* Video layer */}
-      <video
-        ref={videoRef}
-        muted
-        playsInline
-        loop
-        poster="/images/hero-shore-gathering.jpg"
-        className={`absolute inset-0 h-full w-full object-cover ${
-          videoPlaying ? "block" : "hidden"
-        }`}
-        onClick={toggleVideo}
-      >
-        <source src="/video/tortoise.mp4" type="video/mp4" />
-      </video>
+      {!reducedMotion && (
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          loop
+          className="absolute inset-0 h-full w-full object-cover"
+          onClick={toggleVideo}
+        >
+          <source src="/video/tortoise.mp4" type="video/mp4" />
+        </video>
+      )}
 
       {/* Dusk overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-dusk/60 via-dusk/50 to-dusk/70" />
@@ -110,13 +109,15 @@ export function Hero() {
         </div>
 
         {/* Play / Pause control */}
-        <button
-          type="button"
-          onClick={toggleVideo}
-          className="mt-6 text-xs text-cream/50 underline underline-offset-4 transition-colors hover:text-cream/80"
-        >
-          {videoPlaying ? "Pause the lake" : "Play the lake"}
-        </button>
+        {!reducedMotion && (
+          <button
+            type="button"
+            onClick={toggleVideo}
+            className="mt-6 text-xs text-cream/50 underline underline-offset-4 transition-colors hover:text-cream/80"
+          >
+            {videoPlaying ? "Pause the lake" : "Play the lake"}
+          </button>
+        )}
 
         <p className="mt-8 text-xs text-cream/50">
           Private. Screened. One household at a time.

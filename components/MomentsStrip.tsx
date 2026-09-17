@@ -56,7 +56,7 @@ const MOMENTS = [
   },
   {
     src: "/images/host-measuring-bark.jpg",
-    alt: "Queen Nalubaale measuring bark cloth with tape in the banana grove",
+    alt: "Mama Nalubaale measuring bark cloth with tape in the banana grove",
     caption: "Bark measurement",
   },
   {
@@ -88,11 +88,6 @@ const MOMENTS = [
     src: "/images/food-plate.jpg",
     alt: "A plate of sanctuary farm food",
     caption: "Farm plate",
-  },
-  {
-    src: "/images/host-portrait-cowrie.jpg",
-    alt: "Queen Nalubaale wearing cowrie earrings and blue beads",
-    caption: "The host",
   },
   {
     src: "/images/cave-mouth-wide.jpg",

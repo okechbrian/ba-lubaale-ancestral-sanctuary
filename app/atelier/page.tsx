@@ -57,7 +57,7 @@ export default function AtelierPage() {
             <div className="relative overflow-hidden rounded-md">
               <Image
                 src="/images/host-measuring-bark.jpg"
-                alt="Queen Nalubaale measuring bark cloth with tape"
+                alt="Mama Nalubaale measuring bark cloth with tape"
                 width={600}
                 height={450}
                 className="aspect-[4/3] w-full object-cover"

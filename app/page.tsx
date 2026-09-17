@@ -21,7 +21,7 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
           <Image
             src="/images/host-portrait-cowrie.jpg"
-            alt="Queen Nalubaale wearing cowrie earrings and blue beads"
+            alt="Mama Nalubaale wearing cowrie earrings and blue beads"
             width={160}
             height={160}
             className="h-32 w-32 rounded-full object-cover sm:h-40 sm:w-40"
@@ -33,7 +33,7 @@ export default function HomePage() {
               home to yourself.&rdquo;
             </p>
             <cite className="mt-4 block text-sm not-italic text-bark">
-              — Queen Nalubaale, Mama Nalubaale
+              — Mama Nalubaale
             </cite>
           </blockquote>
         </div>
@@ -226,7 +226,7 @@ export default function HomePage() {
             <div className="overflow-hidden rounded-md">
               <Image
                 src="/images/host-measuring-bark.jpg"
-                alt="Queen Nalubaale measuring bark cloth with tape in the banana grove"
+                alt="Mama Nalubaale measuring bark cloth with tape in the banana grove"
                 width={400}
                 height={300}
                 className="aspect-[4/3] w-full object-cover"
@@ -280,14 +280,14 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
           <Image
             src="/images/host-portrait-cowrie.jpg"
-            alt="Queen Nalubaale, Mama Nalubaale — seer, healer, and master artisan"
+            alt="Mama Nalubaale — seer, healer, and master artisan"
             width={224}
             height={224}
             className="h-48 w-48 rounded-full object-cover sm:h-56 sm:w-56"
           />
           <div>
             <h2 className="font-display text-3xl font-semibold text-ink">
-              Queen Nalubaale
+              Mama Nalubaale
             </h2>
             <p className="mt-1 text-bark">Mama Nalubaale</p>
             <p className="mt-4 max-w-lg text-ink/70">
