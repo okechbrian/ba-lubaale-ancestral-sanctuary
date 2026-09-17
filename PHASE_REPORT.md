@@ -1,40 +1,34 @@
-# Phase 8 report — Colour pass (palette-lake-leaf)
+# Phase 9 report — Interactive hero (interact-hero)
 
 Status: complete
-Branch: palette-lake-leaf
+Branch: interact-hero
 Build: pass (15/15 routes)
 Lint: pass (zero warnings)
 
-Palette changes
-- Added --lake: #1565C0 and --leaf: #22E36A tokens to globals.css + Tailwind @theme
-- Primary buttons (all pages): bg-bark → bg-lake, hover:bg-bark/90 → hover:bg-lake/80
-- Nav hover (desktop + mobile): hover:text-ember → hover:text-leaf
-- EN active in LanguageStub: text-ink → text-leaf
-- Footer link hovers: hover:text-bark → hover:text-leaf
-- Secondary text links (View immersions, Visit the Atelier, Meet the Host, View details, Practices link): ember/bark → leaf
-- Readiness strip button: bg-bark → bg-lake
-- 404 button: bg-ember → bg-lake
-- Apply submit button: bg-bark → bg-lake
+Hero
+- 3-still crossfade: hero-shore-gathering.jpg → og-cave-shore.jpg → fire-night.jpg, 7s interval
+- Crossfade pauses on hover via pausedRef
+- Muted film layer: tortoise.mp4 (lake-life fallback), muted, playsInline, click-to-play
+- Video poster = current crossfade still
+- Button label: "Play the lake" / "Stop the lake"
+- prefers-reduced-motion: first still only, no auto crossfade, no autoplay
+- Kept: H1, H2, CTAs, "Private. Screened. One household at a time."
+- Lake buttons stay lake
 
-What stayed the same
-- Bark: overlines, captions, subtitles, craft labels, duration labels, cave etiquette headings, hero subtitle, host honorific, citation text, sacred geography island labels
-- Ember: validation error text on /apply only
-- Copy, routes, prices, photos: unchanged
-- Hero overlay: unchanged (dusk gradient)
-- No new domain, no second Vercel project
+Moments strip (after host invitation)
+- 6 unused approved stills: host-measuring-bark.jpg, bark-teaching.jpg, cowrie-four.jpg, food-luwombo.jpg, forest-butterfly.jpg, arrival-canoe.jpg
+- Quiet lightbox on click, captions short
+- Escape key closes lightbox
+
+Email
+- content/site.ts contact email = queennalubaale@gmail.com
+- Footer Reach Us mailto uses site.contact.email (queennalubaale@gmail.com)
+- Apply form mailto fallback = queennalubaale@gmail.com
+- No Formspree URL (NEXT_PUBLIC_FORMSPREE_ENDPOINT not set)
 
 Files changed
-- app/globals.css (added --lake, --leaf tokens + Tailwind theme)
-- components/Header.tsx (nav hover → leaf, buttons → lake)
-- components/LanguageStub.tsx (EN active → leaf)
-- components/Footer.tsx (link hovers → leaf)
-- app/not-found.tsx (button → lake)
-- app/page.tsx (CTAs → lake, text links → leaf)
-- app/the-land/page.tsx (CTA → lake)
-- app/the-cave/page.tsx (CTA → lake)
-- app/the-host/page.tsx (CTA → lake)
-- app/immersions/page.tsx (CTA → lake, Practices link → leaf)
-- app/practices/page.tsx (CTA → lake)
-- app/atelier/page.tsx (CTA → lake)
-- app/prepare/page.tsx (CTA → lake)
-- app/apply/page.tsx (submit → lake)
+- content/site.ts (email → queennalubaale@gmail.com)
+- app/apply/page.tsx (mailto → queennalubaale@gmail.com)
+- components/Hero.tsx (new — interactive hero client component)
+- components/MomentsStrip.tsx (new — moments grid + lightbox)
+- app/page.tsx (import Hero + MomentsStrip, replace old hero, insert moments)
