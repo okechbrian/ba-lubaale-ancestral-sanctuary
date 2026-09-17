@@ -4,28 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const STILLS = [
-  {
-    src: "/images/hero-shore-gathering.jpg",
-    alt: "Women in rust bark-cloth dresses standing on the Lake Victoria shore",
-  },
-  {
-    src: "/images/og-cave-shore.jpg",
-    alt: "Mossed rock mouth of Nalubaale Cave seen from the water",
-  },
-  {
-    src: "/images/fire-night.jpg",
-    alt: "Night bonfire on the shore with free-roaming herd nearby",
-  },
-] as const;
-
-const CROSSFADE_MS = 7000;
-
 export function Hero() {
-  const [current, setCurrent] = useState(0);
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const pausedRef = useRef(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -37,14 +18,16 @@ export function Hero() {
   }, []);
 
   useEffect(() => {
-    if (reducedMotion || videoPlaying) return;
-    const id = setInterval(() => {
-      if (!pausedRef.current) {
-        setCurrent((i) => (i + 1) % STILLS.length);
-      }
-    }, CROSSFADE_MS);
-    return () => clearInterval(id);
-  }, [reducedMotion, videoPlaying]);
+    if (reducedMotion) return;
+    const v = videoRef.current;
+    if (!v) return;
+    const playPromise = v.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => setVideoPlaying(true))
+        .catch(() => setVideoPlaying(false));
+    }
+  }, [reducedMotion]);
 
   function toggleVideo() {
     const v = videoRef.current;
@@ -53,35 +36,27 @@ export function Hero() {
       v.pause();
       setVideoPlaying(false);
     } else {
-      v.play();
-      setVideoPlaying(true);
+      const playPromise = v.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => setVideoPlaying(true))
+          .catch(() => setVideoPlaying(false));
+      }
     }
   }
 
   return (
-    <section
-      className="relative flex min-h-screen items-center justify-center overflow-hidden"
-      onMouseEnter={() => {
-        pausedRef.current = true;
-      }}
-      onMouseLeave={() => {
-        pausedRef.current = false;
-      }}
-    >
-      {/* Still crossfade layer */}
-      {!videoPlaying &&
-        STILLS.map((s, i) => (
-          <Image
-            key={s.src}
-            src={s.src}
-            alt={s.alt}
-            fill
-            priority={i === 0}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-              i === current ? "opacity-100" : "opacity-0"
-            }`}
-          />
-        ))}
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+      {/* Poster still (visible when video not playing or reduced motion) */}
+      <Image
+        src="/images/hero-shore-gathering.jpg"
+        alt="Women in rust bark-cloth dresses standing on the Lake Victoria shore"
+        fill
+        priority
+        className={`absolute inset-0 h-full w-full object-cover ${
+          videoPlaying ? "hidden" : "block"
+        }`}
+      />
 
       {/* Video layer */}
       <video
@@ -89,7 +64,7 @@ export function Hero() {
         muted
         playsInline
         loop
-        poster={STILLS[current].src}
+        poster="/images/hero-shore-gathering.jpg"
         className={`absolute inset-0 h-full w-full object-cover ${
           videoPlaying ? "block" : "hidden"
         }`}
@@ -134,13 +109,13 @@ export function Hero() {
           </a>
         </div>
 
-        {/* Play the lake button */}
+        {/* Play / Pause control */}
         <button
           type="button"
           onClick={toggleVideo}
           className="mt-6 text-xs text-cream/50 underline underline-offset-4 transition-colors hover:text-cream/80"
         >
-          {videoPlaying ? "Stop the lake" : "Play the lake"}
+          {videoPlaying ? "Pause the lake" : "Play the lake"}
         </button>
 
         <p className="mt-8 text-xs text-cream/50">

@@ -1,28 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 const MOMENTS = [
   {
-    src: "/images/host-measuring-bark.jpg",
-    alt: "Queen Nalubaale measuring bark cloth with tape in the banana grove",
-    caption: "Bark cloth measurement",
+    src: "/images/hero-shore-gathering.jpg",
+    alt: "Shore gathering on Lake Victoria",
+    caption: "Shore gathering",
   },
   {
-    src: "/images/bark-teaching.jpg",
-    alt: "Teaching bark-cloth technique beside the fire",
-    caption: "Bark-cloth teaching",
+    src: "/images/hero-shore-gathering-alt.jpg",
+    alt: "Shore gathering alt view",
+    caption: "Shore light",
   },
   {
-    src: "/images/cowrie-four.jpg",
-    alt: "Four women wearing cowrie strand necklaces",
-    caption: "Cowrie adornment",
+    src: "/images/og-cave-shore.jpg",
+    alt: "Mossed rock mouth of Nalubaale Cave seen from the water",
+    caption: "Cave mouth",
   },
   {
-    src: "/images/food-luwombo.jpg",
-    alt: "Luwombo wrapped in banana leaf",
-    caption: "Luwombo feast",
+    src: "/images/fire-night.jpg",
+    alt: "Night bonfire on the shore",
+    caption: "Night fire",
+  },
+  {
+    src: "/images/closing-shore.jpg",
+    alt: "Shore gathering at sunset",
+    caption: "Sunset shore",
+  },
+  {
+    src: "/images/arrival-boat.jpg",
+    alt: "Approaching the sanctuary by boat",
+    caption: "Arrival by boat",
+  },
+  {
+    src: "/images/arrival-canoe.jpg",
+    alt: "Arriving by canoe to the sanctuary shore",
+    caption: "Canoe arrival",
+  },
+  {
+    src: "/images/forest-roots.jpg",
+    alt: "Buttress roots in the sanctuary forest",
+    caption: "Forest roots",
   },
   {
     src: "/images/forest-butterfly.jpg",
@@ -30,18 +50,116 @@ const MOMENTS = [
     caption: "Forest life",
   },
   {
-    src: "/images/arrival-canoe.jpg",
-    alt: "Arriving by canoe to the sanctuary shore",
-    caption: "Arrival by canoe",
+    src: "/images/coffee-cherries.jpg",
+    alt: "Coffee cherries growing on the sanctuary grounds",
+    caption: "Coffee cherries",
+  },
+  {
+    src: "/images/host-measuring-bark.jpg",
+    alt: "Queen Nalubaale measuring bark cloth with tape in the banana grove",
+    caption: "Bark measurement",
+  },
+  {
+    src: "/images/bark-teaching.jpg",
+    alt: "Teaching bark-cloth technique beside the fire",
+    caption: "Bark teaching",
+  },
+  {
+    src: "/images/bark-dresses-stand.jpg",
+    alt: "Finished bark-cloth dresses hanging on a stand among banana trees",
+    caption: "Bark dresses",
+  },
+  {
+    src: "/images/cowrie-four.jpg",
+    alt: "Four women wearing cowrie strand necklaces",
+    caption: "Cowrie adornment",
+  },
+  {
+    src: "/images/cowrie-three.jpg",
+    alt: "Three women wearing cowrie strand necklaces",
+    caption: "Cowrie strands",
+  },
+  {
+    src: "/images/food-luwombo.jpg",
+    alt: "Luwombo wrapped in banana leaf",
+    caption: "Luwombo feast",
+  },
+  {
+    src: "/images/food-plate.jpg",
+    alt: "A plate of sanctuary farm food",
+    caption: "Farm plate",
+  },
+  {
+    src: "/images/host-portrait-cowrie.jpg",
+    alt: "Queen Nalubaale wearing cowrie earrings and blue beads",
+    caption: "The host",
+  },
+  {
+    src: "/images/cave-mouth-wide.jpg",
+    alt: "Wide view of the cave mouth opening to the forest",
+    caption: "Cave opening",
+  },
+  {
+    src: "/images/cave-mouth-congregation.jpg",
+    alt: "Gathering at the cave mouth",
+    caption: "Cave threshold",
+  },
+  {
+    src: "/images/land-rock-islet.jpg",
+    alt: "Rock islet off the sanctuary shore",
+    caption: "Lake islet",
+  },
+  {
+    src: "/images/fire-wide.jpg",
+    alt: "Wide view of the shore fire at dusk",
+    caption: "Shore fire",
+  },
+  {
+    src: "/images/bark-shore-four.jpg",
+    alt: "Four women in bark cloth standing on the shore",
+    caption: "Shore circle",
+  },
+  {
+    src: "/images/kente-shore-two.jpg",
+    alt: "Two women in kente cloth standing on the shore",
+    caption: "Kente shore",
   },
 ] as const;
 
 export function MomentsStrip() {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [paused, setPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const stripRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const el = stripRef.current;
+    if (!el) return;
+    el.style.animationPlayState = paused ? "paused" : "running";
+  }, [paused, reducedMotion]);
+
+  function openLightbox(i: number) {
+    setPaused(true);
+    setLightbox(i);
+  }
+
+  function closeLightbox() {
+    setLightbox(null);
+    if (!reducedMotion) setPaused(false);
+  }
 
   return (
     <>
-      <section className="bg-cream py-20 sm:py-28">
+      <section className="overflow-hidden bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-display text-3xl font-semibold text-ink">
             Sanctuary Moments
@@ -49,29 +167,59 @@ export function MomentsStrip() {
           <p className="mx-auto mt-3 max-w-2xl text-center text-ink/70">
             Small scenes from the land, the craft, and the table.
           </p>
+        </div>
 
-          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {MOMENTS.map((m, i) => (
-              <button
-                key={m.src}
-                type="button"
-                onClick={() => setLightbox(i)}
-                className="group block overflow-hidden rounded-md"
-              >
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={m.src}
-                    alt={m.alt}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <p className="mt-2 text-center text-xs text-ink/60">
-                  {m.caption}
-                </p>
-              </button>
-            ))}
-          </div>
+        {/* Keyframes */}
+        {!reducedMotion && (
+          <style
+            // eslint-disable-next-line react/no-unknown-property
+            dangerouslySetInnerHTML={{
+              __html:
+                "@keyframes moments-drift{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}",
+            }}
+          />
+        )}
+
+        <div
+          ref={stripRef}
+          className="mt-12 flex gap-4"
+          style={
+            reducedMotion
+              ? undefined
+              : {
+                  animation: "moments-drift 120s linear infinite",
+                  animationPlayState: paused ? "paused" : "running",
+                  width: "max-content",
+                }
+          }
+          onMouseEnter={() => {
+            if (!reducedMotion) setPaused(true);
+          }}
+          onMouseLeave={() => {
+            if (!reducedMotion && lightbox === null) setPaused(false);
+          }}
+        >
+          {[...MOMENTS, ...MOMENTS].map((m, i) => (
+            <button
+              key={`${m.src}-${i}`}
+              type="button"
+              onClick={() => openLightbox(i % MOMENTS.length)}
+              className="group relative w-48 shrink-0 overflow-hidden rounded-md sm:w-56"
+            >
+              <div className="relative aspect-square overflow-hidden">
+                <Image
+                  src={m.src}
+                  alt={m.alt}
+                  width={224}
+                  height={224}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <p className="mt-2 text-center text-xs text-ink/60">
+                {m.caption}
+              </p>
+            </button>
+          ))}
         </div>
       </section>
 
@@ -79,9 +227,9 @@ export function MomentsStrip() {
       {lightbox !== null && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-dusk/90 p-4"
-          onClick={() => setLightbox(null)}
+          onClick={closeLightbox}
           onKeyDown={(e) => {
-            if (e.key === "Escape") setLightbox(null);
+            if (e.key === "Escape") closeLightbox();
           }}
           role="dialog"
           aria-label="Image lightbox"
@@ -89,7 +237,7 @@ export function MomentsStrip() {
         >
           <button
             type="button"
-            onClick={() => setLightbox(null)}
+            onClick={closeLightbox}
             className="absolute right-6 top-6 text-cream/70 transition-colors hover:text-cream"
             aria-label="Close lightbox"
           >
