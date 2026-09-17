@@ -1,34 +1,31 @@
-# Phase 9 report — Interactive hero (interact-hero)
+# Phase 10 report — Video-only hero + film strip moments (interact-hero-2)
 
 Status: complete
-Branch: interact-hero
+Branch: interact-hero-2
 Build: pass (15/15 routes)
 Lint: pass (zero warnings)
 
 Hero
-- 3-still crossfade: hero-shore-gathering.jpg → og-cave-shore.jpg → fire-night.jpg, 7s interval
-- Crossfade pauses on hover via pausedRef
-- Muted film layer: tortoise.mp4 (lake-life fallback), muted, playsInline, click-to-play
-- Video poster = current crossfade still
-- Button label: "Play the lake" / "Stop the lake"
-- prefers-reduced-motion: first still only, no auto crossfade, no autoplay
-- Kept: H1, H2, CTAs, "Private. Screened. One household at a time."
+- Background: video-only (tortoise.mp4), no 3-still crossfade
+- Autoplay muted on page load, playsInline, loop
+- Poster: hero-shore-gathering.jpg (visible until first frame, or when autoplay blocked)
+- prefers-reduced-motion: no autoplay, poster still only, Play control still works
+- Play/Pause control: "Pause the lake" / "Play the lake"
+- If browser blocks autoplay: poster shows, control works, no error thrown
 - Lake buttons stay lake
 
-Moments strip (after host invitation)
-- 6 unused approved stills: host-measuring-bark.jpg, bark-teaching.jpg, cowrie-four.jpg, food-luwombo.jpg, forest-butterfly.jpg, arrival-canoe.jpg
-- Quiet lightbox on click, captions short
-- Escape key closes lightbox
+Moments film strip
+- 24 approved stills (shore, craft, food, forest, fire, cave mouth — no ritual interiors)
+- Horizontal drift right→left via CSS animation (120s loop, seamless)
+- Content duplicated for gapless loop
+- Pause on hover
+- Pause when lightbox open
+- prefers-reduced-motion: static row, no drift, lightbox still works
+- Quiet lightbox on click, short captions, Escape to close
 
 Email
-- content/site.ts contact email = queennalubaale@gmail.com
-- Footer Reach Us mailto uses site.contact.email (queennalubaale@gmail.com)
-- Apply form mailto fallback = queennalubaale@gmail.com
-- No Formspree URL (NEXT_PUBLIC_FORMSPREE_ENDPOINT not set)
+- queennalubaale@gmail.com (unchanged from previous pass)
 
 Files changed
-- content/site.ts (email → queennalubaale@gmail.com)
-- app/apply/page.tsx (mailto → queennalubaale@gmail.com)
-- components/Hero.tsx (new — interactive hero client component)
-- components/MomentsStrip.tsx (new — moments grid + lightbox)
-- app/page.tsx (import Hero + MomentsStrip, replace old hero, insert moments)
+- components/Hero.tsx (rewritten — video-only, autoplay muted, reduced motion handling)
+- components/MomentsStrip.tsx (rewritten — 24 stills, CSS drift animation, pause on hover/lightbox)
