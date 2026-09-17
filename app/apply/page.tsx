@@ -97,7 +97,7 @@ export default function ApplyPage() {
         `Burden / conflict: ${data.burden}`,
       ].join("\n")
     );
-    window.open(`mailto:hello@?subject=${subject}&body=${body}`, "_self");
+    window.open(`mailto:queennalubaale@gmail.com?subject=${subject}&body=${body}`, "_self");
     setSubmitted(true);
   }
 

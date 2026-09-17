@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
+import { Hero } from "@/components/Hero";
+import { MomentsStrip } from "@/components/MomentsStrip";
 
 export const metadata: Metadata = {
   title: "Ba Lubaale Ancestral Sanctuary Kiwamirembe",
@@ -12,56 +14,7 @@ export default function HomePage() {
   return (
     <>
       {/* ─── Section 1: Hero ─── */}
-      <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-        {/* Image placeholder */}
-        <div className="absolute inset-0 bg-dusk" />
-        <Image
-          src="/images/hero-shore-gathering.jpg"
-          alt="Women in rust bark-cloth dresses standing on the Lake Victoria shore"
-          fill
-          priority
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {/* Dusk overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-dusk/60 via-dusk/50 to-dusk/70" />
-
-        <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-xs font-semibold tracking-[0.3em] text-bark uppercase">
-            Ssese Islands · Lake Victoria · Uganda
-          </p>
-          <h1 className="mt-6 font-display text-5xl font-semibold text-cream sm:text-7xl">
-            Ba Lubaale Ancestral Sanctuary
-          </h1>
-          <h2 className="mt-2 font-display text-3xl text-bark sm:text-4xl">
-            Kiwamirembe
-          </h2>
-          <p className="mt-6 text-lg text-cream/80 sm:text-xl">
-            A living ancestral sanctuary of cave, craft, herd, and lake.
-          </p>
-          <p className="mt-2 text-sm tracking-widest text-bark/70 uppercase">
-            The Weaver&apos;s Sanctuary &amp; Sacred Caves
-          </p>
-
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link
-              href="/apply"
-              className="rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
-            >
-              Request an Immersion
-            </Link>
-            <a
-              href="#land-gateways"
-              className="rounded-md border border-cream/30 px-8 py-3 text-sm font-semibold text-cream transition-colors hover:border-cream/60"
-            >
-              Enter the Land
-            </a>
-          </div>
-
-          <p className="mt-8 text-xs text-cream/50">
-            Private. Screened. One household at a time.
-          </p>
-        </div>
-      </section>
+      <Hero />
 
       {/* ─── Section 2: Host Invitation ─── */}
       <section className="bg-cream py-20 sm:py-28">
@@ -85,6 +38,9 @@ export default function HomePage() {
           </blockquote>
         </div>
       </section>
+
+      {/* ─── Section 2b: Sanctuary Moments ─── */}
+      <MomentsStrip />
 
       {/* ─── Section 3: Four Land Gateways ─── */}
       <section

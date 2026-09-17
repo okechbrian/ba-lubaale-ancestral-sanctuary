@@ -16,7 +16,7 @@ export const site = {
     { label: "Policies", href: "/policies" },
   ],
   contact: {
-    email: "hello@",
+    email: "queennalubaale@gmail.com",
     whatsapp: "",
   },
 } as const;
