@@ -127,6 +127,15 @@ export default function TheCavePage() {
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="overflow-hidden rounded-md">
               <Image
+                src="/images/bark-cloth-cave-entrance.jpg"
+                alt="Person in bark cloth standing at the rocky cave entrance"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
                 src="/images/cave-threshold-hay.jpg"
                 alt="First chamber of Nalubaale Cave with hay on the floor"
                 width={400}
@@ -147,6 +156,15 @@ export default function TheCavePage() {
               <Image
                 src="/images/cave-kneeling.jpg"
                 alt="White cloth kneeling work inside the cave"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/bark-cloth-hillside.jpg"
+                alt="Person in bark cloth on the rocky hillside near the cave"
                 width={400}
                 height={300}
                 className="aspect-[4/3] w-full object-cover"

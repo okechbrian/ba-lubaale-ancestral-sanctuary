@@ -79,8 +79,8 @@ export default function HomePage() {
             <Link href="/the-land#lake-house" className="group block">
               <div className="relative overflow-hidden rounded-md">
                 <Image
-                  src="/images/arrival-boat.jpg"
-                  alt="The water the Lake House sits on"
+                  src="/images/lake-house.jpg"
+                  alt="The Lake House on stilts over Lake Victoria, framed by mango trees"
                   width={400}
                   height={300}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -113,8 +113,8 @@ export default function HomePage() {
             <Link href="/the-land#herd" className="group block">
               <div className="relative overflow-hidden rounded-md">
                 <Image
-                  src="/images/fire-night.jpg"
-                  alt="Night bonfire on the shore with free-roaming herd nearby"
+                  src="/images/herd-goats.jpg"
+                  alt="Free-roaming goats in the sanctuary compound"
                   width={400}
                   height={300}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"

@@ -303,3 +303,71 @@ No gallery. Optional thin header still: `og-cave-shore.jpg` or `forest-roots.jpg
 ### Count
 
 87 media files in the drop. 6 held out. 81 available. Homepage uses about 12. Remaining approved files feed inner-page galleries. Missing stills stay labelled placeholders, not stock from another country.
+
+---
+
+## September 23 drop — new additions
+
+Owner added 29 images + 2 videos on 23 Sep 2026. Fills the three biggest remaining placeholders (Lake House exterior, goat herd, forest canopy).
+
+### Do not use
+
+| File | What it actually is |
+|---|---|
+| `IMG-20260915-WA0038.jpg` | Man in formal embroidered robe — studio portrait, not sanctuary aesthetic |
+| `IMG-20260915-WA0039.jpg` | Selfie with Dior sunglasses and gold earrings — modern luxury brand visible |
+| `VID-20260915-WA0071.mp4` | Old video file (474KB), likely low quality |
+| `IMG-20260915-WA0059.jpg` | Wildflowers — not sanctuary-specific |
+| `IMG-20260915-WA0061.jpg` | Wild plant detail — not sanctuary-specific |
+| `IMG-20260915-WA0063.jpg` | Fern detail — not sanctuary-specific |
+| `IMG-20260915-WA0072.jpg` | Dragonfly macro — not sanctuary-specific |
+| `IMG-20260915-WA0094.jpg` | Pineapple close-up on shelf — dark, low quality |
+
+### Approved — core placeholder fills
+
+| Source file | Public name | Use |
+|---|---|---|
+| `Goats.jpg` | `herd-goats.jpg` | Homepage Herd & Fire gateway, `/the-land` herd section, Moments strip |
+| `20260916_144331.jpg` | `lake-house.jpg` | Homepage Lake House gateway, `/the-land` overview + Lake House section, Moments strip |
+| `20260916_144324.jpg` | `lake-house-alt.jpg` | Alternate Lake House angle |
+| `LAke House.mp4` | `/public/video/lake-house.mp4` | `/the-land` Lake House video section (muted autoplay) |
+| `20260916_141935.jpg` | `forest-canopy.jpg` | `/the-land` forest section, Moments strip |
+| `20260916_141927.jpg` | `forest-lake-view.jpg` | `/the-land` forest section |
+
+### Approved — landscape / scenic
+
+| Source file | Public name | Use |
+|---|---|---|
+| `IMG-20260915-WA0046.jpg` | `shore-boat-sky.jpg` | Moments strip, `/the-land` arrival |
+| `IMG-20260915-WA0047.jpg` | `lake-cloudscape.jpg` | Homepage closing, Moments strip |
+| `IMG-20260915-WA0051.jpg` | `sunset-lake-silhouette.jpg` | Homepage closing full-bleed |
+| `IMG-20260915-WA0052.jpg` | `bay-panorama.jpg` | `/the-land` overview |
+| `IMG-20260915-WA0054.jpg` | `sunset-tree.jpg` | Moments strip |
+| `IMG-20260915-WA0055.jpg` | `sunset-calm-lake.jpg` | Moments strip |
+| `IMG-20260915-WA0065.jpg` | `sunset-open-water.jpg` | Moments strip |
+| `IMG-20260915-WA0066.jpg` | `pineapple-farm-lake.jpg` | `/the-land` food section, Moments strip |
+| `IMG-20260915-WA0069.jpg` | `shore-calm-blue.jpg` | `/the-land` shore section |
+| `IMG-20260915-WA0070.jpg` | `fresh-tilapia.jpg` | `/the-land` food section |
+| `IMG-20260915-WA0093.jpg` | `island-natural-arch.jpg` | Homepage neighbouring geography, Moments strip |
+| `IMG-20260915-WA0102.jpg` | `cloudscape-hills.jpg` | Homepage closing |
+
+### Approved — craft / cultural
+
+| Source file | Public name | Use |
+|---|---|---|
+| `IMG-20260915-WA0068.jpg` | `weaving-basket.jpg` | `/atelier` gallery, Moments strip |
+| `IMG-20260915-WA0073.jpg` | `bananas-woven-mats.jpg` | `/atelier` gallery |
+| `IMG-20260915-WA0081.jpg` | `elder-ceremonial-boat.jpg` | `/the-host` or cultural context |
+| `IMG-20260915-WA0085.jpg` | `bark-cloth-banana-harvest.jpg` | `/the-land` food section |
+| `IMG-20260915-WA0087.jpg` | `gathering-boat.jpg` | Moments strip (community) |
+| `IMG-20260915-WA0090.jpg` | `community-forest-path.jpg` | Moments strip (community) |
+| `IMG-20260915-WA0097.jpg` | `bark-cloth-cave-entrance.jpg` | `/the-cave` gallery, Moments strip |
+| `IMG-20260915-WA0098.jpg` | `bark-dress-hearts.jpg` | `/atelier` gallery, Moments strip |
+| `IMG-20260915-WA0100.jpg` | `boat-group-crossing.jpg` | `/prepare` arrival or Moments strip |
+| `IMG-20260915-WA0101.jpg` | `bark-cloth-hillside.jpg` | `/the-cave` gallery |
+
+### Updated counts
+
+Total public images: 87 (Sep 16) + 29 (Sep 23) = **116 images**
+Total video: 1 (tortoise) + 1 (lake house) = **2 videos**
+Moments strip: 24 → **32 images**

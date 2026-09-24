@@ -55,8 +55,8 @@ export default function TheLandPage() {
             </div>
             <div className="relative overflow-hidden rounded-md">
               <Image
-                src="/images/arrival-boat.jpg"
-                alt="The water the Lake House sits on"
+                src="/images/lake-house.jpg"
+                alt="The Lake House on stilts over Lake Victoria, framed by mango trees"
                 width={600}
                 height={450}
                 className="aspect-[4/3] w-full object-cover"
@@ -70,16 +70,30 @@ export default function TheLandPage() {
       <section className="bg-mist py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <div>
-              <h3 className="font-display text-xl text-ink">The Lake House</h3>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/lake-house.jpg"
+                alt="The Lake House on stilts over Lake Victoria"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+              <h3 className="mt-3 font-display text-xl text-ink">The Lake House</h3>
               <p className="mt-2 text-sm text-ink/70">
                 Rooms over the water. Organic meals cooked from the island —
                 fish, herbs, farm milk, matooke, sweet potato. The sound of the
                 lake is the only alarm.
               </p>
             </div>
-            <div>
-              <h3 className="font-display text-xl text-ink">The Forest</h3>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/forest-canopy.jpg"
+                alt="Dense canopy of indigenous trees in the sanctuary forest"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+              <h3 className="mt-3 font-display text-xl text-ink">The Forest</h3>
               <p className="mt-2 text-sm text-ink/70">
                 Ten acres of indigenous trees, buttress roots, and forest
                 trails. Coffee cherries on the branch. Butterflies in the
@@ -96,8 +110,15 @@ export default function TheLandPage() {
                 part of the sanctuary practice.
               </p>
             </div>
-            <div>
-              <h3 className="font-display text-xl text-ink">The Herd</h3>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/herd-goats.jpg"
+                alt="Free-roaming goats in the sanctuary compound"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+              <h3 className="mt-3 font-display text-xl text-ink">The Herd</h3>
               <p className="mt-2 text-sm text-ink/70">
                 Free-roaming goats and cows. Naturally fed. The herd is part of
                 the land, not a photo opportunity. Guest interaction is welcome
@@ -120,6 +141,114 @@ export default function TheLandPage() {
                 A leopard tortoise who has lived on the island longer than any
                 current guest. Seen on the stony shore most afternoons.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Lake House video */}
+      <section className="bg-cream py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-semibold text-ink">
+            The Lake House
+          </h2>
+          <p className="mt-3 text-ink/70">
+            Built on stilts over the water of Lake Victoria. Fish feed beneath
+            the floorboards. The sound of the lake is the only alarm.
+          </p>
+          <div className="mt-8 overflow-hidden rounded-md">
+            <video
+              src="/video/lake-house.mp4"
+              muted
+              playsInline
+              loop
+              className="w-full"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Island food */}
+      <section className="bg-mist py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-semibold text-ink">
+            Island Food
+          </h2>
+          <p className="mt-3 max-w-2xl text-ink/70">
+            Everything served at the sanctuary comes from the island or the lake.
+            Fish caught that morning. Matooke from the garden. Herbs from the
+            forest. Milk from the herd.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/fresh-tilapia.jpg"
+                alt="Fresh tilapia caught from Lake Victoria"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/pineapple-farm-lake.jpg"
+                alt="Pineapple farm on the hillside with Lake Victoria behind"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/bark-cloth-banana-harvest.jpg"
+                alt="Preparing banana harvest in the cookhouse"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Forest trails */}
+      <section className="bg-cream py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-8 lg:grid-cols-2">
+            <div>
+              <h2 className="font-display text-3xl font-semibold text-ink">
+                The Forest
+              </h2>
+              <p className="mt-4 text-ink/70">
+                Ten acres of indigenous trees fed by an ancestral spring. Buttress
+                roots rise from the forest floor. Coffee cherries ripen on the
+                branch. Weaver nests hang from palms along the shore.
+              </p>
+              <p className="mt-4 text-ink/70">
+                Trails wind through the canopy to the far shore. Bicycle paths
+                for those who want to move. Still spots for those who want to
+                sit.
+              </p>
+            </div>
+            <div className="grid gap-4">
+              <div className="overflow-hidden rounded-md">
+                <Image
+                  src="/images/forest-lake-view.jpg"
+                  alt="Moss-covered tree with Lake Victoria visible through the forest canopy"
+                  width={600}
+                  height={450}
+                  className="aspect-[4/3] w-full object-cover"
+                />
+              </div>
+              <div className="overflow-hidden rounded-md">
+                <Image
+                  src="/images/forest-canopy.jpg"
+                  alt="Dense canopy of indigenous trees in the sanctuary forest"
+                  width={600}
+                  height={450}
+                  className="aspect-[4/3] w-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>

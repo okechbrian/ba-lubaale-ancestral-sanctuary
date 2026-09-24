@@ -85,6 +85,24 @@ export default function AtelierPage() {
             </div>
             <div className="overflow-hidden rounded-md">
               <Image
+                src="/images/weaving-basket.jpg"
+                alt="Woman weaving a large basket from natural fibres"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/bark-dress-hearts.jpg"
+                alt="Bark cloth dress with decorative heart cutouts and cowrie trim"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
                 src="/images/bark-dresses-stand.jpg"
                 alt="Finished bark-cloth dresses on a stand"
                 width={400}
@@ -123,6 +141,15 @@ export default function AtelierPage() {
               <Image
                 src="/images/cowrie-seed-necklace.jpg"
                 alt="Cowrie, seed, and white bead strand"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/bananas-woven-mats.jpg"
+                alt="Ripe bananas hanging beside woven mats in the cookhouse"
                 width={400}
                 height={300}
                 className="aspect-[4/3] w-full object-cover"

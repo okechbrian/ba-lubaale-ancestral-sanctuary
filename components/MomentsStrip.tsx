@@ -119,6 +119,46 @@ const MOMENTS = [
     alt: "Two women in kente cloth standing on the shore",
     caption: "Kente shore",
   },
+  {
+    src: "/images/lake-house.jpg",
+    alt: "The Lake House on stilts over Lake Victoria, framed by mango trees",
+    caption: "The Lake House",
+  },
+  {
+    src: "/images/herd-goats.jpg",
+    alt: "Free-roaming goats in the sanctuary compound",
+    caption: "The herd",
+  },
+  {
+    src: "/images/sunset-calm-lake.jpg",
+    alt: "Golden sunset reflecting on calm Lake Victoria water",
+    caption: "Sunset lake",
+  },
+  {
+    src: "/images/weaving-basket.jpg",
+    alt: "Woman weaving a large basket from natural fibres",
+    caption: "Weaving craft",
+  },
+  {
+    src: "/images/bark-cloth-cave-entrance.jpg",
+    alt: "Person in bark cloth standing at the rocky cave entrance",
+    caption: "Cave entrance",
+  },
+  {
+    src: "/images/island-natural-arch.jpg",
+    alt: "Small tree-covered island with a natural rock arch on Lake Victoria",
+    caption: "Lake island",
+  },
+  {
+    src: "/images/bark-dress-hearts.jpg",
+    alt: "Bark cloth dress with decorative heart cutouts and cowrie trim",
+    caption: "Bark artistry",
+  },
+  {
+    src: "/images/pineapple-farm-lake.jpg",
+    alt: "Pineapple farm on the hillside with Lake Victoria in the background",
+    caption: "Island harvest",
+  },
 ] as const;
 
 export function MomentsStrip() {
