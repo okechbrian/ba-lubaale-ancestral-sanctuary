@@ -17,6 +17,7 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ba-lubaale-ancestral-sanctuary.vercel.app"),
   title: {
     default: "Ba Lubaale Ancestral Sanctuary Kiwamirembe",
     template: "%s — Ba Lubaale Ancestral Sanctuary Kiwamirembe",

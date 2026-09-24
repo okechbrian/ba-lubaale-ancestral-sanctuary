@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://ba-lubaale-sanctuary.vercel.app";
+  const base = "https://ba-lubaale-ancestral-sanctuary.vercel.app";
 
   return [
     { url: `${base}/`, lastModified: new Date(), changeFrequency: "monthly", priority: 1 },

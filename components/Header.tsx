@@ -38,7 +38,7 @@ export function Header() {
           <span className="font-display text-lg font-semibold tracking-wide text-ink">
             BA LUBAALE
           </span>
-          <span className="text-[10px] tracking-widest bg-bark text-cream uppercase rounded px-2 py-0.5">
+          <span className="text-[10px] tracking-widest text-bark uppercase">
             {site.subtitle}
           </span>
         </Link>
@@ -88,7 +88,7 @@ export function Header() {
               <span className="font-display text-lg font-semibold tracking-wide text-ink">
                 BA LUBAALE
               </span>
-              <span className="text-[10px] tracking-widest bg-bark text-cream uppercase rounded px-2 py-0.5">
+              <span className="text-[10px] tracking-widest text-bark uppercase">
                 {site.subtitle}
               </span>
             </Link>

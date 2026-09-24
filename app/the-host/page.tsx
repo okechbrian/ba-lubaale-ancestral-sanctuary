@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "The Host",
   description:
-    "Mama Nalubaale. Seer, healer, and master artisan. The heart of the sanctuary.",
+    "Queen Nalubaale — Mama Nalubaale. Seer, healer, and master artisan. The heart of the sanctuary.",
 };
 
 export default function TheHostPage() {
@@ -16,7 +16,7 @@ export default function TheHostPage() {
         <div className="absolute inset-0 bg-dusk" />
         <Image
           src="/images/host-portrait-cowrie.jpg"
-          alt="Mama Nalubaale wearing cowrie earrings and blue beads"
+          alt="Queen Nalubaale wearing cowrie earrings and blue beads"
           fill
           priority
           className="absolute inset-0 h-full w-full object-cover"
@@ -24,9 +24,10 @@ export default function TheHostPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
           <h1 className="font-display text-4xl font-semibold text-cream sm:text-5xl">
-            Mama Nalubaale
+            Queen Nalubaale
           </h1>
-          <p className="mt-2 text-bark text-lg">Seer, Healer, Master Artisan</p>
+          <p className="mt-2 text-bark text-lg">Mama Nalubaale</p>
+          <p className="mt-1 text-cream/70 text-sm">Seer, Healer, Master Artisan</p>
         </div>
       </section>
 
@@ -58,7 +59,7 @@ export default function TheHostPage() {
             <div className="relative overflow-hidden rounded-md">
               <Image
                 src="/images/host-measuring-bark.jpg"
-                alt="Mama Nalubaale measuring bark cloth with tape in the banana grove"
+                alt="Queen Nalubaale measuring bark cloth with tape in the banana grove"
                 width={600}
                 height={450}
                 className="aspect-[4/3] w-full object-cover"
@@ -78,7 +79,7 @@ export default function TheHostPage() {
             <div className="overflow-hidden rounded-md">
               <Image
                 src="/images/host-compound-walk.jpg"
-                alt="Mama Nalubaale walking through the compound in blue wax print"
+                alt="Queen Nalubaale walking through the compound in blue wax print"
                 width={400}
                 height={300}
                 className="aspect-[4/3] w-full object-cover"
@@ -87,7 +88,7 @@ export default function TheHostPage() {
             <div className="overflow-hidden rounded-md">
               <Image
                 src="/images/host-night-fire.jpg"
-                alt="Mama Nalubaale at night by the fire in bark cloth and cowrie"
+                alt="Queen Nalubaale at night by the fire in bark cloth and cowrie"
                 width={400}
                 height={300}
                 className="aspect-[4/3] w-full object-cover"
@@ -96,7 +97,7 @@ export default function TheHostPage() {
             <div className="overflow-hidden rounded-md">
               <Image
                 src="/images/host-lake-scarf.jpg"
-                alt="Mama Nalubaale with green scarf, lake behind"
+                alt="Queen Nalubaale with green scarf, lake behind"
                 width={400}
                 height={300}
                 className="aspect-[4/3] w-full object-cover"
@@ -115,7 +116,7 @@ export default function TheHostPage() {
             home to yourself.&rdquo;
           </blockquote>
           <cite className="mt-6 block text-sm not-italic text-bark">
-            — Mama Nalubaale
+            — Queen Nalubaale
           </cite>
         </div>
       </section>

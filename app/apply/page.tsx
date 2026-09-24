@@ -40,6 +40,7 @@ const inputClass =
 export default function ApplyPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [mailtoFallback, setMailtoFallback] = useState(false);
 
   const {
     register,
@@ -98,6 +99,7 @@ export default function ApplyPage() {
       ].join("\n")
     );
     window.open(`mailto:queennalubaale@gmail.com?subject=${subject}&body=${body}`, "_self");
+    setMailtoFallback(true);
     setSubmitted(true);
   }
 
@@ -124,11 +126,25 @@ export default function ApplyPage() {
           {submitted ? (
             <div className="rounded-md border border-canopy/20 bg-canopy/5 p-8 text-center">
               <p className="font-display text-xl text-ink">Thank you.</p>
-              <p className="mt-4 text-ink/70">
-                If there is a fit, we will write or WhatsApp within several days
-                to arrange a short discovery conversation. Please do not book
-                flights until we confirm the boat.
-              </p>
+              {mailtoFallback ? (
+                <p className="mt-4 text-ink/70">
+                  Your mail app should open with the request pre-filled. If it
+                  does not, send the form details manually to{" "}
+                  <a
+                    href="mailto:queennalubaale@gmail.com"
+                    className="font-semibold text-leaf hover:text-leaf/80"
+                  >
+                    queennalubaale@gmail.com
+                  </a>
+                  . We will write or WhatsApp within several days.
+                </p>
+              ) : (
+                <p className="mt-4 text-ink/70">
+                  If there is a fit, we will write or WhatsApp within several
+                  days to arrange a short discovery conversation. Please do not
+                  book flights until we confirm the boat.
+                </p>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

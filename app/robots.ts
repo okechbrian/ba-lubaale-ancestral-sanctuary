@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/"],
       },
     ],
-    sitemap: "https://ba-lubaale-sanctuary.vercel.app/sitemap.xml",
+    sitemap: "https://ba-lubaale-ancestral-sanctuary.vercel.app/sitemap.xml",
   };
 }
