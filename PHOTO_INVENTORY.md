@@ -86,7 +86,7 @@ Same woman across many frames — Queen Nalubaale / Mama Nalubaale. Prefer outdo
 |---|---|---|
 | `Pics.jpg` | `host-atelier-seat.jpg` | Seated in bark cloth against bamboo; strip TikTok watermark if used |
 | `Ssesse pics.jpg` | `host-portrait-cowrie.jpg` | Orange headwrap, cowrie earrings, blue beads |
-| `Ssese pics 2.jpg` | `host-portrait-headwrap.jpg` | Outdoor, gold collar. **Circle frames use `host-portrait-headwrap-sq.jpg`** — 600×600 face-centred crop (box x186 y72 s600) so the head fills the circle like the old cowrie shot. Never put the raw 810×1080 portrait in a circle; it reads too small. |
+| `Ssese pics 2.jpg` | `host-portrait-headwrap.jpg` | Outdoor, gold collar |
 | `IMG-20260915-WA0140.jpg` | `host-measuring-bark.jpg` | Working bark cloth with tape — atelier + host |
 | `IMG-20260915-WA0155.jpg` | `host-compound-walk.jpg` | Blue wax print, compound grass |
 | `IMG-20260915-WA0173.jpg` | `host-night-fire.jpg` | Night, bark cloth, cowrie |
@@ -197,7 +197,7 @@ Owner confirmed later video files will also live on the site. Same rules: muted 
 
 ## Host block
 
-`host-atelier-seat.jpg` or `host-portrait-headwrap-sq.jpg` — not `host-portrait-cowrie.jpg` (client rejected it, 27 Sep 2026).
+`host-atelier-seat.jpg` or `host-portrait-headwrap.jpg` — not `host-portrait-cowrie.jpg` (client rejected it, 27 Sep 2026).
 
 ## Alt-text voice
 
@@ -216,7 +216,7 @@ Watermark rule: if TikTok / @que treenalubaale (or similar) is visible, crop or 
 | Slot | File → public name | Why this frame |
 |---|---|---|
 | Hero full-bleed | `IMG-20260915-WA0158.jpg` → `hero-shore-gathering.jpg` | Bark-cloth line on Lake Victoria. Dark overlay. Alt: WA0159. |
-| Invitation / host strip (small) | `Ssese pics 2.jpg` → `host-portrait-headwrap-sq.jpg` | Queen Nalubaale outdoors, brown headwrap, gold collar, blue sky. **Owner pick (27 Sep 2026)** — replaces `host-portrait-cowrie.jpg`, which the client rejected. Circle frame = the square crop (see row above). |
+| Invitation / host strip (small) | `Ssese pics 2.jpg` → `host-portrait-headwrap.jpg` | Queen Nalubaale outdoors, brown headwrap, gold collar, blue sky. **Owner pick (27 Sep 2026)** — replaces `host-portrait-cowrie.jpg`, which the client rejected. |
 | Gateway — Cave | `IMG-20260915-WA0256.jpg` → `og-cave-shore.jpg` | Mossed rock mouth from the water. Prefer this over crowded interiors on the home. |
 | Gateway — Lake House (interim) | `IMG-20260915-WA0252.jpg` → `arrival-boat.jpg` | Honest caption: the water the house sits on. Never label as the building. |
 | Gateway — Forest spring | `IMG-20260915-WA0257.jpg` → `forest-roots.jpg` | Buttress roots. Do **not** use the Nanziri-style waterfall (`WA0253`) as if it were the 10-acre spring. |
@@ -224,7 +224,7 @@ Watermark rule: if TikTok / @que treenalubaale (or similar) is visible, crop or 
 | Craft trio — bark | `IMG-20260915-WA0140.jpg` → `host-measuring-bark.jpg` | Hands on olubugo, tape, banana grove. |
 | Craft trio — wear | `IMG-20260915-WA0141.jpg` → `bark-dresses-stand.jpg` | Finished bark-cloth dresses. |
 | Craft trio — cowrie | `IMG-20260503-WA0060.jpg` → `cowrie-four.jpg` | Four women, cowrie strands. |
-| Host block | `Pics.jpg` → `host-atelier-seat.jpg` **after watermark strip**, else `host-portrait-headwrap-sq.jpg` | Queen Nalubaale seated in bark cloth. Caption: Queen Nalubaale · Mama Nalubaale. |
+| Host block | `Pics.jpg` → `host-atelier-seat.jpg` **after watermark strip**, else `host-portrait-headwrap.jpg` | Queen Nalubaale seated in bark cloth. Caption: Queen Nalubaale · Mama Nalubaale. |
 | Closing full-bleed | `IMG-20260915-WA0167.jpg` → `closing-shore.jpg` | Shore gathering, last CTA. |
 | OG / share image | `og-cave-shore.jpg` | Same as cave gateway. |
 
