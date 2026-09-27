@@ -39,8 +39,9 @@ export default function ImmersionsPage() {
             International Immersions
           </h2>
           <p className="mt-3 text-ink/70">
-            Prices in USD. All immersions include Lake House accommodation,
-            organic meals, and guided sessions with the host.
+            Prices in USD. All immersions include organic meals and guided
+            sessions with the host. Accommodation is listed under each
+            immersion.
           </p>
 
           <div className="mt-10 space-y-8">
