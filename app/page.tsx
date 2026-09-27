@@ -20,7 +20,7 @@ export default function HomePage() {
       <section className="bg-cream py-20 sm:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
           <Image
-            src="/images/host-portrait-headwrap.jpg"
+            src="/images/host-portrait-headwrap-sq.jpg"
             alt="Queen Nalubaale outdoors in a brown headwrap and gold collar"
             width={160}
             height={160}
@@ -279,7 +279,7 @@ export default function HomePage() {
       <section className="bg-mist py-20 sm:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
           <Image
-            src="/images/host-portrait-headwrap.jpg"
+            src="/images/host-portrait-headwrap-sq.jpg"
             alt="Queen Nalubaale — seer, healer, and master artisan"
             width={224}
             height={224}
