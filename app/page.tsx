@@ -20,8 +20,8 @@ export default function HomePage() {
       <section className="bg-cream py-20 sm:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
           <Image
-            src="/images/host-portrait-cowrie.jpg"
-            alt="Queen Nalubaale wearing cowrie earrings and blue beads"
+            src="/images/host-portrait-headwrap.jpg"
+            alt="Queen Nalubaale outdoors in a brown headwrap and gold collar"
             width={160}
             height={160}
             className="h-32 w-32 rounded-full object-cover sm:h-40 sm:w-40"
@@ -52,7 +52,7 @@ export default function HomePage() {
             The Land
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-ink/70">
-            Ten acres of forest fed by an ancestral spring. A three-chambered
+            Vast forest fed by an ancestral spring. A three-chambered
             sacred cave. Free-roaming goats and cows. Naturally fed lake fish.
             An ancient resident tortoise.
           </p>
@@ -279,7 +279,7 @@ export default function HomePage() {
       <section className="bg-mist py-20 sm:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
           <Image
-            src="/images/host-portrait-cowrie.jpg"
+            src="/images/host-portrait-headwrap.jpg"
             alt="Queen Nalubaale — seer, healer, and master artisan"
             width={224}
             height={224}
@@ -360,9 +360,9 @@ export default function HomePage() {
               </h3>
               <p className="mt-1 text-sm text-bark">3 days</p>
               <p className="mt-4 text-sm leading-relaxed text-ink/70">
-                Exclusive ten acres, cave, Lake House, spring, livestock,
-                unlimited one-on-one sessions and workshops for the group,
-                private cook using farm milk, eggs, fish, and herbs.
+                Exclusive use of the whole land — cave, Lake House, spring,
+                livestock, unlimited one-on-one sessions and workshops for the
+                group, private cook using farm milk, eggs, fish, and herbs.
               </p>
               <Link
                 href="/immersions"

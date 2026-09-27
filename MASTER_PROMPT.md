@@ -12,7 +12,7 @@ You are the implementation engineer for a production marketing website.
 PROJECT
 Name: Ba Lubaale Ancestral Sanctuary Kiwamirembe
 Poetic subtitle (never the header logo): The Weaver’s Sanctuary & Sacred Caves
-Place: private 10-acre ancestral sanctuary on the Ssese Islands, Lake Victoria, Uganda
+Place: private ancestral sanctuary of vast land on the Ssese Islands, Lake Victoria, Uganda
 Work: screened spiritual immersions, cave sessions, root-water cleansing, fireplace relationship arbitration, ancestral craft (bark cloth / banana fibre / cowrie), sunset water meditation, forest bicycle trails, living with free-roaming goats, cows, and a resident tortoise
 Commercial model: low volume, high touch, application-gated. One household at a time. No drop-ins. No open hotel calendar.
 
@@ -108,7 +108,7 @@ Hero blessing:
 “I listen to the wave upon the shore, the breath within your chest, and the stories carried in the roots of this land. Welcome home to yourself.”
 
 Place:
-“Nestled on a secluded island wrapped in the rhythm of lake waves and morning birdsong. Built upon ten acres of forest fed by an ancestral spring. Home to a three-chambered sacred cave, free-roaming goats and cows, naturally fed lake fish, and an ancient resident tortoise.”
+“Nestled on a secluded island wrapped in the rhythm of lake waves and morning birdsong. Set within vast forest fed by an ancestral spring. Home to a three-chambered sacred cave, free-roaming goats and cows, naturally fed lake fish, and an ancient resident tortoise.”
 
 Cave:
 “Deep inside the quiet chambers, guests work with silence, breath, and voice to set down what is heavy and hear what has been waiting.”
@@ -126,7 +126,7 @@ International immersions — `/immersions` (default public table):
 - Master Transformation & Craft Immersion · 5 days / 4 nights · USD 4,500 solo · USD 7,200 couple
   Includes: full sanctuary access, 2 cave sessions (diagnostic & trauma-release work), daily root-water cleansing, fireplace arbitration if a couple, bark-cloth garment or wall hanging, custom herbal teas.
 - Whole-island buyout · 3 days · USD 10,000 up to 4 guests · + USD 1,500 per extra guest to a maximum of 8
-  Includes: exclusive 10 acres, cave, Lake House, spring, livestock, unlimited 1-on-1 sessions and workshops for the group, private cook using farm milk, eggs, fish, herbs.
+  Includes: exclusive use of the whole land, cave, Lake House, spring, livestock, unlimited 1-on-1 sessions and workshops for the group, private cook using farm milk, eggs, fish, herbs.
 
 On `/immersions` add one line under the table: “East Africa resident rates are offered on conversation and listed with day sessions on Practices.”
 

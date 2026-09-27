@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "The Land",
   description:
-    "Ten acres of forest, lake shore, spring, herd, and fire on the Ssese Islands of Lake Victoria, Uganda.",
+    "Vast forest, lake shore, spring, herd, and fire on the Ssese Islands of Lake Victoria, Uganda.",
 };
 
 export default function TheLandPage() {
@@ -28,7 +28,7 @@ export default function TheLandPage() {
           </h1>
           <p className="mt-3 max-w-xl text-cream/80">
             Nestled on a secluded island wrapped in the rhythm of lake waves and
-            morning birdsong. Built upon ten acres of forest fed by an ancestral
+            morning birdsong. Set within vast forest fed by an ancestral
             spring.
           </p>
         </div>
@@ -95,7 +95,7 @@ export default function TheLandPage() {
               />
               <h3 className="mt-3 font-display text-xl text-ink">The Forest</h3>
               <p className="mt-2 text-sm text-ink/70">
-                Ten acres of indigenous trees, buttress roots, and forest
+                Vast forest of indigenous trees, buttress roots, and forest
                 trails. Coffee cherries on the branch. Butterflies in the
                 understory. Bicycle trails to the far shore.
               </p>
@@ -220,9 +220,10 @@ export default function TheLandPage() {
                 The Forest
               </h2>
               <p className="mt-4 text-ink/70">
-                Ten acres of indigenous trees fed by an ancestral spring. Buttress
-                roots rise from the forest floor. Coffee cherries ripen on the
-                branch. Weaver nests hang from palms along the shore.
+                Vast forest of indigenous trees fed by an ancestral spring.
+                Buttress roots rise from the forest floor. Coffee cherries
+                ripen on the branch. Weaver nests hang from palms along the
+                shore.
               </p>
               <p className="mt-4 text-ink/70">
                 Trails wind through the canopy to the far shore. Bicycle paths

@@ -12,6 +12,8 @@ Source: owner replies to the open-question set. Unanswered items stay last.
 | 6 | Photographs | **Use this set.** Map files in `PHOTO_INVENTORY.md`. Images-only folder on the owner PC: `C:\\Users\\y\\OneDrive\\Desktop\\New folder\\Maama Nalubaale`. Video is in scope (`Ssese pics.mp4` and later clips). Mute autoplay. |
 | 7 | Guest lines / testimonials | **Last.** No invented quotes. No review widgets. |
 | 8 | Production URL | `https://ba-lubaale-ancestral-sanctuary.vercel.app`. All SEO (sitemap, robots, metadataBase) must use this URL. |
+| 9 | Host portrait (client feedback, 27 Sep 2026) | **Use `Ssese pics 2.jpg` → `host-portrait-headwrap.jpg`** (outdoor, brown headwrap, gold collar). Client rejected `host-portrait-cowrie.jpg` ("We need to change this pic"). Applies to the homepage invitation quote, homepage host block, and the `/the-host` hero. |
+| 10 | Land size (client feedback, 27 Sep 2026) | **Never publish an acreage.** Client: "Exclude 10 acres and just mention vast land because that's the truth." All public copy says **vast land / vast forest** instead of a number. Applies to homepage, `/the-land`, `/immersions`. |
 
 ## Still open (do not invent)
 

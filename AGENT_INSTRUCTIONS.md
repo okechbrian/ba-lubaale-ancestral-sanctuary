@@ -122,12 +122,12 @@ Do not design the real homepage yet. Do not copy all images yet. One placeholder
 Build `app/page.tsx` in this exact section order. No extra sections.
 
 1. Full-viewport hero. Image `hero-shore-gathering.jpg` with dusk overlay 40–55%. Overline: Ssese Islands · Lake Victoria · Uganda. H1: Ba Lubaale Ancestral Sanctuary. H2: Kiwamirembe. Deck: A living ancestral sanctuary of cave, craft, herd, and lake. Support: The Weaver’s Sanctuary & Sacred Caves. Primary CTA Request an Immersion → `/apply`. Secondary CTA Enter the Land → scroll to section 3. Microcopy: Private. Screened. One household at a time.
-2. Host invitation first person: “I listen to the wave upon the shore, the breath within your chest, and the stories carried in the roots of this land. Welcome home to yourself.” Small portrait: `host-portrait-cowrie.jpg`.
+2. Host invitation first person: “I listen to the wave upon the shore, the breath within your chest, and the stories carried in the roots of this land. Welcome home to yourself.” Small portrait: `host-portrait-headwrap.jpg` (client rejected `host-portrait-cowrie.jpg`, 27 Sep 2026).
 3. Four land gateways: Cave `og-cave-shore.jpg`; Lake House `arrival-boat.jpg` captioned as the water the house sits on, never labelled as the building; Forest spring `forest-roots.jpg`; Herd & fire `fire-night.jpg`.
 4. Who is welcomed — three columns + exclusion: “This is not a party island, a drop-in lodge, or a clinical facility.”
 5. Three acts: Arrival / Work / Return. Link → `/immersions`.
 6. Craft as healing: `host-measuring-bark.jpg`, `bark-dresses-stand.jpg`, `cowrie-four.jpg`. Line: “You do not only speak the intention. You weave it, sew it, and carry it home.” Link → `/atelier`.
-7. Host block — Queen Nalubaale · Mama Nalubaale, 80–120 words first person → `/the-host`. Use `host-atelier-seat.jpg` only if TikTok watermark is stripped; else `host-portrait-cowrie.jpg`.
+7. Host block — Queen Nalubaale · Mama Nalubaale, 80–120 words first person → `/the-host`. Use `host-atelier-seat.jpg` only if TikTok watermark is stripped; else `host-portrait-headwrap.jpg`. Never `host-portrait-cowrie.jpg` (client rejected it, 27 Sep 2026).
 8. Three stay cards without full prices: Essential Healing Immersion 3 days; Master Transformation & Craft 5 days; Whole-island buyout. View details → `/immersions`.
 9. Readiness strip → `/apply` and `/prepare`.
 10. Neighbouring sacred geography as pilgrimage context off-property. Do not sell as included.

@@ -120,7 +120,7 @@ export default function ImmersionsPage() {
                 </div>
               </div>
               <ul className="mt-6 space-y-2 text-sm text-ink/70">
-                <li>Exclusive 10 acres, cave, Lake House, spring, livestock</li>
+                <li>Exclusive use of the land, cave, Lake House, spring, livestock</li>
                 <li>Unlimited 1-on-1 sessions and workshops for the group</li>
                 <li>
                   Private cook using farm milk, eggs, fish, herbs

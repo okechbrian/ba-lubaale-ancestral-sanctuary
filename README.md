@@ -1,6 +1,6 @@
 # Ba Lubaale Ancestral Sanctuary Kiwamirembe
 
-Private 10-acre ancestral sanctuary on the Ssese Islands, Lake Victoria, Uganda.
+Private ancestral sanctuary of vast land on the Ssese Islands, Lake Victoria, Uganda.
 
 **Site job:** convert the right seeker into a screened application — not sell hotel nights.
 

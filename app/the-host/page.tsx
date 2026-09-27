@@ -15,11 +15,11 @@ export default function TheHostPage() {
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
         <Image
-          src="/images/host-portrait-cowrie.jpg"
-          alt="Queen Nalubaale wearing cowrie earrings and blue beads"
+          src="/images/host-portrait-headwrap.jpg"
+          alt="Queen Nalubaale outdoors in a brown headwrap and gold collar"
           fill
           priority
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover object-[center_22%]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />
         <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">

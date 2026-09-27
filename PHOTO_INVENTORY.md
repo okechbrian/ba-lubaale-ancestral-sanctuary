@@ -197,7 +197,7 @@ Owner confirmed later video files will also live on the site. Same rules: muted 
 
 ## Host block
 
-`host-atelier-seat.jpg` or `host-portrait-cowrie.jpg`
+`host-atelier-seat.jpg` or `host-portrait-headwrap.jpg` — not `host-portrait-cowrie.jpg` (client rejected it, 27 Sep 2026).
 
 ## Alt-text voice
 
@@ -216,7 +216,7 @@ Watermark rule: if TikTok / @que treenalubaale (or similar) is visible, crop or 
 | Slot | File → public name | Why this frame |
 |---|---|---|
 | Hero full-bleed | `IMG-20260915-WA0158.jpg` → `hero-shore-gathering.jpg` | Bark-cloth line on Lake Victoria. Dark overlay. Alt: WA0159. |
-| Invitation / host strip (small) | `Ssesse pics.jpg` → `host-portrait-cowrie.jpg` | Queen Nalubaale, cowrie and blue beads. Indoor curtains are quiet enough for a small portrait. |
+| Invitation / host strip (small) | `Ssese pics 2.jpg` → `host-portrait-headwrap.jpg` | Queen Nalubaale outdoors, brown headwrap, gold collar, blue sky. **Owner pick (27 Sep 2026)** — replaces `host-portrait-cowrie.jpg`, which the client rejected. |
 | Gateway — Cave | `IMG-20260915-WA0256.jpg` → `og-cave-shore.jpg` | Mossed rock mouth from the water. Prefer this over crowded interiors on the home. |
 | Gateway — Lake House (interim) | `IMG-20260915-WA0252.jpg` → `arrival-boat.jpg` | Honest caption: the water the house sits on. Never label as the building. |
 | Gateway — Forest spring | `IMG-20260915-WA0257.jpg` → `forest-roots.jpg` | Buttress roots. Do **not** use the Nanziri-style waterfall (`WA0253`) as if it were the 10-acre spring. |
@@ -224,7 +224,7 @@ Watermark rule: if TikTok / @que treenalubaale (or similar) is visible, crop or 
 | Craft trio — bark | `IMG-20260915-WA0140.jpg` → `host-measuring-bark.jpg` | Hands on olubugo, tape, banana grove. |
 | Craft trio — wear | `IMG-20260915-WA0141.jpg` → `bark-dresses-stand.jpg` | Finished bark-cloth dresses. |
 | Craft trio — cowrie | `IMG-20260503-WA0060.jpg` → `cowrie-four.jpg` | Four women, cowrie strands. |
-| Host block | `Pics.jpg` → `host-atelier-seat.jpg` **after watermark strip**, else `host-portrait-cowrie.jpg` | Queen Nalubaale seated in bark cloth. Caption: Queen Nalubaale · Mama Nalubaale. |
+| Host block | `Pics.jpg` → `host-atelier-seat.jpg` **after watermark strip**, else `host-portrait-headwrap.jpg` | Queen Nalubaale seated in bark cloth. Caption: Queen Nalubaale · Mama Nalubaale. |
 | Closing full-bleed | `IMG-20260915-WA0167.jpg` → `closing-shore.jpg` | Shore gathering, last CTA. |
 | OG / share image | `og-cave-shore.jpg` | Same as cave gateway. |
 
@@ -253,7 +253,7 @@ Visitor rule stays in copy: no guest photography inside.
 
 ### `/the-host`
 
-Hero portrait: `host-atelier-seat.jpg` (watermark stripped) or `host-portrait-cowrie.jpg`.
+Hero portrait: `host-atelier-seat.jpg` (watermark stripped) or `host-portrait-headwrap.jpg` (owner pick — never `host-portrait-cowrie.jpg`).
 Working portrait: `host-measuring-bark.jpg`.
 Land portraits: `host-compound-walk.jpg` (WA0155), `host-tree.jpg` (WA0202), `host-lake-scarf.jpg` (WA0203), `host-garden-welcome.jpg` (WA0201), `host-jetty-black.jpg` (WA0199).
 Night: `host-night-fire.jpg` (WA0173).
