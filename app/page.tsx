@@ -52,9 +52,10 @@ export default function HomePage() {
             The Land
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-ink/70">
-            Vast forest fed by an ancestral spring. A three-chambered
-            sacred cave. Free-roaming goats and cows. Naturally fed lake fish.
-            An ancient resident tortoise.
+            Tropical forest against grassland, fed by a spring in the roots of
+            an ancient tree. A three-chambered sacred cave. Free-roaming goats
+            and cows. Naturally fed lake fish. An ancient resident tortoise,
+            Mutaka — seen most afternoons.
           </p>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -136,30 +137,68 @@ export default function HomePage() {
             Who Is Welcomed
           </h2>
 
-          <div className="mt-12 grid gap-8 sm:grid-cols-3">
+          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div className="text-center">
-              <h3 className="font-display text-xl text-ink">Solo Seekers</h3>
+              <h3 className="font-display text-xl text-ink">Solitude Lovers</h3>
               <p className="mt-3 text-sm text-ink/70">
-                Individuals ready to sit with themselves in silence, fire, and
-                stone. People carrying something heavy who need time beside the
-                lake and inside the cave.
+                People ready to sit with themselves in silence, beside the fire
+                and the stones — grounded back to their roots.
               </p>
             </div>
 
             <div className="text-center">
               <h3 className="font-display text-xl text-ink">Couples</h3>
               <p className="mt-3 text-sm text-ink/70">
-                Partners seeking fireplace relationship arbitration, root-water
-                cleansing, and shared craft beside the fire. Work done together,
-                not performed for an audience.
+                Partners seeking arbitration, a blessing, and a shared craft
+                beside the fire. Work done together, not performed for an
+                audience.
               </p>
             </div>
 
             <div className="text-center">
               <h3 className="font-display text-xl text-ink">Families</h3>
               <p className="mt-3 text-sm text-ink/70">
-                Households wishing to introduce children to living culture, land,
-                herd, and ancestral craft. One household at a time.
+                Households introducing children to living culture, land, herd,
+                and ancestral craft. Reunion, arbitration, and a fresh start.
+                One household at a time.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <h3 className="font-display text-xl text-ink">
+                Retreat Groups
+              </h3>
+              <p className="mt-3 text-sm text-ink/70">
+                A spiritual family — no lies, no hypocrisy. Such a group can
+                choose to visit the sanctuary and its grounds together.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <h3 className="font-display text-xl text-ink">Team Building</h3>
+              <p className="mt-3 text-sm text-ink/70">
+                Teams who come to work together on the land and beside the
+                fire.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <h3 className="font-display text-xl text-ink">
+                Ekyoto Kya Ba Kyaala
+              </h3>
+              <p className="mt-3 text-sm text-ink/70">
+                An annual gathering of women for rest, womb care, and shared
+                talk.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <h3 className="font-display text-xl text-ink">
+                Seekers of Healing &amp; Enrichment
+              </h3>
+              <p className="mt-3 text-sm text-ink/70">
+                People tired, stuck, or carrying a lot — ready to shed, let go,
+                and start fresh. If that is you, send the application.
               </p>
             </div>
           </div>
@@ -323,8 +362,9 @@ export default function HomePage() {
               </h3>
               <p className="mt-1 text-sm text-bark">3 days / 2 nights</p>
               <p className="mt-4 text-sm leading-relaxed text-ink/70">
-                Lake House room, organic meals, one cave diagnostic and sound
-                session, one root-water spring rinse, cowrie talisman workshop.
+                A cottage, two Lake House readings — diagnostic and fish
+                feeding — one cave healing session, daily root-water cleansing,
+                fireplace release, and a cowrie talisman workshop.
               </p>
               <Link
                 href="/immersions"
@@ -341,9 +381,10 @@ export default function HomePage() {
               </h3>
               <p className="mt-1 text-sm text-bark">5 days / 4 nights</p>
               <p className="mt-4 text-sm leading-relaxed text-ink/70">
-                Full sanctuary access, two cave sessions, daily root-water
-                cleansing, fireplace arbitration for couples, bark-cloth
-                garment or wall hanging, custom herbal teas.
+                Full sanctuary access, three Lake House sessions, two cave
+                sessions, daily spring cleansing, fireplace release and
+                arbitration, a bark-cloth garment or wall hanging, and custom
+                herbal teas.
               </p>
               <Link
                 href="/immersions"
@@ -361,8 +402,10 @@ export default function HomePage() {
               <p className="mt-1 text-sm text-bark">3 days</p>
               <p className="mt-4 text-sm leading-relaxed text-ink/70">
                 Exclusive use of the whole land — cave, Lake House, spring,
-                livestock, unlimited one-on-one sessions and workshops for the
-                group, private cook using farm milk, eggs, fish, and herbs.
+                livestock and fireplace, unlimited one-on-one sessions and
+                workshops of the group&apos;s choice, and a private cook using
+                farm milk, lake fish, herbs, and fruit. House food protocol
+                still applies.
               </p>
               <Link
                 href="/immersions"

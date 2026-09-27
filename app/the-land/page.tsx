@@ -44,9 +44,12 @@ export default function TheLandPage() {
               </h2>
               <p className="mt-4 text-ink/70">
                 Home to a three-chambered sacred cave, free-roaming goats and
-                cows, naturally fed lake fish, and an ancient resident tortoise.
-                The forest is fed by an ancestral spring. The Lake House sits
-                over living water.
+                cows, naturally fed lake fish, and an ancient resident
+                tortoise, Mutaka. The forest is fed by an ancestral spring.
+                The Lake House sits over living water.
+              </p>
+              <p className="mt-4 text-ink/70">
+                This living sanctuary was passed to her in 1998.
               </p>
               <p className="mt-4 text-ink/70">
                 Fire burns on the shore most evenings. Board over fish. Goat bell
@@ -95,9 +98,10 @@ export default function TheLandPage() {
               />
               <h3 className="mt-3 font-display text-xl text-ink">The Forest</h3>
               <p className="mt-2 text-sm text-ink/70">
-                Vast forest of indigenous trees, buttress roots, and forest
-                trails. Coffee cherries on the branch. Butterflies in the
-                understory. Bicycle trails to the far shore.
+                Tropical forest set against the grassland that surrounds it. An
+                ancient tree stands inside, and the spring rises in its roots.
+                Birds, monkeys, butterflies — and the sound of water that is
+                not always seen.
               </p>
             </div>
             <div>
@@ -128,9 +132,8 @@ export default function TheLandPage() {
             <div>
               <h3 className="font-display text-xl text-ink">The Fire</h3>
               <p className="mt-2 text-sm text-ink/70">
-                The fireplace on the shore is where evening conversations happen.
-                Where couples sit with the host. Where the day is laid down
-                before sleep.
+                Evening conversation here, with the host and her people. The
+                day is laid down before sleep.
               </p>
             </div>
             <div>
@@ -138,8 +141,8 @@ export default function TheLandPage() {
                 The Resident Tortoise
               </h3>
               <p className="mt-2 text-sm text-ink/70">
-                A leopard tortoise who has lived on the island longer than any
-                current guest. Seen on the stony shore most afternoons.
+                Mutaka, a leopard tortoise who has lived on the island longer
+                than any current guest. Seen most afternoons on the stony shore.
               </p>
             </div>
           </div>
@@ -220,10 +223,10 @@ export default function TheLandPage() {
                 The Forest
               </h2>
               <p className="mt-4 text-ink/70">
-                Vast forest of indigenous trees fed by an ancestral spring.
-                Buttress roots rise from the forest floor. Coffee cherries
-                ripen on the branch. Weaver nests hang from palms along the
-                shore.
+                Tropical forest against the grassland that surrounds it. An
+                ancient tree stands inside, and the spring rises in its roots —
+                clean water, sacred and healing. Birds, monkeys, butterflies,
+                and the sound of water that is not always seen.
               </p>
               <p className="mt-4 text-ink/70">
                 Trails wind through the canopy to the far shore. Bicycle paths
@@ -293,8 +296,8 @@ export default function TheLandPage() {
             The Resident Tortoise
           </h2>
           <p className="mt-3 text-cream/70">
-            A leopard tortoise on the stony shore. Silent. Patient. Older than
-            any of us can say.
+            Mutaka on the stony shore. Silent. Patient. Older than any of us
+            can say.
           </p>
           <div className="mt-8 overflow-hidden rounded-md">
             <video

@@ -40,20 +40,27 @@ export default function TheHostPage() {
                 Seer, Healer, Master Artisan
               </h2>
               <p className="mt-4 text-ink/70">
-                I work with breath, bark, cowrie, root water, and the fire that
+                I work with voice, hands, breath, water, fire, wind, and earth
+                — and with bark, cowrie, and root water beside the fire that
                 has burned on this shore longer than any of us can remember.
-                This sanctuary is not a business I started. It is a place I was
-                given.
+                Being of Ssese origin, I am close to my ancestors.
               </p>
               <p className="mt-4 text-ink/70">
-                The work I carry comes from the women who kept this place before
-                me. It is old, it is living, and it is not mine to sell — only
-                to hold and share.
+                This sanctuary is not a place I started. It is a place I was
+                given — I knowingly inherited this responsibility in August
+                1998. The work I carry came from the women who kept this place
+                long before me. It is old, it is living, and it is not mine to
+                sell — only to hold and share.
               </p>
               <p className="mt-4 text-ink/70">
-                I do not offer guarantees. I offer time, silence, and the
-                techniques my mothers taught me. What happens in the cave is
-                between you and the space. I am the one who holds the door.
+                My Munyoro mother taught me the techniques I work with here.
+                Her mother — my grandmother, a princess of Tooro — raised me in
+                my early years.
+              </p>
+              <p className="mt-4 text-ink/70">
+                I do not offer guarantees. I offer time, silence, and those
+                techniques. What happens in the cave is between you and the
+                space. I am the one who holds the door.
               </p>
             </div>
             <div className="relative overflow-hidden rounded-md">

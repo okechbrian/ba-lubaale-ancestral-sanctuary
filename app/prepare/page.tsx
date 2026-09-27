@@ -168,6 +168,10 @@ export default function PreparePage() {
             Important
           </h2>
           <p className="mt-4 text-cream/70">
+            Fish feeding and chamber work are guided by the host — never
+            self-serve. You are shown what to do, and when.
+          </p>
+          <p className="mt-4 text-cream/70">
             Sessions here are traditional, energetic, and artisanal. They
             complement and do not replace medical or psychiatric care. The
             sanctuary does not provide emergency or clinical services.

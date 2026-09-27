@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "The Cave",
   description:
-    "Nalubaale Cave — three chambers of silence, breath, and voice. Guided sessions only. No photography.",
+    "More than a hundred caves on Ssese, three open to guests — Nalubaale, Musisi, and Wanema. Guided sessions only. No photography.",
 };
 
 export default function TheCavePage() {
@@ -39,14 +39,13 @@ export default function TheCavePage() {
           <div className="grid gap-12 lg:grid-cols-2">
             <div>
               <h2 className="font-display text-3xl font-semibold text-ink">
-                Three Chambers
+                More Than a Hundred Caves
               </h2>
               <p className="mt-4 text-ink/70">
-                Nalubaale Cave is a three-chambered sacred space. The first
-                chamber is a threshold — hay on the floor, low light, the sound
-                of water somewhere behind the rock. The second is where the
-                deeper work happens. The third is for those who need to be
-                completely alone.
+                Ssese holds more than a hundred caves. Only three are open to
+                guests. The rest are visited only after a calling from
+                themselves — they are never offered as an add-on to a booking,
+                and they are not listed here.
               </p>
               <p className="mt-4 text-ink/70">
                 Sessions are guided by the host. You do not enter alone. You do
@@ -63,6 +62,49 @@ export default function TheCavePage() {
                   className="aspect-[16/9] w-full object-cover"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The three open chambers */}
+      <section id="cave" className="bg-mist py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-semibold text-ink">
+            The Three Open Chambers
+          </h2>
+          <div className="mt-8 grid gap-6 lg:grid-cols-3">
+            <div className="rounded-md border border-cream bg-cream p-6">
+              <h3 className="font-display text-xl text-ink">
+                Nalubaale Chamber
+              </h3>
+              <p className="mt-3 text-sm text-ink/70">
+                Belonging to Nalongo Nalubaale, the twin mother — a Queen and
+                mother to creation. People appeal to her for childbearing,
+                marriage, and prosperity. You may visit the cave; closeness to
+                her requires deep spiritual and physical cleansing.
+              </p>
+            </div>
+            <div className="rounded-md border border-cream bg-cream p-6">
+              <h3 className="font-display text-xl text-ink">
+                Lubaale Musisi Chamber
+              </h3>
+              <p className="mt-3 text-sm text-ink/70">
+                Known for movement and for the earthquake, and for waking every
+                person from sleep. When your life has gone stagnant, this is
+                the chamber to visit. Work with him may include his traditional
+                diet.
+              </p>
+            </div>
+            <div className="rounded-md border border-cream bg-cream p-6">
+              <h3 className="font-display text-xl text-ink">
+                Lubaale Wanema Chamber
+              </h3>
+              <p className="mt-3 text-sm text-ink/70">
+                Father of Lubaale Mukasa. Reserved, and responsible for putting
+                things straight. Go to him in the seasons when nothing you do
+                lands right and people find fault in everything.
+              </p>
             </div>
           </div>
         </div>

@@ -64,9 +64,11 @@ export default function ImmersionsPage() {
                 </div>
               </div>
               <ul className="mt-6 space-y-2 text-sm text-ink/70">
-                <li>Lake House room, organic meals</li>
-                <li>1 cave diagnostic &amp; sound session</li>
-                <li>1 root-water spring rinse</li>
+                <li>A cottage</li>
+                <li>Two Lake House readings — diagnostic and fish feeding</li>
+                <li>One cave healing session</li>
+                <li>Daily root-water cleansing</li>
+                <li>Fireplace release</li>
                 <li>Cowrie talisman workshop</li>
               </ul>
             </div>
@@ -92,9 +94,10 @@ export default function ImmersionsPage() {
               </div>
               <ul className="mt-6 space-y-2 text-sm text-ink/70">
                 <li>Full sanctuary access</li>
-                <li>2 cave sessions (diagnostic &amp; trauma-release work)</li>
-                <li>Daily root-water cleansing</li>
-                <li>Fireplace arbitration if a couple</li>
+                <li>Three Lake House sessions</li>
+                <li>Two cave sessions (diagnostic and trauma-release)</li>
+                <li>Daily spring / root-water cleansing</li>
+                <li>Fireplace release and arbitration</li>
                 <li>Bark-cloth garment or wall hanging</li>
                 <li>Custom herbal teas</li>
               </ul>
@@ -120,12 +123,19 @@ export default function ImmersionsPage() {
                 </div>
               </div>
               <ul className="mt-6 space-y-2 text-sm text-ink/70">
-                <li>Exclusive use of the land, cave, Lake House, spring, livestock</li>
-                <li>Unlimited 1-on-1 sessions and workshops for the group</li>
+                <li>Unlimited Lake House access</li>
+                <li>Cave diagnostic and trauma-release</li>
+                <li>Forest and spring</li>
+                <li>Livestock and fireplace</li>
                 <li>
-                  Private cook using farm milk, eggs, fish, herbs
+                  Unlimited one-on-one sessions and workshops of the
+                  group&apos;s choice
                 </li>
+                <li>Private cook using farm milk, lake fish, herbs, fruit</li>
               </ul>
+              <p className="mt-4 text-xs text-ink/60">
+                House food protocol still applies.
+              </p>
             </div>
           </div>
 
