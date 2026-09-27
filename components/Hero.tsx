@@ -70,19 +70,19 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <p className="text-xs font-semibold tracking-[0.3em] text-bark uppercase">
+        <p className="text-xs font-semibold tracking-[0.3em] text-bark-soft uppercase">
           Ssese Islands · Lake Victoria · Uganda
         </p>
         <h1 className="mt-6 font-display text-5xl font-semibold text-cream sm:text-7xl">
           Ba Lubaale Ancestral Sanctuary
         </h1>
-        <h2 className="mt-2 font-display text-3xl text-bark sm:text-4xl">
+        <h2 className="mt-2 font-display text-3xl text-bark-soft sm:text-4xl">
           Kiwamirembe
         </h2>
         <p className="mt-6 text-lg text-cream/80 sm:text-xl">
           A living ancestral sanctuary of cave, craft, herd, and lake.
         </p>
-        <p className="mt-2 text-sm tracking-widest text-bark/70 uppercase">
+        <p className="mt-2 text-sm tracking-widest text-bark-soft/70 uppercase">
           The Weaver&apos;s Sanctuary &amp; Sacred Caves
         </p>
 

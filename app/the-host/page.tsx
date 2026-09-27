@@ -26,7 +26,7 @@ export default function TheHostPage() {
           <h1 className="font-display text-4xl font-semibold text-cream sm:text-5xl">
             Queen Nalubaale
           </h1>
-          <p className="mt-2 text-bark text-lg">Mama Nalubaale</p>
+          <p className="mt-2 text-bark-soft text-lg">Mama Nalubaale</p>
           <p className="mt-1 text-cream/70 text-sm">Seer, Healer, Master Artisan</p>
         </div>
       </section>
@@ -122,7 +122,7 @@ export default function TheHostPage() {
             chest, and the stories carried in the roots of this land. Welcome
             home to yourself.&rdquo;
           </blockquote>
-          <cite className="mt-6 block text-sm not-italic text-bark">
+          <cite className="mt-6 block text-sm not-italic text-bark-soft">
             — Queen Nalubaale
           </cite>
         </div>

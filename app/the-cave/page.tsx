@@ -118,14 +118,14 @@ export default function TheCavePage() {
           </h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             <div className="rounded-md border border-cream/10 p-6">
-              <h3 className="font-display text-lg text-bark">Shoes Off</h3>
+              <h3 className="font-display text-lg text-bark-soft">Shoes Off</h3>
               <p className="mt-2 text-sm text-cream/70">
                 Shoes are removed before entering the cave. This is non-negotiable.
                 Garments can be obtained at the sanctuary.
               </p>
             </div>
             <div className="rounded-md border border-cream/10 p-6">
-              <h3 className="font-display text-lg text-bark">
+              <h3 className="font-display text-lg text-bark-soft">
                 No Phones or Photography
               </h3>
               <p className="mt-2 text-sm text-cream/70">
@@ -135,7 +135,7 @@ export default function TheCavePage() {
               </p>
             </div>
             <div className="rounded-md border border-cream/10 p-6">
-              <h3 className="font-display text-lg text-bark">Guided Only</h3>
+              <h3 className="font-display text-lg text-bark-soft">Guided Only</h3>
               <p className="mt-2 text-sm text-cream/70">
                 You do not wander the cave alone. Every session is led by the
                 host or under her direction. The cave is a working sacred space,
@@ -143,7 +143,7 @@ export default function TheCavePage() {
               </p>
             </div>
             <div className="rounded-md border border-cream/10 p-6">
-              <h3 className="font-display text-lg text-bark">
+              <h3 className="font-display text-lg text-bark-soft">
                 Traditional Work
               </h3>
               <p className="mt-2 text-sm text-cream/70">

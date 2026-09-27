@@ -9,7 +9,7 @@ export function Footer() {
           {/* Brand + blessing */}
           <div>
             <p className="font-display text-lg font-semibold">BA LUBAALE</p>
-            <p className="mt-1 text-xs tracking-widest text-bark uppercase">
+            <p className="mt-1 text-xs tracking-widest text-bark-soft uppercase">
               {site.subtitle}
             </p>
             <p className="mt-4 text-sm leading-relaxed text-cream/70">
@@ -20,7 +20,7 @@ export function Footer() {
 
           {/* Links */}
           <div>
-            <p className="text-xs font-semibold tracking-widest text-bark uppercase">
+            <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
               Sanctuary
             </p>
             <ul className="mt-3 space-y-2">
@@ -39,16 +39,16 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <p className="text-xs font-semibold tracking-widest text-bark uppercase">
+            <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
               Reach Us
             </p>
             <ul className="mt-3 space-y-2 text-sm text-cream/70">
               <li>
-                <span className="text-bark">WhatsApp</span>{" "}
+                <span className="text-bark-soft">WhatsApp</span>{" "}
                 {site.contact.whatsapp || "Available on request"}
               </li>
               <li>
-                <span className="text-bark">Email</span>{" "}
+                <span className="text-bark-soft">Email</span>{" "}
                 <a
                   href={`mailto:${site.contact.email}`}
                   className="transition-colors hover:text-leaf"

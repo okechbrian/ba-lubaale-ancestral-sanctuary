@@ -218,7 +218,7 @@ export default function HomePage() {
 
           <div className="mt-12 grid gap-8 sm:grid-cols-3">
             <div className="text-center">
-              <span className="text-5xl font-display text-bark">I</span>
+              <span className="text-5xl font-display text-bark-soft">I</span>
               <h3 className="mt-4 font-display text-xl text-cream">Arrival</h3>
               <p className="mt-3 text-sm leading-relaxed text-cream/70">
                 Step off the boat onto warm earth. Set down your bag. Let the
@@ -228,7 +228,7 @@ export default function HomePage() {
             </div>
 
             <div className="text-center">
-              <span className="text-5xl font-display text-bark">II</span>
+              <span className="text-5xl font-display text-bark-soft">II</span>
               <h3 className="mt-4 font-display text-xl text-cream">Work</h3>
               <p className="mt-3 text-sm leading-relaxed text-cream/70">
                 Enter the cave. Sit by the fire. Work with breath, voice, bark
@@ -238,7 +238,7 @@ export default function HomePage() {
             </div>
 
             <div className="text-center">
-              <span className="text-5xl font-display text-bark">III</span>
+              <span className="text-5xl font-display text-bark-soft">III</span>
               <h3 className="mt-4 font-display text-xl text-cream">Return</h3>
               <p className="mt-3 text-sm leading-relaxed text-cream/70">
                 Carry home a talisman you made, a garment you wove, and the

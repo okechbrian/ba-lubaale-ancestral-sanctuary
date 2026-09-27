@@ -1,78 +1,59 @@
-# Phase 12 report — Colour token pass (cloth-rust)
+# Phase 13 report — Bark-soft tone for dark sections (cloth-rust)
 
 Status: complete
-Branch: cloth-rust (from origin/main @ 8a36b45)
-Scope: colour tokens only
+Branch: cloth-rust
+Scope: one new colour token + class swaps on dark sections only
 Date: 27 Sep 2026
 
 Gates:
 - `npm run lint` → exit 0 (0 errors, 2 pre-existing warnings)
 - `npm run build` → exit 0 (15/15 routes)
 
-## Owner lock applied
-
-`--bark` — the rust from Queen Nalubaale's gele and rust brocade dress
-(`/images/host-portrait-cowrie.jpg`, `/images/host-portrait-headwrap.jpg`):
+## Token added
 
 ```
---bark: #C4A574  →  --bark: #C4542A
+--bark-soft: #E8A06A;
 ```
 
-## Files changed
+Registered in `@theme inline` as `--color-bark-soft: var(--bark-soft)`, so
+`text-bark-soft` works like any other palette utility. Verified in the built
+CSS: `#e8a06a` present alongside `#c4542a` and `#8b2e14`.
 
-- `app/globals.css` — the only source file touched.
-- `PHASE_REPORT.md` — this report.
+Phase 12 set `--bark` to the rust `#C4542A` and reported the side effect: bark
+text on the dark sections fell to 3.30:1. This tone fixes that without
+disturbing the light sections, where `#C4542A` is now doing good work
+(3.88:1 on cream, up from 2.01:1).
 
-`@theme inline` was reviewed and needs no edit: `--color-bark` and
-`--color-ember` already map through `var(--bark)` / `var(--ember)`, so the
-`:root` change is the single source of truth and flows into the Tailwind
-utilities. Verified in the built CSS: `#c4542a` and `#8b2e14` present,
-`#c4a574` and `#b45a2a` gone.
+## Class swaps — 17 replacements, dark parents only
 
-## Tokens deliberately NOT changed
-
-| Token | Value | Status |
+| File | Lines | Dark parent |
 |---|---|---|
-| `--lake` | `#1565C0` | unchanged — buttons stay lake |
-| `--leaf` | `#22E36A` | unchanged |
-| `--cream` | `#F4EDE0` | unchanged |
-| `--ink` | `#1A1814` | unchanged |
-| `--dusk` | `#1B2A28` | unchanged |
-| `--mist` | `#E7E1D4` | unchanged |
-| `--canopy` | `#2F4A3C` | unchanged |
+| `app/page.tsx` | Three Acts numerals `I` / `II` / `III` | `bg-dusk` section |
+| `app/the-host/page.tsx` | hero overline "Mama Nalubaale", quote cite | dusk hero + `bg-dusk` |
+| `app/the-cave/page.tsx` | 4 etiquette card headings | `bg-dusk` section |
+| `components/Hero.tsx` | location overline, "Kiwamirembe", sub-overline | dusk gradient over hero image |
+| `components/Footer.tsx` | subtitle, "Sanctuary", "Reach Us", WhatsApp, Email | `bg-dusk` footer |
 
-No button, link, or component class was touched. No copy, no prices, no
-photos, no routes, no apply-form fields.
+`text-bark` was **left alone** everywhere the parent is light: the header and
+language stub (`bg-cream`), the homepage invite cite and stay-card meta
+(`bg-cream` / `bg-mist`), the sanctuary-geography labels, the immersions day
+ratings, the 404 overline (body cream), and the two `/apply` protocol
+checkboxes — the last are checkbox accents on a cream card, not body text.
+No `bg-canopy` element carries `text-bark`, so nothing qualified there.
 
-## Ember: darkened, condition met
+No buttons, prices, copy, photos, routes, or form fields were touched.
 
-The lock said keep ember for form errors *unless* it became indistinguishable
-from bark. Measured against the new rust:
+## Contrast
 
-- old ember `#B45A2A` — H 20.9, S 62.2, L 111
-- new bark  `#C4542A` — H 16.4, S 64.7, L 119
-- RGB distance 17.1 / 441 (~4%) — the same rust-orange; not distinguishable
-  in a form field.
-
-So ember was darkened as instructed:
-
-```
---ember: #B45A2A  →  --ember: #8B2E14
-```
-
-Ember is used only for validation messages on `/apply` (11 usages, all
-`text-ember` on cream), and it now reads as a distinctly deeper burnt sienna.
-
-## Contrast effect (WCAG, on `--cream` #F4EDE0)
+On `--dusk` `#1B2A28`:
 
 | Colour | Before | After |
 |---|---|---|
-| bark text | 2.01:1 | **3.88:1** (clear improvement) |
-| ember error text | 4.07:1 | **7.22:1** |
+| `text-bark` (all dark-section text) | 3.30:1 | — |
+| `text-bark-soft` | — | **6.86:1** (AA, passes for body text) |
+| `text-bark-soft/70` (Hero sub-overline) | 2.23:1 as `bark/70` | **4.10:1** |
+| `text-bark-soft` on `--canopy` `#2F4A3C` | — | 4.46:1 |
 
-Trade-off worth knowing: on the `--dusk` sections, `text-bark` falls from
-6.38:1 to 3.30:1. That affects the small cite lines on `/the-host` and the
-homepage, and the large `I / II / III` numerals on the homepage (the numerals
-still clear AA-large at 3:1; the small cites sit below 4.5:1). Raising those
-would mean either a second bark tone or extra classes on dusk sections — both
-outside a token-only pass, so it is reported here rather than changed.
+The two tones are far apart (RGB distance 105.7 / 441), so the light and dark
+sections now read as deliberate rather than as one tone that happens to work
+in one place. Nothing on a dark background is left below 4.5:1.

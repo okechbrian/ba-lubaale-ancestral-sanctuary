@@ -6,6 +6,7 @@
   --canopy: #2F4A3C;
   --dusk: #1B2A28;
   --bark: #C4542A;
+  --bark-soft: #E8A06A;
   --ember: #8B2E14;
   --mist: #E7E1D4;
   --lake: #1565C0;
@@ -18,6 +19,7 @@
   --color-canopy: var(--canopy);
   --color-dusk: var(--dusk);
   --color-bark: var(--bark);
+  --color-bark-soft: var(--bark-soft);
   --color-ember: var(--ember);
   --color-mist: var(--mist);
   --color-lake: var(--lake);
