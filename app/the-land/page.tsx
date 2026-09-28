@@ -43,17 +43,25 @@ export default function TheLandPage() {
                 A Living Place
               </h2>
               <p className="mt-4 text-ink/70">
-                Home to a three-chambered sacred cave, free-roaming goats and
-                cows, naturally fed lake fish, and an ancient resident
-                tortoise, Mutaka. The forest is fed by an ancestral spring.
-                The Lake House sits over living water.
+                Ba Lubaale Ancestral Sanctuary Kiwamirembe is a living place —
+                ground to approach the Lubaale of Ssese and Lake Nalubaale in a
+                single visit, with the host holding the door.
               </p>
               <p className="mt-4 text-ink/70">
-                This living sanctuary was passed to her in 1998.
+                It is older than the people now standing on it. It was passed
+                to her in 1998.
               </p>
               <p className="mt-4 text-ink/70">
-                Fire burns on the shore most evenings. Board over fish. Goat bell
-                at dusk. Weaver nest in the branches above the path to the cave.
+                The forest, the spring, the fire, the herd, and more than a
+                hundred caves are here. Three of the caves are open to guests —
+                Nalubaale, Lubaale Musisi, and Lubaale Wanema. The rest are
+                visited only after a calling.{" "}
+                <Link
+                  href="/the-cave"
+                  className="font-semibold text-leaf hover:underline"
+                >
+                  See the three open caves →
+                </Link>
               </p>
             </div>
             <div className="relative overflow-hidden rounded-md">
@@ -83,9 +91,8 @@ export default function TheLandPage() {
               />
               <h3 className="mt-3 font-display text-xl text-ink">The Lake House</h3>
               <p className="mt-2 text-sm text-ink/70">
-                Rooms over the water. Organic meals cooked from the island —
-                fish, herbs, farm milk, matooke, sweet potato. The sound of the
-                lake is the only alarm.
+                Organic meals cooked from the island — fish, herbs, farm milk,
+                matooke, sweet potato.
               </p>
             </div>
             <div className="overflow-hidden rounded-md">
@@ -101,7 +108,8 @@ export default function TheLandPage() {
                 Tropical forest set against the grassland that surrounds it. An
                 ancient tree stands inside, and the spring rises in its roots.
                 Birds, monkeys, butterflies — and the sound of water that is
-                not always seen.
+                not always seen. Weaver nests hang in the branches above the
+                path to the cave.
               </p>
             </div>
             <div>
@@ -124,16 +132,17 @@ export default function TheLandPage() {
               />
               <h3 className="mt-3 font-display text-xl text-ink">The Herd</h3>
               <p className="mt-2 text-sm text-ink/70">
-                Free-roaming goats and cows. Naturally fed. The herd is part of
-                the land, not a photo opportunity. Guest interaction is welcome
-                but never staged.
+                Free-roaming goats and cows. Naturally fed. Goat bell at dusk.
+                The herd is part of the land, not a photo opportunity. Guest
+                interaction is welcome but never staged.
               </p>
             </div>
             <div>
               <h3 className="font-display text-xl text-ink">The Fire</h3>
               <p className="mt-2 text-sm text-ink/70">
-                Evening conversation here, with the host and her people. The
-                day is laid down before sleep.
+                Fire burns on the shore most evenings. Evening conversation
+                here, with the host and her people. The day is laid down before
+                sleep.
               </p>
             </div>
             <div>
@@ -156,8 +165,11 @@ export default function TheLandPage() {
             The Lake House
           </h2>
           <p className="mt-3 text-ink/70">
-            Built on stilts over the water of Lake Victoria. Fish feed beneath
-            the floorboards. The sound of the lake is the only alarm.
+            The Lake House sits on the water and hosts the ba Lubaale who stay
+            in the lake. Fish feeding is done here, always guided.
+          </p>
+          <p className="mt-3 text-ink/70">
+            Rooms sit over the water on stilts, and the lake is the only alarm.
           </p>
           <div className="mt-8 overflow-hidden rounded-md">
             <video
