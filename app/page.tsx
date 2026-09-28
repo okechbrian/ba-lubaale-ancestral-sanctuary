@@ -53,9 +53,9 @@ export default function HomePage() {
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-ink/70">
             Tropical forest against grassland, fed by a spring in the roots of
-            an ancient tree. A three-chambered sacred cave. Free-roaming goats
-            and cows. Naturally fed lake fish. An ancient resident tortoise,
-            Mutaka — seen most afternoons.
+            an ancient tree. Free-roaming goats and cows. Naturally fed lake
+            fish. An ancient resident tortoise, Mutaka — seen most afternoons.
+            And more than a hundred caves, three of them open to guests.
           </p>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

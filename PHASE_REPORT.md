@@ -1,108 +1,72 @@
-# Phase 11 report — Content alignment (content-align)
+# Phase 14 report — A Living Place split (living-place)
 
 Status: complete
-Branch: content-align (from origin/main)
-Source of truth: owner document "Ba Lubaale Ancestrial Sanctuary" (Sep 2026), cleaned English
+Branch: living-place (from origin/main @ 8a36b45)
+Scope: copy on `/the-land` and the homepage land blurb
 Date: 27 Sep 2026
 
 Gates:
 - `npm run lint` → exit 0 (0 errors, 2 pre-existing warnings)
 - `npm run build` → exit 0 (15/15 routes)
 
-**Prices were not edited.** No figure on `/immersions` or `/practices` changed.
-Verified unchanged in the diff: USD 2,200 / 3,600 / 4,500 / 7,200 / 10,000 /
-+1,500 (max 8); resident and day rates on `/practices` untouched.
+## Owner feedback addressed
 
-## Pages touched (copy only)
+The "A Living Place" block had history and inventory mixed together. It is now
+split: the opening block tells the history of the sanctuary, and the Lake House
+has its own brief narration. Forest, Herd, Fire, and Mutaka are untouched as
+sections of their own.
 
-### 1. `/the-cave` (app/the-cave/page.tsx)
-- Rewritten around: Ssese holds more than a hundred caves, only three open to
-  guests; the rest are visited only after a calling and are never offered as
-  a booking add-on (not listed).
-- New section "The Three Open Chambers":
-  - Nalubaale Chamber — Nalongo Nalubaale, twin mother, Queen and mother to
-    creation; appeals for childbearing, marriage, prosperity; closeness
-    requires deep spiritual and physical cleansing.
-  - Lubaale Musisi Chamber — movement, waking from stagnation, earthquake;
-    one sentence naming that the work may include his traditional diet (no
-    diet menu, no how-to).
-  - Lubaale Wanema Chamber — father of Mukasa; order; when nothing you do
-    lands right.
-- Etiquette kept unchanged: shoes off, no phones/photography, guided only,
-  traditional work. Host-holds-the-door line kept on `/the-host`.
-- Existing cave-mouth photo gallery kept as is — no new ritual-interior
-  images added.
-- Metadata description updated; anchor `#cave` now lands on the chambers.
+## 1. A Living Place — now history, not inventory
 
-### 2. `/the-land` (app/the-land/page.tsx)
-- Tortoise named **Mutaka**, seen most afternoons (overview, card, video block).
-- Forest copy aligned: tropical forest against grassland, ancient tree,
-  spring rising in its roots, birds, monkeys, butterflies, the sound of water
-  that is not always seen.
-- Fireplace copy: evening conversation with the host and her people; the day
-  is laid down before sleep.
-- One sentence only on origin: "This living sanctuary was passed to her in 1998."
+- "Ba Lubaale Ancestral Sanctuary Kiwamirembe is a living place — ground to
+  approach the Lubaale of Ssese and Lake Nalubaale in a single visit, with the
+  host holding the door."
+- "It is older than the people now standing on it. It was passed to her in
+  1998."
+- "The forest, the spring, the fire, the herd, and more than a hundred caves
+  are here. Three of the caves are open to guests — Nalubaale, Lubaale
+  Musisi, and Lubaale Wanema. The rest are visited only after a calling." —
+  then one link, "See the three open caves →", to `/the-cave`.
 
-### 3. Homepage (app/page.tsx)
-- Land intro: tropical forest against grassland, spring in the roots of an
-  ancient tree, tortoise named Mutaka (seen most afternoons).
-- "Who Is Welcomed" replaced three columns with seven short ones: Solitude
-  Lovers, Couples, Families, Retreat Groups, Team Building, Ekyoto Kya Ba
-  Kyaala, Seekers of Healing & Enrichment. Grid now `sm:grid-cols-2
-  lg:grid-cols-4`. No "youth rehabilitation" wording anywhere.
-- Kept: "not a party island, a drop-in lodge, or a clinical facility."
-- Immersion cards re-aligned to the new inclusion lists; **eggs removed** from
-  the buyout card ("farm milk, lake fish, herbs, and fruit") and the line
-  "House food protocol still applies." added.
-- Quote cite unchanged: "— Queen Nalubaale".
+Removed from this block: the cave count presented as a single tourist cave,
+the goats and cows, the lake fish, Mutaka, the spring/forest inventory, the
+Lake House line, and the stray sensory inventory ("Fire burns…", "Board over
+fish", "Goat bell at dusk", "Weaver nest…"). The goat bell and the weaver nest
+were not lost — they moved to the sections that own them (Herd, Forest). The
+unglossable fragment "Board over fish" was dropped rather than guessed at. No
+guarantee language, no slogan.
 
-### 4. `/the-host` (app/the-host/page.tsx)
-- H1 "Queen Nalubaale" + subline "Mama Nalubaale" unchanged.
-- Bio in her voice now includes: Ssese origin; the place was given and she
-  knowingly inherited the responsibility in August 1998; the work came from
-  the women who kept it before her; Munyoro mother and grandmother, a
-  princess of Tooro, who raised her early years (one paragraph, not a royal
-  brochure); she works with voice, hands, breath, water, fire, wind, earth;
-  no guarantees — she holds the door.
+## 2. The Lake House — its own brief narration
 
-### 5. `/immersions` (app/immersions/page.tsx) — inclusions only
-- Essential (3 days / 2 nights): cottage; two Lake House readings —
-  diagnostic and fish feeding; one cave healing session; daily root-water
-  cleansing; fireplace release; cowrie talisman workshop.
-- Master (5 days / 4 nights, duration unchanged): full sanctuary access;
-  three Lake House sessions; two cave sessions (diagnostic and
-  trauma-release); daily spring / root-water cleansing; fireplace release and
-  arbitration; bark-cloth garment or wall hanging; custom herbal teas.
-- Whole-island buyout: unlimited Lake House access; cave diagnostic and
-  trauma-release; forest and spring; livestock and fireplace; unlimited
-  one-on-one sessions and workshops of the group's choice; private cook using
-  farm milk, lake fish, herbs, fruit. **Eggs removed**; note added: "House
-  food protocol still applies."
+Opens as asked: the Lake House sits on the water and hosts the ba Lubaale who
+stay in the lake, and fish feeding is done here, always guided. One short line
+follows about the rooms over the water on stilts. The old "Fish feed beneath
+the floorboards" line was replaced by the guided-feeding line rather than
+carried over.
 
-### 6. `/prepare` (app/prepare/page.tsx)
-- Added one short note: fish feeding and chamber work are guided by the host
-  — never self-serve. Chambers are not presented as a menu.
+The feature-grid card was trimmed to the one fact it alone carries — the meals
+cooked from the island — so the card and the narration no longer repeat each
+other.
 
-### 7. Lint gate fix (required for `npm run lint` to pass)
-- `components/Hero.tsx`, `components/MomentsStrip.tsx`: replaced the
-  synchronous `setState` inside `useEffect` (react-hooks/set-state-in-effect
-  errors, pre-existing on main) with a shared `useReducedMotion()` hook built
-  on `useSyncExternalStore` (`components/useReducedMotion.ts`).
-- Behaviour unchanged: same media query, same `false` server snapshot, same
-  change listener. No palette, layout, or route change.
+## 3. Sections left as their own
 
-## Not changed (per locks)
-- Stack, routes, palette, apply form fields, food protocol text on
-  `/prepare` and `/policies`.
-- Prices on `/immersions` and `/practices`.
-- Title locks: Queen Nalubaale (public English) / Mama Nalubaale (Luganda
-  honorific); she / first person when she speaks; no legal personal name; no
-  TikTok.
-- Female-visitor rule (no chicken, no eggs) unchanged; eggs are never
-  advertised as a default meal.
-- Application-gated, one household at a time.
-- No "you will be changed", no "gods and goddesses of Africa" slogan, no
-  guarantee language. Photography still forbidden in caves and shrines.
-- Owner-document typos not copied: Ancestrial, holly, deliever, hypocrise,
-  firm milk, back cloth, live syock. Banned-phrase scan over built HTML for
-  all six pages: none.
+Forest, Herd, Fire, and Mutaka keep their headings and copy. Only two
+additions, both returns rather than new material: "Goat bell at dusk" joined
+the Herd, "Weaver nests hang in the branches above the path to the cave"
+joined the Forest, and "Fire burns on the shore most evenings" joined the
+Fire.
+
+## Homepage
+
+The land blurb no longer says "A three-chambered sacred cave". It now ends
+"…An ancient resident tortoise, Mutaka — seen most afternoons. And more than
+a hundred caves, three of them open to guests." That phrase is gone from every
+page; chamber wording remains only on `/the-cave`, which was not touched.
+
+## Not changed
+
+Prices, the apply form, the palette, and the cave chamber pages (beyond the new
+inbound link). Diff touches exactly two files: `app/the-land/page.tsx` and
+`app/page.tsx`. Verified in the built HTML: new copy present on both routes,
+"three-chambered" and "Board over fish" absent, and the A Living Place block
+contains no goat, fish, weaver, Mutaka, alarm, or matooke reference.
