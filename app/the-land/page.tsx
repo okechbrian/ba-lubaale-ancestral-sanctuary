@@ -15,8 +15,8 @@ export default function TheLandPage() {
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
         <Image
-          src="/images/forest-roots.jpg"
-          alt="Buttress roots in the forest fed by an ancestral spring"
+          src="/images/forest-lake-view.jpg"
+          alt="A spreading tree with mossy buttress roots, the lake showing through the trunks"
           fill
           priority
           className="absolute inset-0 h-full w-full object-cover"

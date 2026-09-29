@@ -1,72 +1,116 @@
-# Phase 15 report — Merge of cloth-rust + living-place into main
+# Phase 16 report — Media audit (media-audit)
 
-Status: complete
-Branch: main
-Scope: merge only — no new copy, no new pages
+Status: complete for the agreed batch; further items listed under "Open"
+Branch: media-audit (from origin/main @ d2fcd3e)
+Scope: image/video assets and the slots that use them
 Date: 27 Sep 2026
 
-Gates on the merged tree:
+Gates:
 - `npm run lint` → exit 0 (0 errors, 2 pre-existing warnings)
 - `npm run build` → exit 0 (15/15 routes)
 
-## Merges
+## Inventory reconciliation
 
-1. **`origin/cloth-rust` → main** — fast-forward `8a36b45..5342def`. No
-   conflict; the branch was already a descendant of main.
-2. **`origin/living-place` → main** — merge commit. One conflict, in
-   `PHASE_REPORT.md` only, because both branches had overwritten it; the
-   document was rewritten for this phase. `app/page.tsx` auto-merged cleanly —
-   the two branches had edited different regions of it (land blurb vs. Three
-   Acts numerals) and both survived. Verified in the built HTML.
+| | |
+|---|---|
+| Images on disk | 108 (32.8 MB) |
+| Images referenced | 52 |
+| Broken references | **0** |
+| Unused (left in place, per instruction) | 56 (~10.2 MB) |
+| Videos | 2, both used — both **640×360** |
 
-## Tokens confirmed in `app/globals.css`
+`PHOTO_INVENTORY.md` was treated as the governing plan for every judgement
+below.
 
-```
---bark:       #C4542A
---bark-soft:  #E8A06A
---ember:      #8B2E14
---lake:       #1565C0   (unchanged)
---leaf:       #22E36A   (unchanged)
-```
+## Fixed in this pass
 
-`@theme inline` registers `--color-bark`, `--color-bark-soft`,
-`--color-ember` against those variables. All three hexes are present in the
-compiled CSS.
+### 1. `closing-shore.jpg` straightened
+Measured roll by gradient orientation (peak −18°), confirmed visually against
+0/12/−12/19° candidates, settled on **+15°**. Rotated with a 1.311× pre-zoom
+so the frame still fills a 4:3 crop — no white corners, no loss of coverage.
+Affects the homepage closing CTA and the `/immersions` hero.
 
-`text-bark-soft` is applied only where the parent is dark: the homepage Three
-Acts numerals, the `/the-host` hero overline and quote cite, the `/the-cave`
-etiquette card headings, the Hero overlines (over the dusk gradient), and the
-footer. `text-bark` remains on the light sections (header, language stub, home
-invite cite, stay-card meta, geography labels, immersions day ratings, 404
-overline, and the two `/apply` checkboxes, which are accents on a cream card).
+### 2. `lake-house.jpg` cropped tighter
+Original showed a mown lawn, a black water tank and shoreline litter. Cropped
+to x1500 y600 1800×1350 (4:3), which keeps the stilted house, the lake, the far
+shore, the mango canopy and the boat shelter, and drops the litter, tank and
+lawn. The existing alt text is now exactly accurate. 1800×1350, 812 KB.
+Three slots affected: homepage gateway, `/the-land` card and `/the-land` overview.
 
-Contrast on `--dusk`: `bark-soft` 6.86:1 (was 3.30:1 for the rust), and 4.10:1
-at 70% opacity for the Hero sub-overline.
+### 3. Two broken heroes replaced
+Both were 486×1080 (aspect 0.45) portrait phone frames used full-bleed, where
+only **25% of the frame** was visible.
 
-## The two land paragraphs confirmed
+- `/the-land`: `forest-roots.jpg` → `forest-lake-view.jpg` (landscape, already
+  used elsewhere on the page, so no new bytes). A spreading tree with mossy
+  buttress roots and the lake through the trunks.
+- `/prepare`: `arrival-boat.jpg` → `shore-calm-blue.jpg`.
 
-A Living Place — history, not inventory:
+`boat-group-crossing.jpg` was evaluated as the `/prepare` candidate and
+rejected — the frame is foliage-obscured and hazy with no boats or people
+visible, despite its name.
 
-> Ba Lubaale Ancestral Sanctuary Kiwamirembe is a living place — ground to
-> approach the Lubaale of Ssese and Lake Nalubaale in a single visit, with the
-> host holding the door. It is older than the people now standing on it. It was
-> passed to her in 1998. The forest, the spring, the fire, the herd, and more
-> than a hundred caves are here. Three of the caves are open to guests —
-> Nalubaale, Lubaale Musisi, and Lubaale Wanema. The rest are visited only
-> after a calling.
+### 4. Alt text corrected
+`forest-roots.jpg` was captioned "fed by an ancestral spring" while showing no
+water at all. Now: "Buttress roots of an ancient tree in the sanctuary forest".
+Verified: **0** `alt` attributes across all eight built pages still claim water
+the frame does not show. (The hero sub-heading "Set within vast forest fed by an
+ancestral spring" is page copy, not an alt, and was left alone.)
 
-The Lake House — its own narration:
+### 5. Phone watermarks removed — 3 live exposures found and fixed
+A corner-sheet sweep of all 108 files found **9 images carrying a burned-in
+phone watermark**, 4 of them published:
 
-> The Lake House sits on the water and hosts the ba Lubaale who stay in the
-> lake. Fish feeding is done here, always guided. Rooms sit over the water on
-> stilts, and the lake is the only alarm.
+| File | Mark | Status |
+|---|---|---|
+| `pineapple-farm-lake.jpg` | Samsung Quad Camera | **live on `/the-land`** — fixed |
+| `sunset-calm-lake.jpg` | Samsung Quad Camera | **live in `MomentsStrip`** — fixed |
+| `bananas-woven-mats.jpg` | Samsung Quad Camera | live on `/atelier`, hidden only by the crop — fixed |
+| `fresh-tilapia.jpg` | Samsung Quad Camera | live on `/the-land`, hidden only by the crop — fixed |
+| `boat-shelter.jpg` | CAMON 30S Pro | unused |
+| `cloudscape-hills.jpg` | Samsung Quad Camera | unused |
+| `host-garden-welcome.jpg` | CAMON 30S Pro | unused |
+| `kente-rock-sit.jpg` | CAMON 30S Pro | unused |
+| `lake-cloudscape.jpg` | Samsung Quad Camera | unused |
 
-Neither "three-chambered sacred cave" nor "Board over fish" appears anywhere;
-chamber wording remains only on `/the-cave`. The goat bell sits with the Herd
-and the weaver nests with the Forest, as reviewed.
+The three that are in use were re-saved with the bottom 22% removed
+(1080×809 → 1080×631, aspect 1.33 → 1.71), which clears the mark and also makes
+them landscape-native. Verified the marks are gone by re-inspecting the corners.
+
+Note the two that were previously "safe" were safe only because a 4:3 crop
+happened to slice off the bottom 22%. That was luck, not policy.
+
+## Open — not changed, needs your call
+
+1. **The hero is a tortoise.** `Hero.tsx:64` plays `tortoise.mp4` full-bleed,
+   and the approved shore-gathering still only renders under
+   `prefers-reduced-motion`. The unimported 1080p master was reviewed
+   (`20260916_144337.mp4`, 92 s): it is a handheld property pan — lawn, water
+   tanks, tyres, cottage. **Not recommended for the hero.** Still-crossfade or a
+   slow push on the approved still remain the better options.
+2. **Both videos are 360p.** `lake-house.mp4` (19.7 MB) and `tortoise.mp4`
+   (4.9 MB) are 640×360 across full-bleed sections. The 1080p master exists and
+   could be re-encoded, but the hero decision should come first.
+3. **`MomentsStrip` violations**, deferred by instruction: `food-plate.jpg` and
+   `food-luwombo.jpg` (food plates on the homepage), `cowrie-three.jpg`
+   (gathering selfie), `braided-bead-set.jpg` (jewellery macro) — all forbidden
+   by `PHOTO_INVENTORY.md:231` — plus `cave-mouth-wide.jpg`, a crowded cave
+   interior with a silhouetted head, currently rotating above the fold. The last
+   one is the item I would not leave sitting.
+4. **Aspect-ratio crop, remaining 27 images.** 29 of 52 used images lose over
+   40% of their frame in a 4:3 box; the two heroes are fixed above, leaving 8
+   severe (`coffee-cherries`, `braided-bead-set`, `cowrie-seed-necklace`,
+   `cowrie-necklace-still`, `kente-shore-two`, `kente-water-rite` at 34–42%) and
+   ~19 moderate. The severe ones are portrait object stills on `/atelier`; the
+   clean fix is a portrait-shaped box for those cards rather than `object-position`
+   nudging.
+5. **Thin pages.** `/practices` 1 image, `/immersions` 1, `/prepare` 2. Sanctioned
+   filler exists in the unused pool (`fire-embers`, `food-whole-fish`,
+   `food-luwombo`, `kitchen-leaf-wrap`, `host-measuring-bark`, `og-cave-shore`),
+   with the standing guard that no food image may illustrate the no-egg rule.
+6. **Seven watermarked unused images** must be cropped or retouched before any
+   of them is published.
 
 ## Not touched
-
-Prices, the apply form and its fields, the WhatsApp number, and the domain
-were not modified by either merge. The merge diff contains no price, form, or
-contact changes. No pages were added.
+Prices, the apply form and its fields, the WhatsApp number, the domain, routes,
+the palette, and page copy beyond the alt strings listed above.

@@ -98,7 +98,7 @@ export default function HomePage() {
               <div className="relative overflow-hidden rounded-md">
                 <Image
                   src="/images/forest-roots.jpg"
-                  alt="Buttress roots in the forest fed by an ancestral spring"
+                  alt="Buttress roots of an ancient tree in the sanctuary forest"
                   width={400}
                   height={300}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"

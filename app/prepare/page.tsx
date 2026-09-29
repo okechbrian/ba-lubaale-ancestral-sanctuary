@@ -15,8 +15,8 @@ export default function PreparePage() {
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
         <Image
-          src="/images/arrival-boat.jpg"
-          alt="The water the Lake House sits on"
+          src="/images/shore-calm-blue.jpg"
+          alt="Calm water on the lake with the far shore in the distance"
           fill
           priority
           className="absolute inset-0 h-full w-full object-cover"
