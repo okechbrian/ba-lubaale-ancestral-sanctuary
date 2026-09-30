@@ -1,116 +1,125 @@
-# Phase 16 report — Media audit (media-audit)
+# Phase 17 report — Media audit, part two (media-audit)
 
-Status: complete for the agreed batch; further items listed under "Open"
-Branch: media-audit (from origin/main @ d2fcd3e)
-Scope: image/video assets and the slots that use them
+Status: complete
+Branch: media-audit (continues from the part-one commit `a8f882a`)
 Date: 27 Sep 2026
 
 Gates:
 - `npm run lint` → exit 0 (0 errors, 2 pre-existing warnings)
 - `npm run build` → exit 0 (15/15 routes)
 
-## Inventory reconciliation
+## Corrections to the part-one report
 
-| | |
+1. `braided-bead-set.jpg` was listed as a strip violation. **It is not in the
+   strip** — it is `/atelier` only. The actual strip violations were
+   `food-luwombo`, `food-plate`, `cowrie-three` and `cave-mouth-wide`.
+2. The unused watermarked files number **5, not 7**. I had double-counted the
+   two that were live-but-hidden-by-crop and are already fixed.
+
+## A. Strip violations removed
+
+`components/MomentsStrip.tsx` — 31 → 27 entries.
+
+| Removed | Why |
 |---|---|
-| Images on disk | 108 (32.8 MB) |
-| Images referenced | 52 |
-| Broken references | **0** |
-| Unused (left in place, per instruction) | 56 (~10.2 MB) |
-| Videos | 2, both used — both **640×360** |
+| `food-luwombo` | food plate on the homepage — forbidden by `PHOTO_INVENTORY.md:231` |
+| `food-plate` | food plate on the homepage — same rule |
+| `cowrie-three` | catalogued as a gathering selfie |
+| `cave-mouth-wide` | crowded cave interior with a silhouetted head |
 
-`PHOTO_INVENTORY.md` was treated as the governing plan for every judgement
-below.
+Kept: three 0.45 portraits (`arrival-boat`, `forest-roots`, `coffee-cherries`)
+show 45% in the square strip box — accepted, they are the only arrival and
+harvest frames.
 
-## Fixed in this pass
+## B. `/atelier` portrait row
 
-### 1. `closing-shore.jpg` straightened
-Measured roll by gradient orientation (peak −18°), confirmed visually against
-0/12/−12/19° candidates, settled on **+15°**. Rotated with a 1.311× pre-zoom
-so the frame still fills a 4:3 crop — no white corners, no loss of coverage.
-Affects the homepage closing CTA and the `/immersions` hero.
+`cowrie-necklace-still` (0.56), `braided-bead-set` (0.45) and
+`cowrie-seed-necklace` (0.45) were portrait object stills inside `aspect-[4/3]`
+cards, showing only 34–42% of the frame. They now sit in their own three-up
+**"Finished Pieces"** section using `aspect-[3/4]`, so the whole piece is
+shown. The people-and-place cards keep 4:3, so the page rhythm is unchanged.
 
-### 2. `lake-house.jpg` cropped tighter
-Original showed a mown lawn, a black water tank and shoreline litter. Cropped
-to x1500 y600 1800×1350 (4:3), which keeps the stilted house, the lake, the far
-shore, the mango canopy and the boat shelter, and drops the litter, tank and
-lawn. The existing alt text is now exactly accurate. 1800×1350, 812 KB.
-Three slots affected: homepage gateway, `/the-land` card and `/the-land` overview.
+## C. Thin pages filled
 
-### 3. Two broken heroes replaced
-Both were 486×1080 (aspect 0.45) portrait phone frames used full-bleed, where
-only **25% of the frame** was visible.
+- `/practices` — added a quiet three-up stills strip (`fire-embers`,
+  `host-measuring-bark`, `sunset-calm-lake`) **after** the price lists rather
+  than inside them; dropping images between price cards would break the
+  reading flow.
+- `/immersions` — added the trio the inventory explicitly allows: cave mouth
+  (`og-cave-shore`), bark wear (`bark-dresses-stand`), fire (`fire-night`).
+  No food plates, no cave crowds.
+- `/prepare` — `fire-embers` at the evening passage, and `food-whole-fish`
+  placed directly under the island-meals sentence. **Guard held:** no food
+  image sits beside the no-chicken / no-egg rule, which remains text only.
+  Verified in the built HTML that the first 300 characters of that section are
+  rule text with no food reference.
 
-- `/the-land`: `forest-roots.jpg` → `forest-lake-view.jpg` (landscape, already
-  used elsewhere on the page, so no new bytes). A spreading tree with mossy
-  buttress roots and the lake through the trunks.
-- `/prepare`: `arrival-boat.jpg` → `shore-calm-blue.jpg`.
+## D. Hero: five-frame crossfade, tortoise retained
 
-`boat-group-crossing.jpg` was evaluated as the `/prepare` candidate and
-rejected — the frame is foliage-obscured and hazy with no boats or people
-visible, despite its name.
+`components/Hero.tsx` now cycles on a 36s round —
+`hero-shore-gathering` → `forest-lake-view` → `fire-night` → `closing-shore` →
+`tortoise.mp4`. Per your instruction both survive: the tortoise is the closing
+frame rather than the whole hero. Zero new bytes, and reduced-motion visitors
+still get a single still with no video.
 
-### 4. Alt text corrected
-`forest-roots.jpg` was captioned "fed by an ancestral spring" while showing no
-water at all. Now: "Buttress roots of an ancient tree in the sanctuary forest".
-Verified: **0** `alt` attributes across all eight built pages still claim water
-the frame does not show. (The hero sub-heading "Set within vast forest fed by an
-ancestral spring" is page copy, not an alt, and was left alone.)
+The old click-to-pause control is gone, since there is no single video to
+pause; that also retires the unused `videoPlaying` state.
 
-### 5. Phone watermarks removed — 3 live exposures found and fixed
-A corner-sheet sweep of all 108 files found **9 images carrying a burned-in
-phone watermark**, 4 of them published:
+### A real bug caught before shipping
 
-| File | Mark | Status |
-|---|---|---|
-| `pineapple-farm-lake.jpg` | Samsung Quad Camera | **live on `/the-land`** — fixed |
-| `sunset-calm-lake.jpg` | Samsung Quad Camera | **live in `MomentsStrip`** — fixed |
-| `bananas-woven-mats.jpg` | Samsung Quad Camera | live on `/atelier`, hidden only by the crop — fixed |
-| `fresh-tilapia.jpg` | Samsung Quad Camera | live on `/the-land`, hidden only by the crop — fixed |
-| `boat-shelter.jpg` | CAMON 30S Pro | unused |
-| `cloudscape-hills.jpg` | Samsung Quad Camera | unused |
-| `host-garden-welcome.jpg` | CAMON 30S Pro | unused |
-| `kente-rock-sit.jpg` | CAMON 30S Pro | unused |
-| `lake-cloudscape.jpg` | Samsung Quad Camera | unused |
+The first implementation drove each layer's opacity with CSS custom properties
+as keyframe offsets. The production build collapsed them:
 
-The three that are in use were re-saved with the bottom 22% removed
-(1080×809 → 1080×631, aspect 1.33 → 1.71), which clears the mark and also makes
-them landscape-native. Verified the marks are gone by re-inspecting the corners.
+```
+@keyframes heroFade{0%{opacity:0}to{opacity:0}}
+```
 
-Note the two that were previously "safe" were safe only because a 4:3 crop
-happened to slice off the bottom 22%. That was luck, not policy.
+Custom properties are not valid keyframe offsets, so the minifier reduced the
+rule to a single 0%/100% pair — every layer would have sat at opacity 0 and the
+hero would have rendered **no image at all**, just the dusk overlay. Replaced
+with five explicit keyframe blocks using literal stops. Verified present and
+intact in the built CSS:
 
-## Open — not changed, needs your call
+```
+heroFrame1  0%,16.7% → 1     20.8%,to → 0
+heroFrame2  0%,16.7% → 0     20.8%,33.3% → 1    37.5%,to → 0
+heroFrame3  0%,33.3% → 0     37.5%,50% → 1      54.2%,to → 0
+heroFrame4  0%,50% → 0       54.2%,66.7% → 1    70.8%,to → 0
+heroFrame5  0%,66.7% → 0     70.8%,95.8% → 1    to → 0
+```
 
-1. **The hero is a tortoise.** `Hero.tsx:64` plays `tortoise.mp4` full-bleed,
-   and the approved shore-gathering still only renders under
-   `prefers-reduced-motion`. The unimported 1080p master was reviewed
-   (`20260916_144337.mp4`, 92 s): it is a handheld property pan — lawn, water
-   tanks, tyres, cottage. **Not recommended for the hero.** Still-crossfade or a
-   slow push on the approved still remain the better options.
-2. **Both videos are 360p.** `lake-house.mp4` (19.7 MB) and `tortoise.mp4`
-   (4.9 MB) are 640×360 across full-bleed sections. The 1080p master exists and
-   could be re-encoded, but the hero decision should come first.
-3. **`MomentsStrip` violations**, deferred by instruction: `food-plate.jpg` and
-   `food-luwombo.jpg` (food plates on the homepage), `cowrie-three.jpg`
-   (gathering selfie), `braided-bead-set.jpg` (jewellery macro) — all forbidden
-   by `PHOTO_INVENTORY.md:231` — plus `cave-mouth-wide.jpg`, a crowded cave
-   interior with a silhouetted head, currently rotating above the fold. The last
-   one is the item I would not leave sitting.
-4. **Aspect-ratio crop, remaining 27 images.** 29 of 52 used images lose over
-   40% of their frame in a 4:3 box; the two heroes are fixed above, leaving 8
-   severe (`coffee-cherries`, `braided-bead-set`, `cowrie-seed-necklace`,
-   `cowrie-necklace-still`, `kente-shore-two`, `kente-water-rite` at 34–42%) and
-   ~19 moderate. The severe ones are portrait object stills on `/atelier`; the
-   clean fix is a portrait-shaped box for those cards rather than `object-position`
-   nudging.
-5. **Thin pages.** `/practices` 1 image, `/immersions` 1, `/prepare` 2. Sanctioned
-   filler exists in the unused pool (`fire-embers`, `food-whole-fish`,
-   `food-luwombo`, `kitchen-leaf-wrap`, `host-measuring-bark`, `og-cave-shore`),
-   with the standing guard that no food image may illustrate the no-egg rule.
-6. **Seven watermarked unused images** must be cropped or retouched before any
-   of them is published.
+### How far the visual check actually got
+
+Confirmed live in a headless browser: the hero does switch images (distinct
+frames captured), and the page renders correctly. **I could not verify the
+exact per-frame timing this way** — Chromium's `--virtual-time-budget`
+advances timers but not the CSS animation clock predictably, so captured frames
+landed at arbitrary points in the cycle. The ordering above is guaranteed by
+the keyframe stops, but please eyeball the rhythm once on the deployed site.
+
+A second false start worth recording: port 3000 was already occupied by an
+unrelated project, so my first screenshots were of the wrong website entirely.
+Everything above was re-verified on port 3111.
+
+## E. Five unused watermarked files cropped
+
+`boat-shelter`, `cloudscape-hills`, `kente-rock-sit`, `host-garden-welcome`,
+`lake-cloudscape` — bottom 22% removed, same operation as the four fixed in
+part one. None are referenced by code, so there is no visual risk; this just
+stops anyone reaching for a marked file later.
+
+## Still open
+
+1. **Both videos remain 640×360.** Deferred by agreement. The 1080p master is
+   the same property-pan footage, so re-encoding fixes sharpness but not
+   framing. `/the-land` also has the cropped `lake-house.jpg` still as a
+   sharper fallback if you would rather drop the video.
+2. **Two aspect cases left unfixed:** `kente-shore-two` and `kente-water-rite`
+   on `/atelier` show 42% in a 4:3 box. Their subjects look centre-weighted so
+   they should be fine, but they are worth an eye.
+3. **The unimported 1080p master** (`20260916_144337.mp4`, 92s) and the 1.5s
+   `VID-20260915-WA0071.mp4` remain on disk, unimported.
 
 ## Not touched
 Prices, the apply form and its fields, the WhatsApp number, the domain, routes,
-the palette, and page copy beyond the alt strings listed above.
+the palette, and page copy.

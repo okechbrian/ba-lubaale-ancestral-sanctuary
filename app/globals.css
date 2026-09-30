@@ -32,3 +32,73 @@ body {
   background: var(--cream);
   color: var(--ink);
 }
+
+/* Hero crossfade — 36s round.
+   One keyframe block per layer, with literal stops. Custom properties are
+   NOT used as keyframe offsets: the CSS minifier collapses those rules
+   to a single 0%/100% pair, which would leave the hero blank. */
+@keyframes heroFrame1 {
+  0%,
+  16.7% {
+    opacity: 1;
+  }
+  20.8%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes heroFrame2 {
+  0%,
+  16.7% {
+    opacity: 0;
+  }
+  20.8%,
+  33.3% {
+    opacity: 1;
+  }
+  37.5%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes heroFrame3 {
+  0%,
+  33.3% {
+    opacity: 0;
+  }
+  37.5%,
+  50% {
+    opacity: 1;
+  }
+  54.2%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes heroFrame4 {
+  0%,
+  50% {
+    opacity: 0;
+  }
+  54.2%,
+  66.7% {
+    opacity: 1;
+  }
+  70.8%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes heroFrame5 {
+  0%,
+  66.7% {
+    opacity: 0;
+  }
+  70.8%,
+  95.8% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

@@ -199,6 +199,41 @@ export default function PracticesPage() {
         </div>
       </section>
 
+      {/* Supporting stills */}
+      <section className="bg-mist py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/fire-embers.jpg"
+                alt="Low embers glowing on the shore fire"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/host-measuring-bark.jpg"
+                alt="Hands measuring bark cloth in the banana grove"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/sunset-calm-lake.jpg"
+                alt="Golden sunset on calm Lake Victoria water"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-dusk py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">

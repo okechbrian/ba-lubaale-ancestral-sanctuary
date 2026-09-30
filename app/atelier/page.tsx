@@ -121,11 +121,31 @@ export default function AtelierPage() {
             </div>
             <div className="overflow-hidden rounded-md">
               <Image
-                src="/images/cowrie-necklace-still.jpg"
-                alt="Finished cowrie and stone necklace"
+                src="/images/bananas-woven-mats.jpg"
+                alt="Ripe bananas hanging beside woven mats in the cookhouse"
                 width={400}
                 height={300}
                 className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Finished pieces — portrait frames so the object is not cut short */}
+      <section className="bg-cream py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-semibold text-ink">
+            Finished Pieces
+          </h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/cowrie-necklace-still.jpg"
+                alt="Finished cowrie and stone necklace"
+                width={400}
+                height={533}
+                className="aspect-[3/4] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
@@ -133,8 +153,8 @@ export default function AtelierPage() {
                 src="/images/braided-bead-set.jpg"
                 alt="Braided bead necklace and bracelet set"
                 width={400}
-                height={300}
-                className="aspect-[4/3] w-full object-cover"
+                height={533}
+                className="aspect-[3/4] w-full object-cover"
               />
             </div>
             <div className="overflow-hidden rounded-md">
@@ -142,17 +162,8 @@ export default function AtelierPage() {
                 src="/images/cowrie-seed-necklace.jpg"
                 alt="Cowrie, seed, and white bead strand"
                 width={400}
-                height={300}
-                className="aspect-[4/3] w-full object-cover"
-              />
-            </div>
-            <div className="overflow-hidden rounded-md">
-              <Image
-                src="/images/bananas-woven-mats.jpg"
-                alt="Ripe bananas hanging beside woven mats in the cookhouse"
-                width={400}
-                height={300}
-                className="aspect-[4/3] w-full object-cover"
+                height={533}
+                className="aspect-[3/4] w-full object-cover"
               />
             </div>
           </div>

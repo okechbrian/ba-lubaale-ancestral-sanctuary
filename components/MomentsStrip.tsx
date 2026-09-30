@@ -76,26 +76,6 @@ const MOMENTS = [
     caption: "Cowrie adornment",
   },
   {
-    src: "/images/cowrie-three.jpg",
-    alt: "Three women wearing cowrie strand necklaces",
-    caption: "Cowrie strands",
-  },
-  {
-    src: "/images/food-luwombo.jpg",
-    alt: "Luwombo wrapped in banana leaf",
-    caption: "Luwombo feast",
-  },
-  {
-    src: "/images/food-plate.jpg",
-    alt: "A plate of sanctuary farm food",
-    caption: "Farm plate",
-  },
-  {
-    src: "/images/cave-mouth-wide.jpg",
-    alt: "Wide view of the cave mouth opening to the forest",
-    caption: "Cave opening",
-  },
-  {
     src: "/images/cave-mouth-congregation.jpg",
     alt: "Gathering at the cave mouth",
     caption: "Cave threshold",

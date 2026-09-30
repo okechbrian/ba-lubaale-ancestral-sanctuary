@@ -110,6 +110,15 @@ export default function PreparePage() {
             screens after dark. If you need to make an urgent call, step away
             from the shared spaces.
           </p>
+          <div className="mt-8 max-w-md overflow-hidden rounded-md">
+            <Image
+              src="/images/fire-embers.jpg"
+              alt="Low embers glowing on the evening shore fire"
+              width={400}
+              height={300}
+              className="aspect-[4/3] w-full object-cover"
+            />
+          </div>
         </div>
       </section>
 
@@ -144,6 +153,15 @@ export default function PreparePage() {
             sweet potato, herbs, farm milk, fruit. The protocol is stated plainly
             here and will appear as a yes/no question on the application form.
           </p>
+          <div className="mt-6 max-w-sm overflow-hidden rounded-md">
+            <Image
+              src="/images/food-whole-fish.jpg"
+              alt="A whole fish served on a banana leaf"
+              width={400}
+              height={300}
+              className="aspect-[4/3] w-full object-cover"
+            />
+          </div>
         </div>
       </section>
 

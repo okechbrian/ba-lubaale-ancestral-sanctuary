@@ -151,6 +151,41 @@ export default function ImmersionsPage() {
         </div>
       </section>
 
+      {/* Supporting stills */}
+      <section className="bg-mist py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/og-cave-shore.jpg"
+                alt="Mossed rock mouth of Nalubaale Cave seen from the water"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/bark-dresses-stand.jpg"
+                alt="Finished bark-cloth dresses on a stand among banana trees"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <Image
+                src="/images/fire-night.jpg"
+                alt="Night bonfire on the shore"
+                width={400}
+                height={300}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-dusk py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">

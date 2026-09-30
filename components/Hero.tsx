@@ -1,68 +1,81 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useReducedMotion } from "@/components/useReducedMotion";
 
+/**
+ * Hero crossfade: four stills then the tortoise clip, 36s round.
+ * The first frame paints at once; the rest ramp in and out on the
+ * per-layer keyframes declared in globals.css. Costs no JavaScript and
+ * no extra bytes. Reduced-motion visitors get one still and no cycle.
+ */
+const HERO_CYCLE = "36s linear infinite";
+
+const FIRST_FRAME = {
+  src: "/images/hero-shore-gathering.jpg",
+  alt: "Women in rust bark-cloth dresses standing on the Lake Victoria shore",
+};
+
+const LATER_FRAMES = [
+  { src: "/images/forest-lake-view.jpg", frame: 2 },
+  { src: "/images/fire-night.jpg", frame: 3 },
+  { src: "/images/closing-shore.jpg", frame: 4 },
+] as const;
+
 export function Hero() {
-  const [videoPlaying, setVideoPlaying] = useState(false);
   const reducedMotion = useReducedMotion();
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (reducedMotion) return;
-    const v = videoRef.current;
-    if (!v) return;
-    const playPromise = v.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => setVideoPlaying(true))
-        .catch(() => setVideoPlaying(false));
-    }
-  }, [reducedMotion]);
-
-  function toggleVideo() {
-    const v = videoRef.current;
-    if (!v) return;
-    if (videoPlaying) {
-      v.pause();
-      setVideoPlaying(false);
-    } else {
-      const playPromise = v.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => setVideoPlaying(true))
-          .catch(() => setVideoPlaying(false));
-      }
-    }
-  }
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      {/* Poster still — only for reduced motion */}
-      {reducedMotion && (
+      {reducedMotion ? (
+        /* Reduced motion: one still, no cycle, no video */
         <Image
-          src="/images/hero-shore-gathering.jpg"
-          alt="Women in rust bark-cloth dresses standing on the Lake Victoria shore"
+          src={FIRST_FRAME.src}
+          alt={FIRST_FRAME.alt}
           fill
           priority
           className="absolute inset-0 h-full w-full object-cover"
         />
-      )}
+      ) : (
+        <>
+          {/* Frame 1 — already on screen at load, so it never fades in */}
+          <Image
+            src={FIRST_FRAME.src}
+            alt={FIRST_FRAME.alt}
+            fill
+            priority
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ animation: `heroFrame1 ${HERO_CYCLE}` }}
+          />
 
-      {/* Video layer */}
-      {!reducedMotion && (
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          loop
-          className="absolute inset-0 h-full w-full object-cover"
-          onClick={toggleVideo}
-        >
-          <source src="/video/tortoise.mp4" type="video/mp4" />
-        </video>
+          {/* Frames 2–4: stills */}
+          {LATER_FRAMES.map(({ src, frame }) => (
+            <Image
+              key={src}
+              src={src}
+              alt=""
+              fill
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ animation: `heroFrame${frame} ${HERO_CYCLE}` }}
+            />
+          ))}
+
+          {/* Frame 5: the tortoise clip closes the cycle */}
+          <video
+            muted
+            playsInline
+            loop
+            autoPlay
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ animation: `heroFrame5 ${HERO_CYCLE}` }}
+          >
+            <source src="/video/tortoise.mp4" type="video/mp4" />
+          </video>
+        </>
       )}
 
       {/* Dusk overlay */}
@@ -100,17 +113,6 @@ export function Hero() {
             Enter the Land
           </a>
         </div>
-
-        {/* Play / Pause control */}
-        {!reducedMotion && (
-          <button
-            type="button"
-            onClick={toggleVideo}
-            className="mt-6 text-xs text-cream/50 underline underline-offset-4 transition-colors hover:text-cream/80"
-          >
-            {videoPlaying ? "Pause the lake" : "Play the lake"}
-          </button>
-        )}
 
         <p className="mt-8 text-xs text-cream/50">
           Private. Screened. One household at a time.
