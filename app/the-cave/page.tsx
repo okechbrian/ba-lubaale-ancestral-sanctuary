@@ -79,6 +79,9 @@ export default function TheCavePage() {
               <h3 className="font-display text-xl text-ink">
                 Nalubaale Chamber
               </h3>
+              <p className="mt-2 text-sm font-semibold text-ember">
+                motherhood, marriage, prosperity — closeness after cleansing
+              </p>
               <p className="mt-3 text-sm text-ink/70">
                 Belonging to Nalongo Nalubaale, the twin mother — a Queen and
                 mother to creation. People appeal to her for childbearing,
@@ -90,6 +93,9 @@ export default function TheCavePage() {
               <h3 className="font-display text-xl text-ink">
                 Lubaale Musisi Chamber
               </h3>
+              <p className="mt-2 text-sm font-semibold text-ember">
+                movement out of stagnation
+              </p>
               <p className="mt-3 text-sm text-ink/70">
                 Known for movement and for the earthquake, and for waking every
                 person from sleep. When your life has gone stagnant, this is
@@ -101,6 +107,9 @@ export default function TheCavePage() {
               <h3 className="font-display text-xl text-ink">
                 Lubaale Wanema Chamber
               </h3>
+              <p className="mt-2 text-sm font-semibold text-ember">
+                order, when nothing lands right
+              </p>
               <p className="mt-3 text-sm text-ink/70">
                 Father of Lubaale Mukasa. Reserved, and responsible for putting
                 things straight. Go to him in the seasons when nothing you do

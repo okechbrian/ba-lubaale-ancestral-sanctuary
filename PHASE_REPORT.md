@@ -1,125 +1,94 @@
-# Phase 17 report — Media audit, part two (media-audit)
+# Teaching ground report
 
 Status: complete
-Branch: media-audit (continues from the part-one commit `a8f882a`)
-Date: 27 Sep 2026
+Branch: teaching-ground (from origin/main)
+Build: pass (15/15 routes)
+Lint: pass (0 errors, 2 pre-existing warnings)
 
-Gates:
-- `npm run lint` → exit 0 (0 errors, 2 pre-existing warnings)
-- `npm run build` → exit 0 (15/15 routes)
+## The three films (ids)
 
-## Corrections to the part-one report
+1. **Okwezuula, part 1** — id `0Soh_8nwBZc`
+   EN: Unveiling. Who you are, and what has been blocking the life.
+2. **Master the art of balance** — id `ycERgjuSUNs`
+   EN: Silence, conduct, and the thirty quiet minutes with no phone.
+3. **FFUNA OBUGAGGA MU NAMBULA BIZINGA BYE SSESE** — id `4bTrmRtg_WU`
+   EN: The Ssese gathering. The annual coming-together, not a resort advert.
 
-1. `braided-bead-set.jpg` was listed as a strip violation. **It is not in the
-   strip** — it is `/atelier` only. The actual strip violations were
-   `food-luwombo`, `food-plate`, `cowrie-three` and `cave-mouth-wide`.
-2. The unused watermarked files number **5, not 7**. I had double-counted the
-   two that were live-but-hidden-by-crop and are already fixed.
+Channel: https://www.youtube.com/@nalubaalethedivine7639 — link label
+**Nalubaale The Divine**.
 
-## A. Strip violations removed
+## What shipped
 
-`components/MomentsStrip.tsx` — 31 → 27 entries.
+- `content/teaching.ts` — the three films + channel, single source for the
+  shelf and the footer.
+- `components/HearHer.tsx` — new. youtube-nocookie embeds, click-to-play
+  facade (thumbnail from `i.ytimg.com`, iframe mounts only on click, so
+  nothing loads or plays on page load), no autoplay on load, title =
+  Luganda/channel title, one English line under each. Placed on `/the-host`
+  under the bio with `id="hear-her"`. Not a client-side autoplay: playback
+  starts only from the click, per the "no autoplay sound" lock.
+- Footer repeat: three titles (linking to `/the-host#hear-her`) + the channel
+  link, no second set of iframes. Footer grid went 3 → 4 columns
+  (sm:2 / lg:4) to hold it.
+- Homepage teaching line under the hero, before Sanctuary Moments:
+  "This ground is where the Lubaale of Ssese can be approached, and where the
+  teaching is lived." + `Hear her →` `/the-host#hear-her`. Prices and the
+  apply CTA untouched.
+- Layout shift:
+  - `/the-host` bio — portrait large (7 of 12 cols), bio in a narrow column
+    (4 of 12, col-start 9, max-w-md), then the film shelf full width.
+  - Homepage host block — same portrait (larger round crop), two sentences,
+    `Meet the host →`.
+- `/the-cave` chamber one-liners under each name:
+  - Nalubaale: motherhood, marriage, prosperity — closeness after cleansing
+  - Musisi: movement out of stagnation
+  - Wanema: order, when nothing lands right
+  No diet menu added; existing chamber copy untouched.
 
-| Removed | Why |
-|---|---|
-| `food-luwombo` | food plate on the homepage — forbidden by `PHOTO_INVENTORY.md:231` |
-| `food-plate` | food plate on the homepage — same rule |
-| `cowrie-three` | catalogued as a gathering selfie |
-| `cave-mouth-wide` | crowded cave interior with a silhouetted head |
+## What was not done (and why)
 
-Kept: three 0.45 portraits (`arrival-boat`, `forest-roots`, `coffee-cherries`)
-show 45% in the square strip box — accepted, they are the only arrival and
-harvest frames.
+- Only the homepage, `/the-host` and `/the-cave` were touched. Every other
+  page is unchanged, per "Do not rebuild every page in this pass."
+- "The Work" photo row on `/the-host` kept as-is — it is the working
+  portraits, not the host block.
 
-## B. `/atelier` portrait row
+## Locks verified
 
-`cowrie-necklace-still` (0.56), `braided-bead-set` (0.45) and
-`cowrie-seed-necklace` (0.45) were portrait object stills inside `aspect-[4/3]`
-cards, showing only 34–42% of the frame. They now sit in their own three-up
-**"Finished Pieces"** section using `aspect-[3/4]`, so the whole piece is
-shown. The people-and-place cards keep 4:3, so the page rhythm is unchanged.
+- Queen Nalubaale (EN) / Mama Nalubaale (LG) — unchanged.
+- Prices unchanged. Apply fields unchanged. No chicken/eggs rule untouched.
+- No WhatsApp number: footer still shows the empty slot ("Available on
+  request"); `0706559119` appears nowhere in the build.
+- No autoplay sound: no iframe exists until a click mounts it.
+- Photography-in-caves rule lines untouched in footer, `/prepare`, `/policies`.
+- Not a channel dump: three films only, no playlist, no channel banner.
 
-## C. Thin pages filled
+## Files created or changed
 
-- `/practices` — added a quiet three-up stills strip (`fire-embers`,
-  `host-measuring-bark`, `sunset-calm-lake`) **after** the price lists rather
-  than inside them; dropping images between price cards would break the
-  reading flow.
-- `/immersions` — added the trio the inventory explicitly allows: cave mouth
-  (`og-cave-shore`), bark wear (`bark-dresses-stand`), fire (`fire-night`).
-  No food plates, no cave crowds.
-- `/prepare` — `fire-embers` at the evening passage, and `food-whole-fish`
-  placed directly under the island-meals sentence. **Guard held:** no food
-  image sits beside the no-chicken / no-egg rule, which remains text only.
-  Verified in the built HTML that the first 300 characters of that section are
-  rule text with no food reference.
+- created `components/HearHer.tsx`
+- created `content/teaching.ts`
+- `app/page.tsx` (teaching line, host block)
+- `app/the-host/page.tsx` (bio restructure, shelf)
+- `app/the-cave/page.tsx` (chamber one-liners)
+- `components/Footer.tsx` (Hear her column, 4-col grid)
+- `next.config.ts` (`images.remotePatterns` for `i.ytimg.com` thumbnails)
+- `PHASE_REPORT.md` (this file)
 
-## D. Hero: five-frame crossfade, tortoise retained
+## Images used (public names)
 
-`components/Hero.tsx` now cycles on a 36s round —
-`hero-shore-gathering` → `forest-lake-view` → `fire-night` → `closing-shore` →
-`tortoise.mp4`. Per your instruction both survive: the tortoise is the closing
-frame rather than the whole hero. Zero new bytes, and reduced-motion visitors
-still get a single still with no video.
+- `host-portrait-headwrap.jpg`, `host-measuring-bark.jpg` (existing)
+- remote film thumbnails: `i.ytimg.com/vi/<id>/sddefault.jpg` (all three
+  verified 200; maxres/hq720 do not exist for them)
 
-The old click-to-pause control is gone, since there is no single video to
-pause; that also retires the unused `videoPlaying` state.
+## Blockers for the owner / Grok
 
-### A real bug caught before shipping
+- Eyeball the shelf on `/the-host` once deployed: thumbnail crop (bars
+  removed by object-cover), play behaviour, and the footer column wrap.
+- Decision noted: the click loads the embed with `autoplay=1` so the film
+  actually starts on click. Say the word if you want click = load only, then
+  press play inside the player.
 
-The first implementation drove each layer's opacity with CSS custom properties
-as keyframe offsets. The production build collapsed them:
+## How to preview
 
-```
-@keyframes heroFade{0%{opacity:0}to{opacity:0}}
-```
-
-Custom properties are not valid keyframe offsets, so the minifier reduced the
-rule to a single 0%/100% pair — every layer would have sat at opacity 0 and the
-hero would have rendered **no image at all**, just the dusk overlay. Replaced
-with five explicit keyframe blocks using literal stops. Verified present and
-intact in the built CSS:
-
-```
-heroFrame1  0%,16.7% → 1     20.8%,to → 0
-heroFrame2  0%,16.7% → 0     20.8%,33.3% → 1    37.5%,to → 0
-heroFrame3  0%,33.3% → 0     37.5%,50% → 1      54.2%,to → 0
-heroFrame4  0%,50% → 0       54.2%,66.7% → 1    70.8%,to → 0
-heroFrame5  0%,66.7% → 0     70.8%,95.8% → 1    to → 0
-```
-
-### How far the visual check actually got
-
-Confirmed live in a headless browser: the hero does switch images (distinct
-frames captured), and the page renders correctly. **I could not verify the
-exact per-frame timing this way** — Chromium's `--virtual-time-budget`
-advances timers but not the CSS animation clock predictably, so captured frames
-landed at arbitrary points in the cycle. The ordering above is guaranteed by
-the keyframe stops, but please eyeball the rhythm once on the deployed site.
-
-A second false start worth recording: port 3000 was already occupied by an
-unrelated project, so my first screenshots were of the wrong website entirely.
-Everything above was re-verified on port 3111.
-
-## E. Five unused watermarked files cropped
-
-`boat-shelter`, `cloudscape-hills`, `kente-rock-sit`, `host-garden-welcome`,
-`lake-cloudscape` — bottom 22% removed, same operation as the four fixed in
-part one. None are referenced by code, so there is no visual risk; this just
-stops anyone reaching for a marked file later.
-
-## Still open
-
-1. **Both videos remain 640×360.** Deferred by agreement. The 1080p master is
-   the same property-pan footage, so re-encoding fixes sharpness but not
-   framing. `/the-land` also has the cropped `lake-house.jpg` still as a
-   sharper fallback if you would rather drop the video.
-2. **Two aspect cases left unfixed:** `kente-shore-two` and `kente-water-rite`
-   on `/atelier` show 42% in a 4:3 box. Their subjects look centre-weighted so
-   they should be fine, but they are worth an eye.
-3. **The unimported 1080p master** (`20260916_144337.mp4`, 92s) and the 1.5s
-   `VID-20260915-WA0071.mp4` remain on disk, unimported.
-
-## Not touched
-Prices, the apply form and its fields, the WhatsApp number, the domain, routes,
-the palette, and page copy.
+- `npm run dev`
+- routes checked: `/` (teaching line + host block), `/the-host`
+  (`#hear-her` shelf), `/the-cave` (chamber lines), footer on any route.

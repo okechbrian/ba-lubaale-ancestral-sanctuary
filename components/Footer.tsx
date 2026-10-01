@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { site } from "@/content/site";
+import { channel, films } from "@/content/teaching";
 
 export function Footer() {
   return (
     <footer className="border-t border-mist bg-dusk text-cream">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand + blessing */}
           <div>
             <p className="font-display text-lg font-semibold">BA LUBAALE</p>
@@ -35,6 +36,33 @@ export function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Hear her */}
+          <div>
+            <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
+              Hear her
+            </p>
+            <ul className="mt-3 space-y-2">
+              {films.map((film) => (
+                <li key={film.id}>
+                  <Link
+                    href="/the-host#hear-her"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    {film.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <a
+              href={channel.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
+            >
+              {channel.label}
+            </a>
           </div>
 
           {/* Contact */}

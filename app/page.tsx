@@ -16,6 +16,22 @@ export default function HomePage() {
       {/* ─── Section 1: Hero ─── */}
       <Hero />
 
+      {/* ─── Section 1b: Teaching line ─── */}
+      <section className="bg-dusk py-8 sm:py-10">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 px-4 text-center sm:px-6 lg:px-8">
+          <p className="font-display text-lg leading-relaxed text-cream sm:text-xl">
+            This ground is where the Lubaale of Ssese can be approached, and
+            where the teaching is lived.
+          </p>
+          <Link
+            href="/the-host#hear-her"
+            className="text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
+          >
+            Hear her →
+          </Link>
+        </div>
+      </section>
+
       {/* ─── Section 2: Host Invitation ─── */}
       <section className="bg-cream py-20 sm:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
@@ -320,25 +336,25 @@ export default function HomePage() {
           <Image
             src="/images/host-portrait-headwrap.jpg"
             alt="Queen Nalubaale — seer, healer, and master artisan"
-            width={224}
-            height={224}
-            className="h-48 w-48 rounded-full object-cover sm:h-56 sm:w-56"
+            width={288}
+            height={288}
+            className="h-56 w-56 rounded-full object-cover sm:h-72 sm:w-72"
           />
-          <div>
+          <div className="max-w-md">
             <h2 className="font-display text-3xl font-semibold text-ink">
               Queen Nalubaale
             </h2>
             <p className="mt-1 text-bark">Mama Nalubaale</p>
-            <p className="mt-4 max-w-lg text-ink/70">
-              I work with breath, bark, cowrie, root water, and the fire that has
-              burned on this shore longer than any of us can remember. This
-              sanctuary is not a business I started. It is a place I was given.
+            <p className="mt-4 text-lg text-ink/70">
+              I work with breath, bark, cowrie, root water, and the fire that
+              has burned on this shore longer than any of us can remember. This
+              sanctuary is not a business I started — it is a place I was given.
             </p>
             <Link
               href="/the-host"
-              className="mt-4 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
+              className="mt-5 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
             >
-              Meet the Host →
+              Meet the host →
             </Link>
           </div>
         </div>
