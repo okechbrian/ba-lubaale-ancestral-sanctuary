@@ -19,6 +19,7 @@ export default function TheCavePage() {
           alt="Mossed rock mouth of Nalubaale Cave seen from the water"
           fill
           priority
+          quality={85}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />

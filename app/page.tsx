@@ -497,6 +497,7 @@ export default function HomePage() {
           alt="Shore gathering on Lake Victoria at sunset"
           fill
           priority
+          quality={85}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-dusk/60" />

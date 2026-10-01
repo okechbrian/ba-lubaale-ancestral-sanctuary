@@ -19,6 +19,7 @@ export default function ImmersionsPage() {
           alt="Shore gathering on Lake Victoria"
           fill
           priority
+          quality={85}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />

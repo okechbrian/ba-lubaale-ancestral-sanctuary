@@ -19,6 +19,7 @@ export default function TheHostPage() {
           alt="Queen Nalubaale outdoors in a brown headwrap and gold collar"
           fill
           priority
+          quality={85}
           className="absolute inset-0 h-full w-full object-cover object-[center_22%]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dusk/70 to-transparent" />

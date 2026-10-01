@@ -371,3 +371,59 @@ Owner added 29 images + 2 videos on 23 Sep 2026. Fills the three biggest remaini
 Total public images: 87 (Sep 16) + 29 (Sep 23) = **116 images**
 Total video: 1 (tortoise) + 1 (lake house) = **2 videos**
 Moments strip: 24 → **32 images**
+
+---
+
+## Hero resolution pass (Oct 1)
+
+Heroes are rendered full-viewport, so a 1080-wide source ends up stretched by
+the browser across a 1920-2880px viewport. Next serves the source file untouched
+at every requested width (verified: `w=1920` and `w=3840` both return the
+original), so the pixels had to be added at the source.
+
+Ten hero sources were rewritten as a 2x Lanczos3 upscale, capped at 2400px, with
+a light unsharp pass at q85 - see `scripts/upscale-heroes.mjs`:
+
+| File | Was | Now |
+|---|---|---|
+| `hero-shore-gathering.jpg` | 1080x810 | 2160x1620 |
+| `fire-night.jpg` | 1080x809 | 2160x1618 |
+| `closing-shore.jpg` | 1024x768 | 2048x1536 |
+| `shore-calm-blue.jpg` | 1080x632 | 2160x1264 |
+| `og-cave-shore.jpg` | 1080x486 | 2160x972 |
+| `cowrie-four.jpg` | 684x912 | 1368x1824 |
+| `host-portrait-headwrap.jpg` | 810x1080 | 1620x2160 |
+
+`forest-lake-view.jpg` (4000x3000) needed nothing. Upscaling resamples, it does
+not invent detail - the originals are recoverable from git.
+
+All ten hero `<Image>` components now carry `quality={85}`, declared in
+`next.config.ts` under `images.qualities`. Content images stay at the default 75.
+
+### Two swaps considered and rejected
+
+`/prepare` and `/immersions` were candidates for the full-resolution photos on
+disk (`forest-canopy`, `lake-house-alt`, and the unused camera original
+`20260916_144331.jpg` at 4000x3000). Both were dropped:
+
+- `/immersions` + `/practices` - the rule above still applies. "No extra hero.
+  Reuse `hero-shore-gathering.jpg` or `closing-shore.jpg` as a quiet banner."
+- `/prepare` - every usable crop of `20260916_144331.jpg` is either 80% empty sky
+  or shows the black water tank, stacked firewood, a tyre swing and the lawn.
+  Those contradict the arrival copy ("There is no dock sign. No resort flag").
+  `shore-calm-blue.jpg` stays and carries the upscale instead.
+
+### Video
+
+`lake-house.mp4` was 640x360 - the master `20260916_144337.mp4` (HEVC 1920x1080,
+92.2s) was on disk and unused. Re-encoded to H.264 1920x1080, `hqdn3d` denoise,
+CRF 31, no audio (the tag is muted). Tortoise stays 640x360: no HD source exists
+for it anywhere on disk.
+
+### Still open
+
+Real originals, if the owner can resend them at full size, would beat every
+measure above. The library was delivered over WhatsApp at ~1080px; only four
+photos in the project arrived at camera resolution (4000x3000). Highest value
+targets: `hero-shore-gathering.jpg` (home hero), `closing-shore.jpg`,
+`fire-night.jpg`, and an HD tortoise clip.

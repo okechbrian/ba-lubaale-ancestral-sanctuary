@@ -35,6 +35,7 @@ export function Hero() {
           alt={FIRST_FRAME.alt}
           fill
           priority
+          quality={85}
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
@@ -45,6 +46,7 @@ export function Hero() {
             alt={FIRST_FRAME.alt}
             fill
             priority
+            quality={85}
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover"
             style={{ animation: `heroFrame1 ${HERO_CYCLE}` }}
@@ -57,6 +59,7 @@ export function Hero() {
               src={src}
               alt=""
               fill
+              quality={85}
               aria-hidden="true"
               className="absolute inset-0 h-full w-full object-cover"
               style={{ animation: `heroFrame${frame} ${HERO_CYCLE}` }}
