@@ -52,6 +52,12 @@ export default function PreparePage() {
                 can remove easily. Long-leg coverings are required on sacred
                 ground. Garments can be obtained at the sanctuary if needed.
               </p>
+              <Link
+                href="/arrive"
+                className="mt-4 inline-block text-sm font-semibold text-leaf hover:underline"
+              >
+                The journey →
+              </Link>
             </div>
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-md">
