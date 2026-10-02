@@ -1,106 +1,102 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import type { z } from "zod";
+import DateRangePicker from "@/components/DateRangePicker";
+import { bookingRequestSchema } from "@/lib/booking/schema";
+import type { DateRange } from "@/lib/booking/availability";
 
-const formSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("A valid email is required"),
-  whatsapp: z.string().optional(),
-  country: z.string().min(1, "Country is required"),
-  window: z.string().optional(),
-  party: z.enum(["solo", "couple", "family", "buyout"], {
-    message: "Please select a party type",
-  }),
-  drawing: z.string().min(1, "Please share what is drawing you here"),
-  comfort: z.string().min(1, "Please share your comfort level"),
-  limits: z.string().optional(),
-  protocols: z.enum(["yes", "no"], {
-    message: "Please select yes or no",
-  }),
-  digitalSunset: z.enum(["yes", "no"], {
-    message: "Please select yes or no",
-  }),
-  burden: z.string().min(1, "Please share what you are ready to set down"),
-  policiesCheck: z.literal(true, {
-    message: "You must acknowledge the policies",
-  }),
-  complementaryCheck: z.literal(true, {
-    message: "You must acknowledge the complementary-care disclaimer",
-  }),
-});
-
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof bookingRequestSchema>;
 
 const inputClass =
   "mt-1 block w-full rounded-md border border-mist bg-cream px-4 py-3 text-ink placeholder-ink/40 focus:border-bark focus:outline-none focus:ring-1 focus:ring-bark";
 
+const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
+
 export default function ApplyPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [mailtoFallback, setMailtoFallback] = useState(false);
+  const [apiError, setApiError] = useState<{
+    message: string;
+    whatsapp: boolean;
+  } | null>(null);
+  const [busy, setBusy] = useState<DateRange[]>([]);
+  const [blocked, setBlocked] = useState<string[]>([]);
 
   const {
     register,
     handleSubmit,
+    control,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(bookingRequestSchema),
   });
+
+  const checkIn = useWatch({ control, name: "check_in" });
+  const checkOut = useWatch({ control, name: "check_out" });
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/availability")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("unavailable"))))
+      .then((data: { ranges?: DateRange[]; blocked?: string[] }) => {
+        if (cancelled) return;
+        setBusy(data.ranges ?? []);
+        setBlocked(data.blocked ?? []);
+      })
+      .catch(() => {
+        // Calendar hint only — the server re-validates every submission.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function onSubmit(data: FormData) {
     setSubmitting(true);
-
-    const endpoint = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT ?? "";
-
-    if (endpoint) {
-      try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        if (res.ok) {
-          setSubmitted(true);
-        } else {
-          fallbackMailto(data);
-        }
-      } catch {
-        fallbackMailto(data);
+    setApiError(null);
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.status === 201) {
+        setSubmitted(true);
+        return;
       }
-    } else {
-      fallbackMailto(data);
+      const body: { message?: string } = await res.json().catch(() => ({}));
+      if (res.status === 409) {
+        setApiError({
+          message:
+            body.message ||
+            "Those dates are no longer available. Please choose another window.",
+          whatsapp: false,
+        });
+      } else if (res.status === 503) {
+        setApiError({
+          message:
+            "Booking intake is temporarily unavailable. Please try again in a few minutes.",
+          whatsapp: true,
+        });
+      } else {
+        setApiError({
+          message: "Something went wrong submitting your request. Please try again.",
+          whatsapp: true,
+        });
+      }
+    } catch {
+      setApiError({
+        message:
+          "We could not reach the booking service. Please check your connection and try again.",
+        whatsapp: true,
+      });
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
-  }
-
-  function fallbackMailto(data: FormData) {
-    const subject = encodeURIComponent(
-      `Immersion request — ${data.fullName} (${data.party})`
-    );
-    const body = encodeURIComponent(
-      [
-        `Name: ${data.fullName}`,
-        `Email: ${data.email}`,
-        `WhatsApp: ${data.whatsapp || "not provided"}`,
-        `Country: ${data.country}`,
-        `Window: ${data.window || "flexible"}`,
-        `Party: ${data.party}`,
-        ``,
-        `What is drawing you: ${data.drawing}`,
-        `Comfort with traditional work: ${data.comfort}`,
-        `Mobility / allergies: ${data.limits || "none"}`,
-        `Honour protocols: ${data.protocols}`,
-        `Digital sunset: ${data.digitalSunset}`,
-        `Burden / conflict: ${data.burden}`,
-      ].join("\n")
-    );
-    window.open(`mailto:queennalubaale@gmail.com?subject=${subject}&body=${body}`, "_self");
-    setMailtoFallback(true);
-    setSubmitted(true);
   }
 
   return (
@@ -130,45 +126,31 @@ export default function ApplyPage() {
           {submitted ? (
             <div className="rounded-md border border-canopy/20 bg-canopy/5 p-8 text-center">
               <p className="font-display text-xl text-ink">Thank you.</p>
-              {mailtoFallback ? (
-                <p className="mt-4 text-ink/70">
-                  Your mail app should open with the request pre-filled. If it
-                  does not, send the form details manually to{" "}
-                  <a
-                    href="mailto:queennalubaale@gmail.com"
-                    className="font-semibold text-leaf hover:text-leaf/80"
-                  >
-                    queennalubaale@gmail.com
-                  </a>
-                  . We will write or WhatsApp within several days.
-                </p>
-              ) : (
-                <p className="mt-4 text-ink/70">
-                  If there is a fit, we will write or WhatsApp within several
-                  days to arrange a short discovery conversation. Please do not
-                  book flights until we confirm the boat.
-                </p>
-              )}
+              <p className="mt-4 text-ink/70">
+                If there is a fit, we will write or WhatsApp within several
+                days to arrange a short discovery conversation. Please do not
+                book flights until we confirm the boat.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* 1. Full name */}
               <div>
                 <label
-                  htmlFor="fullName"
+                  htmlFor="name"
                   className="block text-sm font-medium text-ink"
                 >
                   Full name
                 </label>
                 <input
                   type="text"
-                  id="fullName"
-                  {...register("fullName")}
+                  id="name"
+                  {...register("name")}
                   className={inputClass}
                 />
-                {errors.fullName && (
+                {errors.name && (
                   <p className="mt-1 text-xs text-ember">
-                    {errors.fullName.message}
+                    {errors.name.message}
                   </p>
                 )}
               </div>
@@ -235,16 +217,16 @@ export default function ApplyPage() {
               {/* 5. Requested window */}
               <div>
                 <label
-                  htmlFor="window"
+                  htmlFor="requested_window"
                   className="block text-sm font-medium text-ink"
                 >
                   Requested window (month / flexible dates)
                 </label>
                 <input
                   type="text"
-                  id="window"
+                  id="requested_window"
                   placeholder="e.g. March 2027, flexible"
-                  {...register("window")}
+                  {...register("requested_window")}
                   className={inputClass}
                 />
               </div>
@@ -275,7 +257,91 @@ export default function ApplyPage() {
                 )}
               </div>
 
-              {/* 7. What is drawing you */}
+              {/* 7. Dates */}
+              <div>
+                <span className="block text-sm font-medium text-ink">
+                  Your dates
+                </span>
+                <div className="mt-1 grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="check_in" className="text-xs text-ink/60">
+                      Check-in
+                    </label>
+                    <input
+                      type="date"
+                      id="check_in"
+                      value={checkIn || ""}
+                      min={new Date().toISOString().slice(0, 10)}
+                      onChange={(e) => setValue("check_in", e.target.value, {
+                        shouldValidate: true,
+                      })}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="check_out" className="text-xs text-ink/60">
+                      Check-out
+                    </label>
+                    <input
+                      type="date"
+                      id="check_out"
+                      value={checkOut || ""}
+                      min={checkIn || undefined}
+                      onChange={(e) => setValue("check_out", e.target.value, {
+                        shouldValidate: true,
+                      })}
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+                <DateRangePicker
+                  busy={busy}
+                  blocked={blocked}
+                  checkIn={checkIn || ""}
+                  checkOut={checkOut || ""}
+                  onChange={(inDay, outDay) => {
+                    setValue("check_in", inDay, { shouldValidate: true });
+                    setValue("check_out", outDay, { shouldValidate: true });
+                  }}
+                />
+                {(errors.check_in || errors.check_out) && (
+                  <p className="mt-1 text-xs text-ember">
+                    {errors.check_in?.message || errors.check_out?.message}
+                  </p>
+                )}
+              </div>
+
+              {/* 8. Stay */}
+              <div>
+                <label
+                  htmlFor="stay_slug"
+                  className="block text-sm font-medium text-ink"
+                >
+                  Immersion
+                </label>
+                <select
+                  id="stay_slug"
+                  {...register("stay_slug")}
+                  className={inputClass}
+                >
+                  <option value="">Select...</option>
+                  <option value="essential">
+                    Essential Healing Immersion — 3 days / 2 nights
+                  </option>
+                  <option value="master">
+                    Master Transformation &amp; Craft Immersion — 5 days / 4
+                    nights
+                  </option>
+                  <option value="buyout">Whole-island buyout</option>
+                </select>
+                {errors.stay_slug && (
+                  <p className="mt-1 text-xs text-ember">
+                    {errors.stay_slug.message}
+                  </p>
+                )}
+              </div>
+
+              {/* 9. What is drawing you */}
               <div>
                 <label
                   htmlFor="drawing"
@@ -296,7 +362,7 @@ export default function ApplyPage() {
                 )}
               </div>
 
-              {/* 8. Comfort with traditional work */}
+              {/* 10. Comfort with traditional work */}
               <div>
                 <label
                   htmlFor="comfort"
@@ -318,7 +384,7 @@ export default function ApplyPage() {
                 )}
               </div>
 
-              {/* 9. Mobility / allergies */}
+              {/* 11. Mobility / allergies */}
               <div>
                 <label
                   htmlFor="limits"
@@ -335,7 +401,7 @@ export default function ApplyPage() {
                 />
               </div>
 
-              {/* 10. Protocols */}
+              {/* 12. Protocols */}
               <div>
                 <label
                   htmlFor="protocols"
@@ -361,32 +427,32 @@ export default function ApplyPage() {
                 )}
               </div>
 
-              {/* 11. Digital sunset */}
+              {/* 13. Digital sunset */}
               <div>
                 <label
-                  htmlFor="digitalSunset"
+                  htmlFor="digital_sunset"
                   className="block text-sm font-medium text-ink"
                 >
                   Will you observe digital sunset (phones silent in the Lake
                   House, none in the cave)?
                 </label>
                 <select
-                  id="digitalSunset"
-                  {...register("digitalSunset")}
+                  id="digital_sunset"
+                  {...register("digital_sunset")}
                   className={inputClass}
                 >
                   <option value="">Select...</option>
                   <option value="yes">Yes</option>
                   <option value="no">No</option>
                 </select>
-                {errors.digitalSunset && (
+                {errors.digital_sunset && (
                   <p className="mt-1 text-xs text-ember">
-                    {errors.digitalSunset.message}
+                    {errors.digital_sunset.message}
                   </p>
                 )}
               </div>
 
-              {/* 12. Burden / conflict */}
+              {/* 14. Burden / conflict */}
               <div>
                 <label
                   htmlFor="burden"
@@ -407,7 +473,17 @@ export default function ApplyPage() {
                 )}
               </div>
 
-              {/* 13. Checkbox: policies */}
+              {/* Honeypot: humans never see or focus this. */}
+              <input
+                type="text"
+                {...register("website")}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="hidden"
+              />
+
+              {/* Checkbox: policies */}
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
@@ -429,7 +505,7 @@ export default function ApplyPage() {
                 </p>
               )}
 
-              {/* 14. Checkbox: complementary care */}
+              {/* Checkbox: complementary care */}
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
@@ -449,6 +525,23 @@ export default function ApplyPage() {
                 <p className="text-xs text-ember">
                   {errors.complementaryCheck.message}
                 </p>
+              )}
+
+              {/* Server error */}
+              {apiError && (
+                <div className="rounded-md border border-ember/40 bg-ember/5 p-4 text-sm text-ink">
+                  <p>{apiError.message}</p>
+                  {apiError.whatsapp && whatsappNumber && (
+                    <a
+                      href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block font-semibold text-leaf hover:text-leaf/80"
+                    >
+                      Or message us on WhatsApp
+                    </a>
+                  )}
+                </div>
               )}
 
               {/* Submit */}
