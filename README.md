@@ -28,3 +28,25 @@ Images stay on the owner PC until copied into `/public`:
 `C:\\Users\\y\\OneDrive\\Desktop\\New folder\\Maama Nalubaale`
 
 Repo: https://github.com/okechbrian/ba-lubaale-ancestral-sanctuary
+
+## Engineering setup (booking system, from 2 Oct 2026)
+
+1. `npm install`
+2. Copy `.env.example` → `.env.local` and fill values (every key documents what
+   happens when it is empty — the app never fakes an integration).
+3. Create the Supabase project and apply
+   `supabase/migrations/20261002000000_init_booking_schema.sql` (SQL editor, or
+   `supabase db push`). Put `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in env —
+   server-only, never exposed to the browser (RLS is on with no policies).
+4. Scripts: `npm run dev` · `lint` · `typecheck` · `test` · `build`.
+   CI (`.github/workflows/ci.yml`) runs lint + test + build on every push/PR,
+   with no secrets required.
+
+| Missing credential | Honest behaviour (no fakes) |
+|---|---|
+| Supabase | `POST /api/bookings` → 503; apply form shows "temporarily unavailable" |
+| Pesapal | Approve disabled with a banner; no payment links generated |
+| Gmail SMTP | emails written to `email_log` as `stubbed`, shown as NOT SENT in admin |
+| WhatsApp number | floating button hidden |
+
+Change history: [CHANGELOG.md](./CHANGELOG.md).
