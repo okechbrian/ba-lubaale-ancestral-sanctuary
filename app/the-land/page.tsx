@@ -50,7 +50,7 @@ export default function TheLandPage() {
               </p>
               <p className="mt-4 text-ink/70">
                 It is older than the people now standing on it. It was passed
-                to her in 1998.
+                to me in 1998. I am the one telling the story.
               </p>
               <p className="mt-4 text-ink/70">
                 The forest, the spring, the fire, the herd, and more than a
