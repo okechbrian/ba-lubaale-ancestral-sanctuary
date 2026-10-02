@@ -7,7 +7,11 @@ const nextConfig: NextConfig = {
     // hero images opt up to 85.
     qualities: [75, 85],
     // Film shelf thumbnails. The player itself only loads on click.
-    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com" }],
+    // *.supabase.co = owner-uploaded CMS photos in the public `cms` bucket.
+    remotePatterns: [
+      { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "*.supabase.co" },
+    ],
   },
 };
 

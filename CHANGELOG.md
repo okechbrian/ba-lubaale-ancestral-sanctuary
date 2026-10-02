@@ -41,6 +41,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   falls back to the in-repo content. Every write also validates client-side
   via `tests/api-content.test.ts` (auth, unknown keys, schema rejection,
   missing-DB behaviour).
+- **CMS photo uploads (Supabase Storage).** `POST /api/admin/content/images`
+  (admin session) stores owner photos in a public `cms` bucket
+  (migration `20261002000002_add_cms_storage.sql`: 8 MB limit, jpeg/png/webp/
+  avif, no write policies — service role only). Photos are downscaled in the
+  browser to ≤2400px WebP before upload; the image picker merges repo photos
+  with bucket uploads and gains an "Upload a new photo" button with honest
+  error messages for size, type and missing database
+  (`tests/api-images.test.ts`). `next.config.ts` allows `*.supabase.co`
+  images.
 
 - **Booking data layer (Supabase).** Migration `supabase/migrations/20261002000000_init_booking_schema.sql`
   defines `bookings`, `payments` (deposit/balance, unique completed rows per

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { prepareImageUpload } from "@/lib/cms/resize";
 
 type Obj = Record<string, unknown>;
 
@@ -93,13 +94,55 @@ function ImageField({
   value,
   onChange,
   images,
+  onUploaded,
 }: {
   name: string;
   value: { src: string; alt: string };
   onChange: (v: { src: string; alt: string }) => void;
   images: string[];
+  onUploaded: (src: string) => void;
 }) {
   const known = images.includes(value.src);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [uploadErr, setUploadErr] = useState<string | null>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    setBusy(true);
+    setUploadErr(null);
+    try {
+      const prepared = await prepareImageUpload(f);
+      const fd = new FormData();
+      fd.append("file", prepared);
+      const res = await fetch("/api/admin/content/images", {
+        method: "POST",
+        body: fd,
+      });
+      const body = (await res.json().catch(() => ({}))) as { src?: string; error?: string };
+      if (res.ok && body.src) {
+        onUploaded(body.src);
+        onChange({ ...value, src: body.src });
+      } else {
+        setUploadErr(
+          body.error === "file_too_large"
+            ? "That photo is too large (max 8 MB)."
+            : body.error === "unsupported_type"
+              ? "Unsupported format — use JPEG, PNG, WebP or AVIF."
+              : body.error === "database_not_configured"
+                ? "Database not configured — uploads are unavailable."
+                : `Upload failed (${body.error ?? res.status}).`,
+        );
+      }
+    } catch {
+      setUploadErr("Upload failed — check the photo and try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="rounded border border-mist bg-cream/70 p-3">
       {name && (
@@ -108,26 +151,43 @@ function ImageField({
         </p>
       )}
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block text-sm text-ink/70">
-          Photo
-          <select
-            className="mt-1 block w-full rounded border border-mist bg-white px-2 py-1.5 text-sm text-ink"
-            value={known ? value.src : "__other"}
-            onChange={(e) => {
-              if (e.target.value !== "__other")
-                onChange({ ...value, src: e.target.value });
-            }}
+        <div>
+          <label className="block text-sm text-ink/70">
+            Photo
+            <select
+              className="mt-1 block w-full rounded border border-mist bg-white px-2 py-1.5 text-sm text-ink"
+              value={known ? value.src : "__other"}
+              onChange={(e) => {
+                if (e.target.value !== "__other")
+                  onChange({ ...value, src: e.target.value });
+              }}
+            >
+              {!known && value.src && (
+                <option value="__other">{value.src}</option>
+              )}
+              {images.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            className={`${btn} mt-2`}
+            disabled={busy}
+            onClick={() => inputRef.current?.click()}
           >
-            {!known && value.src && (
-              <option value="__other">{value.src}</option>
-            )}
-            {images.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
-        </label>
+            {busy ? "Uploading…" : "Upload a new photo"}
+          </button>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/avif"
+            className="hidden"
+            onChange={handleFile}
+          />
+        </div>
         <label className="block text-sm text-ink/70">
           Alt text (describe the photo)
           <input
@@ -138,6 +198,7 @@ function ImageField({
           />
         </label>
       </div>
+      {uploadErr && <p className="mt-2 text-xs text-ember">{uploadErr}</p>}
     </div>
   );
 }
@@ -147,15 +208,23 @@ function Field({
   value,
   onChange,
   images,
+  onUploaded,
 }: {
   name: string;
   value: unknown;
   onChange: (v: unknown) => void;
   images: string[];
+  onUploaded: (src: string) => void;
 }) {
   if (isImageRef(value)) {
     return (
-      <ImageField name={name} value={value} onChange={onChange} images={images} />
+      <ImageField
+        name={name}
+        value={value}
+        onChange={onChange}
+        images={images}
+        onUploaded={onUploaded}
+      />
     );
   }
 
@@ -210,6 +279,7 @@ function Field({
                 value={item}
                 onChange={(v) => setAt(i, v)}
                 images={images}
+                onUploaded={onUploaded}
               />
             </div>
           ))}
@@ -249,6 +319,7 @@ function Field({
               value={v}
               onChange={(nv) => onChange({ ...value, [k]: nv })}
               images={images}
+              onUploaded={onUploaded}
             />
           ))}
         </div>
@@ -304,6 +375,7 @@ export default function ContentEditor({
   const [draft, setDraft] = useState<unknown>(() => clone(initial));
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<Message | null>(null);
+  const [uploaded, setUploaded] = useState<string[]>([]);
   const [prevInitial, setPrevInitial] = useState(initial);
 
   if (prevInitial !== initial) {
@@ -427,7 +499,15 @@ export default function ContentEditor({
         </p>
       )}
 
-      <Field name="" value={draft} onChange={setDraft} images={images} />
+      <Field
+        name=""
+        value={draft}
+        onChange={setDraft}
+        images={[...images, ...uploaded.filter((u) => !images.includes(u))]}
+        onUploaded={(src) =>
+          setUploaded((prev) => (prev.includes(src) ? prev : [...prev, src]))
+        }
+      />
     </section>
   );
 }
