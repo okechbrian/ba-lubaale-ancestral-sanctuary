@@ -5,6 +5,34 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Payment completion is now one atomic database operation.** Migration
+  `20261002000003_payment_integrity.sql` adds the `apply_payment_completion`
+  RPC: webhook claim + payment completion + booking status transition commit
+  in a SINGLE Postgres transaction. If any step fails, everything — the claim
+  included — rolls back and the IPN returns 503, so Pesapal's retry re-applies
+  from a clean slate; a duplicate delivery returns `claimed: false` and changes
+  nothing. Confirmation emails run after commit (an SMTP failure logs, never
+  half-commits a payment). The multi-statement "payment marked, booking stuck"
+  window is gone.
+- **Approved/paid bookings can never overlap.** `btree_gist` EXCLUDE
+  constraint `bookings_no_overlap` on `daterange(check_in, check_out, '[)')`
+  (half-open, matching the availability rules — back-to-back stays stay legal).
+  Approving now pre-checks the window and returns a clear **409
+  `overlapping_booking`** before any external call; a lost approval race hits
+  the constraint itself and maps to the same 409 (`OverlappingBookingError`,
+  SQLSTATE 23P01). Pending/declined requests remain exempt.
+- **Integration tests on a real database (no fakes).**
+  `tests/payment-integrity.test.ts` + `npm run test:integrity` run against the
+  local Supabase stack (`supabase start` + `supabase db reset`): (1) a
+  BEFORE UPDATE trigger fails the booking step after the payment step →
+  asserts zero rows changed (payment still `initiated`, no claim), then the
+  retry fully recovers (`completed` + `paid` + exactly one claim); (2) two
+  overlapping approvals → route 409 + constraint rejection of the direct
+  update + a back-to-back approval still succeeds. Without the env vars the
+  suite skips with a notice — it never fakes a pass.
+
 ### Added
 
 - **Owner CMS — content overrides (P2, foundation).** `lib/cms/` resolves

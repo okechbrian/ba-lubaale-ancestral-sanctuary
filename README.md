@@ -38,7 +38,10 @@ Repo: https://github.com/okechbrian/ba-lubaale-ancestral-sanctuary
    `supabase/migrations/` (SQL editor, or `supabase db push`). Put
    `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in env — server-only, never
    exposed to the browser (RLS is on with no policies).
-4. Scripts: `npm run dev` · `lint` · `typecheck` · `test` · `build`.
+4. Scripts: `npm run dev` · `lint` · `typecheck` · `test` · `build` ·
+   `test:integrity` (payment-integrity integration tests against a REAL local
+   database — first run `supabase start` + `supabase db reset`; without the
+   stack the suite skips with a notice, it never fakes a pass).
    CI (`.github/workflows/ci.yml`) runs lint + test + build on every push/PR,
    with no secrets required.
 

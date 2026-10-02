@@ -1,6 +1,12 @@
 import { isAdminRequest } from "@/lib/admin/session";
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
-import { getBooking, updateBookingStatus } from "@/lib/db/bookings";
+import {
+  OverlappingBookingError,
+  getBooking,
+  updateBookingStatus,
+} from "@/lib/db/bookings";
+import { assertWindowAvailable } from "@/lib/db/availability";
+import { AvailabilityConflictError } from "@/lib/booking/availability";
 import { getSettings } from "@/lib/db/settings";
 import { depositAmountUsd, stayAmountUsd } from "@/lib/booking/pricing";
 import { sendAndLog } from "@/lib/email/sender";
@@ -18,10 +24,11 @@ type Ctx = { params: Promise<{ id: string }> };
 
 /**
  * POST /api/admin/bookings/[id]/action — { action: "approve" | "decline" }.
- * Approve refuses without Pesapal configured (503, honest matrix), creates the
- * deposit checkout FIRST, then marks the booking approved and emails the
- * guest one message with the payment link. Decline just emails a short honest
- * note. Session-guarded.
+ * Approve refuses without Pesapal configured (503, honest matrix), refuses
+ * overlapping/blocked windows with a clear 409, creates the deposit checkout
+ * FIRST, then marks the booking approved and emails the guest one message
+ * with the payment link. Decline just emails a short honest note.
+ * Session-guarded.
  */
 export async function POST(request: Request, ctx: Ctx): Promise<Response> {
   if (!(await isAdminRequest(request))) {
@@ -55,6 +62,25 @@ export async function POST(request: Request, ctx: Ctx): Promise<Response> {
     }
 
     if (body.action === "approve") {
+      // Clear 409 before anything external: the window must be free of
+      // approved/paid stays and owner-blocked days (same rule guests get).
+      // The `bookings_no_overlap` EXCLUDE constraint backstops races at
+      // update time and is mapped to the same 409 in the catch below.
+      try {
+        await assertWindowAvailable({
+          check_in: booking.check_in,
+          check_out: booking.check_out,
+        });
+      } catch (availErr) {
+        if (availErr instanceof AvailabilityConflictError) {
+          return Response.json(
+            { error: "overlapping_booking", message: availErr.message },
+            { status: 409 },
+          );
+        }
+        throw availErr;
+      }
+
       const settings = await getSettings();
       const totalUsd = stayAmountUsd(booking.stay_slug, booking.party, settings);
       const depositUsd = depositAmountUsd(totalUsd, settings);
@@ -93,6 +119,14 @@ export async function POST(request: Request, ctx: Ctx): Promise<Response> {
   } catch (err) {
     if (err instanceof DatabaseNotConfiguredError) {
       return Response.json({ error: "database_not_configured" }, { status: 503 });
+    }
+    if (err instanceof OverlappingBookingError) {
+      // Race lost against a concurrent approve: the exclusion constraint
+      // refused to place two approved/paid stays on the same nights.
+      return Response.json(
+        { error: "overlapping_booking", message: err.message },
+        { status: 409 },
+      );
     }
     if (err instanceof PesapalNotConfiguredError) {
       return Response.json({ error: "payment_provider_unavailable" }, { status: 503 });

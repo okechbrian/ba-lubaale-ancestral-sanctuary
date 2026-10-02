@@ -54,6 +54,27 @@ export async function getBooking(id: string): Promise<BookingRow | null> {
   return data as BookingRow | null;
 }
 
+/** Thrown when a write would put a booking into approved/paid on top of an
+ * existing approved/paid stay — i.e. the `bookings_no_overlap` EXCLUDE
+ * constraint (23P01) fired. Routes map this to HTTP 409. */
+export class OverlappingBookingError extends Error {
+  constructor() {
+    super("Dates overlap an existing approved/paid booking.");
+    this.name = "OverlappingBookingError";
+  }
+}
+
+/** PostgREST forwards SQLSTATE codes; exclusion violations are 23P01. */
+export function isOverlapViolation(error: {
+  code?: string;
+  message?: string;
+}): boolean {
+  return (
+    error.code === "23P01" ||
+    /bookings_no_overlap|exclusion constraint/i.test(error.message ?? "")
+  );
+}
+
 export async function updateBookingStatus(
   id: string,
   status: BookingStatus,
@@ -71,7 +92,10 @@ export async function updateBookingStatus(
     .eq("id", id)
     .select()
     .single();
-  if (error) throw new Error(`updateBookingStatus failed: ${error.message}`);
+  if (error) {
+    if (isOverlapViolation(error)) throw new OverlappingBookingError();
+    throw new Error(`updateBookingStatus failed: ${error.message}`);
+  }
   return data as BookingRow;
 }
 
