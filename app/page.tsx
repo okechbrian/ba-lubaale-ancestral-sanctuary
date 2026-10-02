@@ -377,6 +377,9 @@ export default function HomePage() {
                 Essential Healing Immersion
               </h3>
               <p className="mt-1 text-sm text-bark">3 days / 2 nights</p>
+              <p className="mt-2 text-sm font-semibold text-ink">
+                Essential from USD 2,200
+              </p>
               <p className="mt-4 text-sm leading-relaxed text-ink/70">
                 A cottage, two Lake House readings — diagnostic and fish
                 feeding — one cave healing session, daily root-water cleansing,
@@ -396,6 +399,9 @@ export default function HomePage() {
                 Master Transformation &amp; Craft
               </h3>
               <p className="mt-1 text-sm text-bark">5 days / 4 nights</p>
+              <p className="mt-2 text-sm font-semibold text-ink">
+                Master from USD 4,500
+              </p>
               <p className="mt-4 text-sm leading-relaxed text-ink/70">
                 Full sanctuary access, three Lake House sessions, two cave
                 sessions, daily spring cleansing, fireplace release and
@@ -416,6 +422,9 @@ export default function HomePage() {
                 Whole-Island Buyout
               </h3>
               <p className="mt-1 text-sm text-bark">3 days</p>
+              <p className="mt-2 text-sm font-semibold text-ink">
+                Buyout from USD 10,000
+              </p>
               <p className="mt-4 text-sm leading-relaxed text-ink/70">
                 Exclusive use of the whole land — cave, Lake House, spring,
                 livestock and fireplace, unlimited one-on-one sessions and
@@ -431,6 +440,14 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+
+          <p className="mt-8 text-center text-sm text-ink/60">
+            East Africa resident rates are on{" "}
+            <Link href="/practices" className="text-leaf hover:underline">
+              /practices
+            </Link>
+            .
+          </p>
         </div>
       </section>
 
