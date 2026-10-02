@@ -169,9 +169,6 @@ export default function TheLandPage() {
             The Lake House sits on the water and hosts the ba Lubaale who stay
             in the lake. Fish feeding is done here, always guided.
           </p>
-          <p className="mt-3 text-ink/70">
-            Rooms sit over the water on stilts, and the lake is the only alarm.
-          </p>
           <div className="mt-8 overflow-hidden rounded-md">
             <video
               src="/video/lake-house.mp4"
