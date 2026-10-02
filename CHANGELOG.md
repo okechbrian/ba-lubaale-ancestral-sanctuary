@@ -7,6 +7,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Owner CMS — content overrides (P2, foundation).** `lib/cms/` resolves
+  owner-edited blocks from the `settings` table (`content:*` keys, zod-validated)
+  and falls back to in-repo defaults when the database is missing **or** a saved
+  value fails validation — a bad save can never publish broken content. Public
+  pages re-render every 60 s (`revalidate`), so edits appear without redeploy.
+- **FAQ is data-driven** (`content/faq.ts`, `app/faq/page.tsx` maps items with
+  alternating section colours) and **homepage gallery moved to
+  `content/moments.ts`** — `MomentsStrip` now takes `moments` as a prop.
+  Both blocks are admin-editable in the next milestone.
+- **Inline link syntax for owner copy:** `[label](/href)` in edited paragraphs
+  renders as a link (`components/InlineText.tsx`); only `/relative` and
+  `https://` hrefs are honoured — unsafe schemes render literally.
+- **CMS tests** (`tests/cms.test.ts`): defaults validate, broken shapes are
+  rejected, no-database fallback returns defaults, link parsing is safe.
+
 - **Booking data layer (Supabase).** Migration `supabase/migrations/20261002000000_init_booking_schema.sql`
   defines `bookings`, `payments` (deposit/balance, unique completed rows per
   booking), `webhook_events` (idempotency), `blocked_dates`, `settings`
