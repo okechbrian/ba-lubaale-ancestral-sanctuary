@@ -27,7 +27,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **`.env.example`** documents every key with its honest behaviour when empty
   (database → 503, payments → disabled approve, email → stored as `stubbed`).
 - Dummy WhatsApp number `256700000000` wired via `NEXT_PUBLIC_WHATSAPP_NUMBER`
-  (real number to be supplied by the owner; empty value hides the button).
+  (real number to be supplied by the owner; an empty value — or the example
+  placeholder — hides the button).
 - **Availability API.** `GET /api/availability` returns approved/paid date
   ranges plus owner-blocked days for the form calendar; 503 when the database
   is not configured.
@@ -87,6 +88,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   and disabled Approve when `PESAPAL_*` is missing.
 - **`/pay/thankyou`** — post-checkout page that explicitly waits for verified
   confirmation instead of claiming success.
+- **Floating WhatsApp button** (`components/WhatsAppButton.tsx`, rendered in the
+  root layout) — links to `wa.me/<NEXT_PUBLIC_WHATSAPP_NUMBER>`; the shared
+  `lib/whatsapp.ts#whatsappDigits` hides it entirely when the number is unset
+  *or* still the documented example placeholder, so no dead link can ever be
+  published. `/apply`'s WhatsApp fallback uses the same helper.
+- **Image & video weight pass** (public/ ≈54 MB → ≈24 MB): the three 4000×3000
+  photos (`forest-canopy`, `forest-lake-view`, `lake-house-alt`) re-encoded to
+  2400×1800 q75 (≈6 MB each → ≈0.9 MB); `lake-house.mp4` re-encoded 1080p/92 s
+  → 540p/24 fps no-audio (31 MB → 7 MB) and now ships with a poster frame,
+  `preload="none"` and visible controls; `tortoise.mp4` re-encoded 640p → 1.9 MB.
 
 ### Removed
 

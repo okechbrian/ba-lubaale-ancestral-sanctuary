@@ -172,6 +172,9 @@ export default function TheLandPage() {
           <div className="mt-8 overflow-hidden rounded-md">
             <video
               src="/video/lake-house.mp4"
+              poster="/images/lake-house-poster.jpg"
+              preload="none"
+              controls
               muted
               playsInline
               loop

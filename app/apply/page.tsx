@@ -7,13 +7,14 @@ import type { z } from "zod";
 import DateRangePicker from "@/components/DateRangePicker";
 import { bookingRequestSchema } from "@/lib/booking/schema";
 import type { DateRange } from "@/lib/booking/availability";
+import { whatsappDigits } from "@/lib/whatsapp";
 
 type FormData = z.infer<typeof bookingRequestSchema>;
 
 const inputClass =
   "mt-1 block w-full rounded-md border border-mist bg-cream px-4 py-3 text-ink placeholder-ink/40 focus:border-bark focus:outline-none focus:ring-1 focus:ring-bark";
 
-const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
+const whatsappNumber = whatsappDigits(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
 
 export default function ApplyPage() {
   const [submitted, setSubmitted] = useState(false);
