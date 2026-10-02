@@ -1,94 +1,97 @@
-# Teaching ground report
+# PHASE REPORT — clarity-gate
 
-Status: complete
-Branch: teaching-ground (from origin/main)
-Build: pass (15/15 routes)
-Lint: pass (0 errors, 2 pre-existing warnings)
+Branch `clarity-gate` from `origin/main` (`a236a2d`). No teaching-* branches used.
 
-## The three films (ids)
+Gates: `npm run lint` → exit 0, 0 errors (2 pre-existing warnings: `components/MomentsStrip.tsx:183`, `scripts/compress-images.mjs:1`). `npm run build` → exit 0, 17/17 routes incl. `/arrive` and `/faq`; no `/teachings`.
 
-1. **Okwezuula, part 1** — id `0Soh_8nwBZc`
-   EN: Unveiling. Who you are, and what has been blocking the life.
-2. **Master the art of balance** — id `ycERgjuSUNs`
-   EN: Silence, conduct, and the thirty quiet minutes with no phone.
-3. **FFUNA OBUGAGGA MU NAMBULA BIZINGA BYE SSESE** — id `4bTrmRtg_WU`
-   EN: The Ssese gathering. The annual coming-together, not a resort advert.
+Guards verified: nav untouched (`content/site.ts` unmodified), Hear her + film ids `0Soh_8nwBZc` / `ycERgjuSUNs` / `4bTrmRtg_WU` intact, `0706559119` absent.
 
-Channel: https://www.youtube.com/@nalubaalethedivine7639 — link label
-**Nalubaale The Divine**.
+## Task 1 — her voice on A Living Place
 
-## What shipped
+Files: `app/the-land/page.tsx` only (homepage does not repeat that block — no edit).
 
-- `content/teaching.ts` — the three films + channel, single source for the
-  shelf and the footer.
-- `components/HearHer.tsx` — new. youtube-nocookie embeds, click-to-play
-  facade (thumbnail from `i.ytimg.com`, iframe mounts only on click, so
-  nothing loads or plays on page load), no autoplay on load, title =
-  Luganda/channel title, one English line under each. Placed on `/the-host`
-  under the bio with `id="hear-her"`. Not a client-side autoplay: playback
-  starts only from the click, per the "no autoplay sound" lock.
-- Footer repeat: three titles (linking to `/the-host#hear-her`) + the channel
-  link, no second set of iframes. Footer grid went 3 → 4 columns
-  (sm:2 / lg:4) to hold it.
-- Homepage teaching line under the hero, before Sanctuary Moments:
-  "This ground is where the Lubaale of Ssese can be approached, and where the
-  teaching is lived." + `Hear her →` `/the-host#hear-her`. Prices and the
-  apply CTA untouched.
-- Layout shift:
-  - `/the-host` bio — portrait large (7 of 12 cols), bio in a narrow column
-    (4 of 12, col-start 9, max-w-md), then the film shelf full width.
-  - Homepage host block — same portrait (larger round crop), two sentences,
-    `Meet the host →`.
-- `/the-cave` chamber one-liners under each name:
-  - Nalubaale: motherhood, marriage, prosperity — closeness after cleansing
-  - Musisi: movement out of stagnation
-  - Wanema: order, when nothing lands right
-  No diet menu added; existing chamber copy untouched.
+"It was passed to her in 1998." → "It was passed to me in 1998. I am the one telling the story." Lubaale of Ssese and Lake Nalubaale, 1998, more than a hundred caves, three open (Nalubaale, Musisi, Wanema), and host holding the door all kept. Block not turned into an inventory.
 
-## What was not done (and why)
+Check:
 
-- Only the homepage, `/the-host` and `/the-cave` were touched. Every other
-  page is unchanged, per "Do not rebuild every page in this pass."
-- "The Work" photo row on `/the-host` kept as-is — it is the working
-  portraits, not the host block.
+```
+$ grep -n "passed to her" app/the-land/page.tsx app/page.tsx
+(no matches — 0)
+```
 
-## Locks verified
+Commit: `53fa654 land: A Living Place inheritance told in her voice`
 
-- Queen Nalubaale (EN) / Mama Nalubaale (LG) — unchanged.
-- Prices unchanged. Apply fields unchanged. No chicken/eggs rule untouched.
-- No WhatsApp number: footer still shows the empty slot ("Available on
-  request"); `0706559119` appears nowhere in the build.
-- No autoplay sound: no iframe exists until a click mounts it.
-- Photography-in-caves rule lines untouched in footer, `/prepare`, `/policies`.
-- Not a channel dump: three films only, no playlist, no channel banner.
+## Task 2 — Lake House has no rooms
 
-## Files created or changed
+Files: `app/the-land/page.tsx` (paragraph "Rooms sit over the water on stilts, and the lake is the only alarm." deleted). `app/page.tsx` and `app/immersions/page.tsx` had no bedroom wording — no edits. Stays already sleep in "A cottage"; nothing pointed at a Lake House room. Prices untouched.
 
-- created `components/HearHer.tsx`
-- created `content/teaching.ts`
-- `app/page.tsx` (teaching line, host block)
-- `app/the-host/page.tsx` (bio restructure, shelf)
-- `app/the-cave/page.tsx` (chamber one-liners)
-- `components/Footer.tsx` (Hear her column, 4-col grid)
-- `next.config.ts` (`images.remotePatterns` for `i.ytimg.com` thumbnails)
-- `PHASE_REPORT.md` (this file)
+Check:
 
-## Images used (public names)
+```
+$ grep -ni "room" app/the-land/page.tsx app/page.tsx app/immersions/page.tsx
+(total matches: 0)
+```
 
-- `host-portrait-headwrap.jpg`, `host-measuring-bark.jpg` (existing)
-- remote film thumbnails: `i.ytimg.com/vi/<id>/sddefault.jpg` (all three
-  verified 200; maxres/hq720 do not exist for them)
+Commit: `94375ab land: Lake House keeps no rooms - bedroom line removed`
 
-## Blockers for the owner / Grok
+## Task 3 — starting prices on the existing cards
 
-- Eyeball the shelf on `/the-host` once deployed: thumbnail crop (bars
-  removed by object-cover), play behaviour, and the footer column wrap.
-- Decision noted: the click loads the embed with `autoplay=1` so the film
-  actually starts on click. Say the word if you want click = load only, then
-  press play inside the player.
+File: `app/page.tsx` only. Figures verified against `app/immersions/page.tsx` (USD 2,200 solo / USD 4,500 solo / USD 10,000 up to 4) before typing: Essential from USD 2,200 · Master from USD 4,500 · Buyout from USD 10,000. One line added: East Africa resident rates are on `/practices`. No fourth price.
 
-## How to preview
+Check:
 
-- `npm run dev`
-- routes checked: `/` (teaching line + host block), `/the-host`
-  (`#hear-her` shelf), `/the-cave` (chamber lines), footer on any route.
+```
+$ grep -n "USD" app/page.tsx
+381: Essential from USD 2,200
+403: Master from USD 4,500
+426: Buyout from USD 10,000
+$ grep -n "resident rates" app/page.tsx
+445: East Africa resident rates are on{" "}
+```
+
+Commit: `d8b095c home: starting prices on the three stay cards, resident rates line`
+
+## Task 4 — /arrive
+
+Files: `app/arrive/page.tsx` (new, prepare section pattern), `app/prepare/page.tsx` ("The journey →" link under Arrival), `components/Footer.tsx` (Sanctuary column), `app/sitemap.ts`. Not added to `content/site.ts` nav (file untouched). Content only: Entebbe, the ferry toward the Ssese Islands, then the sanctuary boat. No timetable, no ticket price, no dock name (no dock names exist anywhere on the site).
+
+Check:
+
+```
+$ grep -nE "\b\d{1,2}:\d{2}\b|\b\d{1,2}\s?(am|pm)\b" app/arrive/page.tsx   → clock hits: 0
+$ grep -nE "UGX|shilling|/=" app/arrive/page.tsx                           → fare hits: 0
+$ git diff -- content/site.ts                                               → no changes
+```
+
+Commit: `9309655 arrive: Entebbe - ferry - sanctuary boat page, linked from prepare and footer`
+
+## Task 5 — /faq
+
+Files: `app/faq/page.tsx` (new, policies section pattern), `components/Footer.tsx`, `app/sitemap.ts`. Not in `content/site.ts` nav (untouched). Answers copied from /prepare and /policies: food (female visitors no chicken, no eggs), safety (not a clinic, no emergency care), what to bring (shoes off, phones down after dark), one household, photography forbidden in caves and shrines. Cancellation carries no figure: "Terms are confirmed in writing after approval." (`/policies` has 50% figures — none copied into the FAQ.)
+
+Check:
+
+```
+$ grep -n "%" app/faq/page.tsx
+(no matches — 0)
+```
+
+Commit: `3e5daa7 faq: answers gathered from prepare and policies, footer and sitemap link`
+
+## Task 6 — apply sentence
+
+File: `app/apply/page.tsx` only. Added under the intro: "If approved, a deposit link is sent by email. This form does not take payment." Boat warning kept. Every field and both checkboxes untouched.
+
+Check:
+
+```
+register( calls: 14 (was 14) · schema keys: 14 · type="checkbox": 2
+payment widgets (stripe|flutterwave|paystack|paypal|checkout): 0
+"deposit link": 1 · "take payment": 1 · boat warning: 1
+```
+
+Commit: `0df9de7 apply: state that the form takes no payment, deposit link by email after approval`
+
+## Task 7 — gates
+
+`npm run lint && npm run build` → both exit 0 (17 routes, 0 type errors). This report overwritten with one section per task and the grep results above. Branch pushed to `origin/clarity-gate`.
