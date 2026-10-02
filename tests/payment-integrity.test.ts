@@ -6,10 +6,11 @@
  *
  * Without those env vars the suite SKIPS with a notice — it never fakes a pass.
  */
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
 import { Client } from "pg";
 import { POST as bookingAction } from "@/app/api/admin/bookings/[id]/action/route";
+import { POST as ipn } from "@/app/api/payments/ipn/route";
 import { SESSION_COOKIE, createSessionToken } from "@/lib/admin/session";
 import { getDb } from "@/lib/db/client";
 import {
@@ -18,6 +19,20 @@ import {
   updateBookingStatus,
 } from "@/lib/db/bookings";
 import { applyPaymentCompletion, getPaymentById } from "@/lib/db/payments";
+
+// The IPN test needs the provider's ANSWER, not the provider. Everything
+// else in this file (and in the route) stays real: the mocked function only
+// reports "completed" so the authenticated-verification path, the atomic RPC
+// and the email side effects run unmodified.
+vi.mock("@/lib/payments/pesapal", async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import("@/lib/payments/pesapal")
+  >();
+  return {
+    ...actual,
+    getTransactionStatus: vi.fn(async () => ({ statusCode: 1 })),
+  };
+});
 
 const TEST_URL = process.env.TEST_SUPABASE_URL;
 const TEST_KEY = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
@@ -85,6 +100,7 @@ async function seedPayment(bookingId: string, tag: string): Promise<{ id: string
 
 describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
   let pg: Client;
+  const savedEnv: Record<string, string | undefined> = {};
 
   async function claimCount(externalId: string): Promise<number> {
     const r = await pg.query(
@@ -92,6 +108,17 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
       [externalId],
     );
     return r.rows[0].n as number;
+  }
+
+  async function fixtureEmails(
+    email: string,
+    template: string,
+  ): Promise<{ n: number; body: string | null; status: string | null }> {
+    const r = await pg.query(
+      "select count(*)::int as n, min(body) as body, min(status) as status from public.email_log where to_email = $1 and template = $2",
+      [email, template],
+    );
+    return r.rows[0] as { n: number; body: string | null; status: string | null };
   }
 
   beforeAll(async () => {
@@ -105,11 +132,20 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
     process.env.PESAPAL_CONSUMER_KEY = "test-key-never-sent";
     process.env.PESAPAL_CONSUMER_SECRET = "test-secret-never-sent";
     process.env.PESAPAL_IPN_URL = "http://localhost/api/payments/ipn";
+    // Email honesty: no SMTP => every send must land as status=stubbed, and
+    // no owner notification may leak into the assertions.
+    for (const k of ["SMTP_USER", "SMTP_PASS", "OWNER_NOTIFY_EMAIL"]) {
+      savedEnv[k] = process.env[k];
+      delete process.env[k];
+    }
 
     pg = new Client({ connectionString: TEST_DB });
     await pg.connect();
     // Leftovers from a crashed run would trip the overlap constraint.
     await pg.query("delete from public.bookings where name like 'it-fix-%'");
+    await pg.query(
+      "delete from public.email_log where to_email = 'it-fixtures@example.test'",
+    );
     await pg.query("drop trigger if exists it_booking_fail on public.bookings");
     await pg.query("drop function if exists public.it_booking_fail()");
   }, 30_000);
@@ -118,6 +154,13 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
     await pg.query("drop trigger if exists it_booking_fail on public.bookings").catch(() => undefined);
     await pg.query("drop function if exists public.it_booking_fail()").catch(() => undefined);
     await pg.query("delete from public.bookings where name like 'it-fix-%'").catch(() => undefined);
+    await pg.query(
+      "delete from public.email_log where to_email = 'it-fixtures@example.test'",
+    ).catch(() => undefined);
+    for (const [k, v] of Object.entries(savedEnv)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
     await pg.end().catch(() => undefined);
   });
 
@@ -255,5 +298,64 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
     });
     const approved = await updateBookingStatus(third.id, "approved");
     expect(approved.status).toBe("approved");
+  });
+
+  it("deposit IPN sends guest confirmation + prepare guide EXACTLY once", async () => {
+    const uid = randomUUID();
+    const tag = `ipnmail-${uid}`;
+    const trackingId = `it-${tag}`; // must equal seedPayment's provider_ref
+    const booking = await seedBooking({
+      tag: `ipnmail-${uid}`,
+      status: "approved",
+      check_in: "2027-09-01",
+      check_out: "2027-09-05",
+    });
+    const payment = await seedPayment(booking.id, tag);
+    const email = "it-fixtures@example.test";
+
+    const request = () =>
+      new Request("http://localhost/api/payments/ipn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderTrackingId: trackingId,
+          orderMerchantReference: booking.id,
+          orderNotificationType: "IPNCHANGE",
+        }),
+      });
+
+    // (1) First delivery: payment settles AND both guest emails go out
+    //     (stubbed — no SMTP in this run — but recorded in email_log).
+    const res1 = await ipn(request());
+    expect(res1.status).toBe(200);
+    expect((await getPaymentById(payment.id))?.status).toBe("completed");
+    expect((await getBooking(booking.id))?.status).toBe("paid");
+
+    const confirmation = await fixtureEmails(
+      email,
+      "payment_received_deposit_guest",
+    );
+    expect(confirmation.n).toBe(1);
+    expect(confirmation.status).toBe("stubbed");
+
+    const guide = await fixtureEmails(email, "prepare_guide_guest");
+    expect(guide.n).toBe(1);
+    expect(guide.status).toBe("stubbed");
+    // The guide is the /prepare content, verbatim — proof the shared content
+    // file reached the guest, not a placeholder.
+    expect(guide.body).toContain("Digital Sunset");
+    expect(guide.body).toContain("Female-Visitor Food Protocol");
+    expect(guide.body).toContain("/prepare");
+    // Content locks hold in email too: no private phone number.
+    expect(guide.body).not.toContain("0706559119");
+
+    // (2) Duplicate delivery (Pesapal retries): acknowledged, no new emails.
+    const res2 = await ipn(request());
+    expect(res2.status).toBe(200);
+    expect((await fixtureEmails(email, "prepare_guide_guest")).n).toBe(1);
+    expect(
+      (await fixtureEmails(email, "payment_received_deposit_guest")).n,
+    ).toBe(1);
+    expect(await claimCount(trackingId)).toBe(1);
   });
 });
