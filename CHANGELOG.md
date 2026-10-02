@@ -15,7 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **FAQ is data-driven** (`content/faq.ts`, `app/faq/page.tsx` maps items with
   alternating section colours) and **homepage gallery moved to
   `content/moments.ts`** — `MomentsStrip` now takes `moments` as a prop.
-  Both blocks are admin-editable in the next milestone.
+  Both blocks are admin-editable at `/admin/content`.
 - **Inline link syntax for owner copy:** `[label](/href)` in edited paragraphs
   renders as a link (`components/InlineText.tsx`); only `/relative` and
   `https://` hrefs are honoured — unsafe schemes render literally.
@@ -29,6 +29,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   owner-editable field; layout, aspect ratios and anchors stay in the code.
   Prices, policies, FAQ-of-record and brand titles remain outside casual CMS
   reach (prices live in `/admin/settings`; policies stay in the repo).
+- **Admin content editor (`/admin/content`).** One tab for every owner-editable
+  block (homepage gallery, FAQ, The Land, The Host, The Cave, Atelier): a
+  generic schema-driven form with reorderable lists, image pickers fed from the
+  photo library (`public/images`), alt-text fields, dirty-state tracking and a
+  "Revert to default" action. Saving goes through `PUT /api/admin/content`
+  (admin session required) — the server validates against the block schema
+  before writing, rejects bad shapes with field-level issues
+  (`400 invalid_content`) and reports a missing database honestly
+  (`503 database_not_configured`). `DELETE` clears an override so the site
+  falls back to the in-repo content. Every write also validates client-side
+  via `tests/api-content.test.ts` (auth, unknown keys, schema rejection,
+  missing-DB behaviour).
 
 - **Booking data layer (Supabase).** Migration `supabase/migrations/20261002000000_init_booking_schema.sql`
   defines `bookings`, `payments` (deposit/balance, unique completed rows per

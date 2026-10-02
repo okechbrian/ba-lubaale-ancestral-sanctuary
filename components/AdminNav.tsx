@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 const TABS = [
   { href: "/admin", label: "Requests" },
+  { href: "/admin/content", label: "Content" },
   { href: "/admin/dates", label: "Blocked dates" },
   { href: "/admin/settings", label: "Settings" },
   { href: "/admin/emails", label: "Emails" },

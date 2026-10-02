@@ -1,5 +1,36 @@
 import type { z } from "zod";
 import { getDb } from "@/lib/db/client";
+import {
+  CMS_KEYS,
+  atelierBlockSchema,
+  caveBlockSchema,
+  faqBlockSchema,
+  hostBlockSchema,
+  landBlockSchema,
+  momentsBlockSchema,
+} from "@/lib/cms/blocks";
+
+/** Every owner-editable block: settings key → zod schema (save validates). */
+export const CMS_REGISTRY = {
+  [CMS_KEYS.moments]: momentsBlockSchema,
+  [CMS_KEYS.faq]: faqBlockSchema,
+  [CMS_KEYS.theLand]: landBlockSchema,
+  [CMS_KEYS.theHost]: hostBlockSchema,
+  [CMS_KEYS.theCave]: caveBlockSchema,
+  [CMS_KEYS.atelier]: atelierBlockSchema,
+} as const;
+
+export class UnknownCmsKeyError extends Error {
+  constructor(public key: string) {
+    super(`Unknown content block: ${key}`);
+  }
+}
+
+export class InvalidCmsContentError extends Error {
+  constructor(public issues: { path: (string | number)[]; message: string }[]) {
+    super("Content failed validation");
+  }
+}
 
 /**
  * Owner-editable content overrides, stored in the `settings` table under a
@@ -30,4 +61,51 @@ export async function resolveContent<Block>(
   } catch {
     return defaults;
   }
+}
+
+/** Raw override value for a known block key; undefined = no override (or no DB). */
+export async function getContentOverride(key: string): Promise<unknown> {
+  try {
+    const schema = CMS_REGISTRY[key as keyof typeof CMS_REGISTRY];
+    if (!schema) return undefined;
+    const db = getDb();
+    const { data, error } = await db
+      .from("settings")
+      .select("value")
+      .eq("key", key)
+      .maybeSingle();
+    if (error || !data) return undefined;
+    return data.value ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Validate + persist an override. Throws Unknown/Invalid/Database errors. */
+export async function saveContent(key: string, value: unknown): Promise<void> {
+  const schema = CMS_REGISTRY[key as keyof typeof CMS_REGISTRY];
+  if (!schema) throw new UnknownCmsKeyError(key);
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) {
+    throw new InvalidCmsContentError(
+      parsed.error.issues.map((i) => ({
+        path: i.path.map((p) => (typeof p === "symbol" ? String(p) : p)),
+        message: i.message,
+      })),
+    );
+  }
+  const db = getDb();
+  const { error } = await db
+    .from("settings")
+    .upsert([{ key, value: parsed.data }], { onConflict: "key" });
+  if (error) throw new Error(`saveContent failed: ${error.message}`);
+}
+
+/** Remove an override — the site falls back to the in-repo defaults. */
+export async function deleteContent(key: string): Promise<void> {
+  const schema = CMS_REGISTRY[key as keyof typeof CMS_REGISTRY];
+  if (!schema) throw new UnknownCmsKeyError(key);
+  const db = getDb();
+  const { error } = await db.from("settings").delete().eq("key", key);
+  if (error) throw new Error(`deleteContent failed: ${error.message}`);
 }
