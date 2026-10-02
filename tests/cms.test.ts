@@ -1,9 +1,20 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resolveContent } from "@/lib/cms";
-import { faqBlockSchema, momentsBlockSchema } from "@/lib/cms/blocks";
+import {
+  atelierBlockSchema,
+  caveBlockSchema,
+  faqBlockSchema,
+  hostBlockSchema,
+  landBlockSchema,
+  momentsBlockSchema,
+} from "@/lib/cms/blocks";
 import { parseInlineLinks } from "@/components/InlineText";
 import { faqDefault } from "@/content/faq";
 import { momentsDefault } from "@/content/moments";
+import { landDefault } from "@/content/the-land";
+import { hostDefault } from "@/content/the-host";
+import { caveDefault } from "@/content/the-cave";
+import { atelierDefault } from "@/content/atelier";
 
 const KEYS = ["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"];
 const saved: Record<string, string | undefined> = {};
@@ -29,6 +40,22 @@ describe("content defaults validate", () => {
 
   it("momentsDefault passes its schema", () => {
     expect(momentsBlockSchema.safeParse(momentsDefault).success).toBe(true);
+  });
+
+  it("the-land default passes its schema", () => {
+    expect(landBlockSchema.safeParse(landDefault).success).toBe(true);
+  });
+
+  it("the-host default passes its schema", () => {
+    expect(hostBlockSchema.safeParse(hostDefault).success).toBe(true);
+  });
+
+  it("the-cave default passes its schema", () => {
+    expect(caveBlockSchema.safeParse(caveDefault).success).toBe(true);
+  });
+
+  it("atelier default passes its schema", () => {
+    expect(atelierBlockSchema.safeParse(atelierDefault).success).toBe(true);
   });
 
   it("rejects broken shapes (bad save can never publish)", () => {

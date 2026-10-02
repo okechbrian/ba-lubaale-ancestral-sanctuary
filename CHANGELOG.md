@@ -21,6 +21,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `https://` hrefs are honoured — unsafe schemes render literally.
 - **CMS tests** (`tests/cms.test.ts`): defaults validate, broken shapes are
   rejected, no-database fallback returns defaults, link parsing is safe.
+- **Story pages are data-driven:** `/the-land`, `/the-host`, `/the-cave` and
+  `/atelier` now render from `content/the-land.ts`, `content/the-host.ts`,
+  `content/the-cave.ts`, `content/atelier.ts` (verbatim defaults, zod-typed
+  schemas in `lib/cms/blocks.ts`) via `resolveContent` with 60 s revalidation.
+  Every section heading, paragraph, card and image slot (src + alt) is an
+  owner-editable field; layout, aspect ratios and anchors stay in the code.
+  Prices, policies, FAQ-of-record and brand titles remain outside casual CMS
+  reach (prices live in `/admin/settings`; policies stay in the repo).
 
 - **Booking data layer (Supabase).** Migration `supabase/migrations/20261002000000_init_booking_schema.sql`
   defines `bookings`, `payments` (deposit/balance, unique completed rows per
