@@ -7,6 +7,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The booking honeypot is now actually enforced in the route.** The hidden
+  `website` field previously only failed inside zod, and the generic 400
+  echoed `issues: [{path: "website"}]` — telling bots exactly which field to
+  leave empty. `POST /api/bookings` now checks the honeypot immediately after
+  the rate limiter: a filled value logs a loud `console.warn` with the client
+  IP, returns a generic 400 that never names the field, and stores nothing.
 - **Payment completion is now one atomic database operation.** Migration
   `20261002000003_payment_integrity.sql` adds the `apply_payment_completion`
   RPC: webhook claim + payment completion + booking status transition commit
@@ -35,6 +41,33 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Rate limiting on the two public write endpoints** (Upstash Redis over
+  plain REST — no SDK; host-agnostic, where Vercel KV would lock the site to
+  Vercel): `/api/admin/login` 5 attempts / 15 min per IP, `POST /api/bookings`
+  3 / hour per IP, bucketed per client IP (`lib/rate-limit.ts`). Documented
+  failure policy: bookings **fail-open** during backend errors (intake stays
+  up, `x-ratelimit-mode: fail-open`), admin login **fail-closed** (503
+  `rate_limiter_unavailable` — brute-force protection wins). Missing
+  `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` disables each bucket
+  **loudly**: one `console.warn` per process plus an
+  `x-ratelimit-mode: disabled-missing-config` header on every response —
+  never a silent bypass, never a fake "enabled". 429 responses carry
+  `Retry-After` and `retry_after`.
+- **Cloudflare Turnstile on `/apply`, verified server-side.** The widget
+  (explicit render, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`) sends the token as
+  `cf_turnstile_response`; `POST /api/bookings` verifies it against
+  `https://challenges.cloudflare.com/turnstile/v0/siteverify` (the historical
+  `siteverify.cloudflare.com` host no longer exists) **after** schema
+  validation so an invalid form never burns the single-use token, and the
+  client resets the widget after every failed submit. Enforcement requires
+  BOTH keys (a secret without a sitekey would brick the form) and is
+  fail-closed when configured: no token -> 403 `turnstile_required`,
+  rejected -> 403 `turnstile_failed`, Cloudflare unreachable -> 503
+  `turnstile_unavailable`. Missing keys disable verification **loudly**
+  (`x-turnstile-mode: disabled-missing-keys` + warn) — an unverified token is
+  only ever accepted when the feature is visibly off. Tests hit the real
+  siteverify endpoint with Cloudflare's official always-pass/always-fail keys
+  (no mocked captcha) and skip with a notice when the network is unavailable.
 - **Owner CMS — content overrides (P2, foundation).** `lib/cms/` resolves
   owner-edited blocks from the `settings` table (`content:*` keys, zod-validated)
   and falls back to in-repo defaults when the database is missing **or** a saved

@@ -5,8 +5,19 @@ import type { BookingRequest } from "@/lib/booking/schema";
 
 const savedEnv: Record<string, string | undefined> = {};
 
+const GUARD_KEYS = [
+  "SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  // Abuse-protection vars: never inherit a developer's/CI's real config —
+  // these tests must run with the limiter and Turnstile visibly disabled.
+  "UPSTASH_REDIS_REST_URL",
+  "UPSTASH_REDIS_REST_TOKEN",
+  "TURNSTILE_SECRET_KEY",
+  "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+];
+
 beforeAll(() => {
-  for (const key of ["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"]) {
+  for (const key of GUARD_KEYS) {
     savedEnv[key] = process.env[key];
     delete process.env[key];
   }

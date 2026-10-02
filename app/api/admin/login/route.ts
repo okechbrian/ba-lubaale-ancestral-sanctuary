@@ -3,6 +3,8 @@ import {
   SESSION_TTL_MS,
   createSessionToken,
 } from "@/lib/admin/session";
+import { clientIp } from "@/lib/client-ip";
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
 
 /** Constant-time-ish string compare (never logs or echoes credentials). */
 function matches(a: string, b: string): boolean {
@@ -13,18 +15,49 @@ function matches(a: string, b: string): boolean {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // Brute-force guard: 5 attempts / 15 min per IP. FAIL-CLOSED — if the
+  // Upstash backend is down, login answers 503 rate_limiter_unavailable
+  // instead of accepting unlimited attempts. Missing UPSTASH keys disable
+  // the limiter LOUDLY (x-ratelimit-mode: disabled-missing-config + warn).
+  const rl = await checkRateLimit({
+    name: "admin-login",
+    limit: 5,
+    windowSec: 15 * 60,
+    onFailure: "closed",
+    ip: clientIp(request),
+  });
+  const rlHeaders = rateLimitHeaders(rl);
+  if (!rl.allowed && rl.mode === "fail-closed") {
+    return Response.json(
+      { error: "rate_limiter_unavailable" },
+      { status: 503, headers: rlHeaders },
+    );
+  }
+  if (!rl.allowed) {
+    return Response.json(
+      { error: "rate_limited", retry_after: rl.retryAfterSec },
+      { status: 429, headers: rlHeaders },
+    );
+  }
+
   const user = process.env.ADMIN_USERNAME;
   const pass = process.env.ADMIN_PASSWORD;
   const secret = process.env.ADMIN_SESSION_SECRET;
   if (!user || !pass || !secret) {
-    return Response.json({ error: "admin_not_configured" }, { status: 503 });
+    return Response.json(
+      { error: "admin_not_configured" },
+      { status: 503, headers: rlHeaders },
+    );
   }
 
   let body: { username?: string; password?: string };
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "invalid_json" }, { status: 400 });
+    return Response.json(
+      { error: "invalid_json" },
+      { status: 400, headers: rlHeaders },
+    );
   }
 
   const ok =
@@ -33,7 +66,10 @@ export async function POST(request: Request): Promise<Response> {
     matches(body.username, user) &&
     matches(body.password, pass);
   if (!ok) {
-    return Response.json({ error: "invalid_credentials" }, { status: 401 });
+    return Response.json(
+      { error: "invalid_credentials" },
+      { status: 401, headers: rlHeaders },
+    );
   }
 
   const token = await createSessionToken(secret);
@@ -42,6 +78,7 @@ export async function POST(request: Request): Promise<Response> {
     {
       status: 200,
       headers: {
+        ...rlHeaders,
         "Set-Cookie": [
           `${SESSION_COOKIE}=${encodeURIComponent(token)}`,
           "Path=/",

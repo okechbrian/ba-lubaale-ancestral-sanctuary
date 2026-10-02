@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Script from "next/script";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
@@ -11,10 +12,25 @@ import { whatsappDigits } from "@/lib/whatsapp";
 
 type FormData = z.infer<typeof bookingRequestSchema>;
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+      reset: (id?: string) => void;
+      remove: (id: string) => void;
+    };
+    onTurnstileLoad?: () => void;
+  }
+}
+
 const inputClass =
   "mt-1 block w-full rounded-md border border-mist bg-cream px-4 py-3 text-ink placeholder-ink/40 focus:border-bark focus:outline-none focus:ring-1 focus:ring-bark";
 
 const whatsappNumber = whatsappDigits(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
+
+// Cloudflare Turnstile — absent key disables the widget (the server disables
+// verification just as loudly; both keys are required to enforce).
+const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
 
 export default function ApplyPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -25,6 +41,9 @@ export default function ApplyPage() {
   } | null>(null);
   const [busy, setBusy] = useState<DateRange[]>([]);
   const [blocked, setBlocked] = useState<string[]>([]);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileDivRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
 
   const {
     register,
@@ -56,25 +75,77 @@ export default function ApplyPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!turnstileSiteKey) {
+      console.warn(
+        "[apply] Turnstile disabled: NEXT_PUBLIC_TURNSTILE_SITE_KEY is not set.",
+      );
+      return;
+    }
+    const renderWidget = () => {
+      if (widgetIdRef.current || !turnstileDivRef.current || !window.turnstile) {
+        return;
+      }
+      widgetIdRef.current = window.turnstile.render(turnstileDivRef.current, {
+        sitekey: turnstileSiteKey,
+        action: "apply",
+        callback: (token: string) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => setTurnstileToken(""),
+      });
+    };
+    // Script loads async (render=explicit): either it is already there, or
+    // its onload fires window.onTurnstileLoad.
+    window.onTurnstileLoad = renderWidget;
+    if (window.turnstile) renderWidget();
+    return () => {
+      window.onTurnstileLoad = undefined;
+      if (widgetIdRef.current && window.turnstile) {
+        window.turnstile.remove(widgetIdRef.current);
+      }
+      widgetIdRef.current = null;
+    };
+  }, []);
+
   async function onSubmit(data: FormData) {
     setSubmitting(true);
     setApiError(null);
+    // Tokens are single-use: after ANY failed submit the widget must issue a
+    // fresh one, or the retry would be rejected as timeout-or-duplicate.
+    // reset() with no id resets every widget on the page (there is only one).
+    const resetTurnstile = () => {
+      setTurnstileToken("");
+      if (window.turnstile) window.turnstile.reset();
+    };
     try {
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, cf_turnstile_response: turnstileToken }),
       });
       if (res.status === 201) {
         setSubmitted(true);
         return;
       }
+      resetTurnstile();
       const body: { message?: string } = await res.json().catch(() => ({}));
       if (res.status === 409) {
         setApiError({
           message:
             body.message ||
             "Those dates are no longer available. Please choose another window.",
+          whatsapp: false,
+        });
+      } else if (res.status === 403) {
+        setApiError({
+          message:
+            "The security check did not pass. Please try again in a moment.",
+          whatsapp: false,
+        });
+      } else if (res.status === 429) {
+        setApiError({
+          message:
+            "Too many attempts. Please wait a few minutes and try again.",
           whatsapp: false,
         });
       } else if (res.status === 503) {
@@ -124,6 +195,12 @@ export default function ApplyPage() {
       {/* Form */}
       <section className="bg-cream py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          {turnstileSiteKey && (
+            <Script
+              src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad"
+              strategy="afterInteractive"
+            />
+          )}
           {submitted ? (
             <div className="rounded-md border border-canopy/20 bg-canopy/5 p-8 text-center">
               <p className="font-display text-xl text-ink">Thank you.</p>
@@ -543,6 +620,11 @@ export default function ApplyPage() {
                     </a>
                   )}
                 </div>
+              )}
+
+              {/* Cloudflare Turnstile (only when a site key is configured) */}
+              {turnstileSiteKey && (
+                <div ref={turnstileDivRef} className="cf-turnstile" />
               )}
 
               {/* Submit */}

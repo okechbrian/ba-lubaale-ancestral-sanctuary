@@ -15,6 +15,12 @@ const KEYS = [
   "ADMIN_SESSION_SECRET",
   "SUPABASE_URL",
   "SUPABASE_SERVICE_ROLE_KEY",
+  // Abuse-protection vars: never inherit a developer's/CI's real config —
+  // login must behave as "limiter disabled" here, deterministically.
+  "UPSTASH_REDIS_REST_URL",
+  "UPSTASH_REDIS_REST_TOKEN",
+  "TURNSTILE_SECRET_KEY",
+  "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
 ];
 const saved: Record<string, string | undefined> = {};
 
