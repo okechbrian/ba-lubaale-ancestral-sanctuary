@@ -57,8 +57,36 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   saved to the `settings` table; no code changes needed.
 - **Email log viewer** (`/admin/emails`) — every notification with status
   (`sent`/`stubbed`/`failed`) and full body, so stubbed mail is obvious.
-- **Transactional templates:** approved (total + deposit + "secure link to
-  follow") and declined (polite, no invented reasons).
+- **Transactional templates:** approved (total, deposit, hosted payment
+  link) and declined (polite, no invented reasons).
+- **Pesapal client** (`lib/payments/pesapal.ts`) for API 3.0 hosted checkout —
+  verified endpoints (`Auth/RequestToken`, `URLSetup/GetIpnList` +
+  `RegisterIPN`, `Transactions/SubmitOrderRequest`,
+  `Transactions/GetTransactionStatus`), sandbox/live bases, token caching,
+  401 refresh, timeouts. Missing credentials throw instead of faking links.
+- **Checkout API** `POST /api/payments/checkout` (admin) — creates/reopens a
+  deposit or balance attempt in UGX at the owner-set rate, stores the hosted
+  URL (new `payments.redirect_url` column), and can email the link to the
+  guest. Gates come from the pure `canCreateCheckout` state machine.
+- **Idempotent IPN** `POST|GET /api/payments/ipn` — because Pesapal IPN has
+  **no HMAC signature**, every event is re-verified with an authenticated
+  `GetTransactionStatus` call plus currency/amount/reference checks,
+  claimed exactly once (`webhook_events`), and only then applied; mismatch
+  events are acked but never applied. **Approve** now creates the deposit
+  checkout *first* (503 `payment_provider_unavailable` when Pesapal is
+  unset — approve stays disabled), then emails the guest the link in the
+  approval message itself.
+- **Payment state machine** (`lib/payments/state.ts`) — pure, unit-tested:
+  remote status mapping (0/2/3 → failed, 1 → completed), verification
+  outcomes, booking transitions (deposit → paid; never resurrects
+  pending/declined), checkout gates.
+- **Confirmation emails:** deposit received (balance figure stated), balance
+  received (fully paid + `/arrive` link), owner payment notification.
+- **Admin payments panel** on the booking detail page — attempt history,
+  create/resend deposit & balance links, copyable hosted URL; honest banner
+  and disabled Approve when `PESAPAL_*` is missing.
+- **`/pay/thankyou`** — post-checkout page that explicitly waits for verified
+  confirmation instead of claiming success.
 
 ### Removed
 

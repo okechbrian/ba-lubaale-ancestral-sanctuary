@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 export default function BookingActions({
   id,
   status,
+  paymentsConfigured,
 }: {
   id: string;
   status: string;
+  paymentsConfigured: boolean;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<"approve" | "decline" | null>(null);
@@ -30,6 +32,12 @@ export default function BookingActions({
       const body: { error?: string } = await res.json().catch(() => ({}));
       if (body.error === "database_not_configured") {
         setError("Database not configured — the action was not applied.");
+      } else if (body.error === "payment_provider_unavailable") {
+        setError(
+          "Approving needs payments configured (PESAPAL_* env) — the request stays pending.",
+        );
+      } else if (body.error === "payment_provider_error") {
+        setError("The payment provider rejected checkout creation — still pending.");
       } else if (body.error === "invalid_transition") {
         setError("This request is no longer pending.");
         router.refresh();
@@ -54,6 +62,17 @@ export default function BookingActions({
     );
   }
 
+  if (!paymentsConfigured) {
+    return (
+      <div className="rounded-md border border-ember/40 bg-ember/5 p-4 text-sm text-ink">
+        <strong>Approve is disabled:</strong> payments are not configured
+        (missing <code>PESAPAL_*</code> env). Approval creates the deposit
+        link, so nothing is approved until real payments can be offered — the
+        site never fakes a link.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex gap-3">
@@ -73,8 +92,8 @@ export default function BookingActions({
         </button>
       </div>
       <p className="text-xs text-ink/50">
-        Approve emails the guest the total and deposit; decline emails a short
-        polite note. Payment links arrive in the payments milestone.
+        Approve creates the deposit checkout first, then emails the guest one
+        message with the payment link. Decline emails a short polite note.
       </p>
       {error && <p className="text-sm text-ember">{error}</p>}
     </div>

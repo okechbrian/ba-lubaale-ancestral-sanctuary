@@ -2,7 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
 import { getBooking } from "@/lib/db/bookings";
+import { listPaymentsForBooking } from "@/lib/db/payments";
+import { canCreateCheckout } from "@/lib/payments/state";
+import { isPesapalConfigured } from "@/lib/payments/pesapal";
 import BookingActions from "@/components/BookingActions";
+import PaymentAdmin from "@/components/PaymentAdmin";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +42,15 @@ export default async function AdminBookingDetailPage({
     throw err;
   }
   if (!booking) notFound();
+
+  let payments: Awaited<ReturnType<typeof listPaymentsForBooking>> = [];
+  try {
+    payments = await listPaymentsForBooking(booking.id);
+  } catch (err) {
+    if (!(err instanceof DatabaseNotConfiguredError)) throw err;
+  }
+  const facts = payments.map((p) => ({ kind: p.kind, status: p.status }));
+  const configured = isPesapalConfigured();
 
   return (
     <div>
@@ -84,8 +97,20 @@ export default async function AdminBookingDetailPage({
         )}
       </dl>
 
+      <PaymentAdmin
+        bookingId={booking.id}
+        configured={configured}
+        depositAllowed={canCreateCheckout(booking.status, "deposit", facts)}
+        balanceAllowed={canCreateCheckout(booking.status, "balance", facts)}
+        payments={payments}
+      />
+
       <div className="mt-6">
-        <BookingActions id={booking.id} status={booking.status} />
+        <BookingActions
+          id={booking.id}
+          status={booking.status}
+          paymentsConfigured={configured}
+        />
       </div>
     </div>
   );
