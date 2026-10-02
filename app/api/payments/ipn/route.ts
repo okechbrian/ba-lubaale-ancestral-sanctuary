@@ -17,6 +17,7 @@ import { sendAndLog } from "@/lib/email/sender";
 import {
   balanceReceivedGuest,
   depositReceivedGuest,
+  howToPrepareGuest,
   ownerPaymentReceived,
 } from "@/lib/email/templates";
 
@@ -131,6 +132,18 @@ async function handle(params: {
               guest.subject,
               guest.text,
             );
+            if (payment.kind === "deposit") {
+              // Deposit paid = stay confirmed: send the how-to-prepare guide
+              // (same content as /prepare). Inside the same try/catch: an
+              // email failure never fails the webhook.
+              const guide = howToPrepareGuest(booking);
+              await sendAndLog(
+                "prepare_guide_guest",
+                booking.email,
+                guide.subject,
+                guide.text,
+              );
+            }
             const owner = process.env.OWNER_NOTIFY_EMAIL;
             if (owner) {
               const note = ownerPaymentReceived(booking, payment);
