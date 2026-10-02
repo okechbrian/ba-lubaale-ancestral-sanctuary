@@ -47,6 +47,7 @@ export interface PaymentRow {
   provider: string;
   provider_ref: string;
   provider_payment_id: string | null;
+  redirect_url: string | null;
   status: PaymentStatus;
   paid_at: string | null;
 }

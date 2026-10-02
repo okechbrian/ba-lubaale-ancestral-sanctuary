@@ -22,3 +22,20 @@ export async function claimWebhookEvent(
   if (error.code === "23505") return false; // unique violation = already seen
   throw new Error(`claimWebhookEvent failed: ${error.message}`);
 }
+
+/**
+ * Releases a claim when processing failed after claiming, so the provider's
+ * retry can be processed (otherwise the event would be lost forever).
+ */
+export async function releaseWebhookEvent(
+  provider: string,
+  externalId: string,
+): Promise<void> {
+  const db = getDb();
+  const { error } = await db
+    .from("webhook_events")
+    .delete()
+    .eq("provider", provider)
+    .eq("external_id", externalId);
+  if (error) throw new Error(`releaseWebhookEvent failed: ${error.message}`);
+}

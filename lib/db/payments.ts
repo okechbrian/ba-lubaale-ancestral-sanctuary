@@ -63,3 +63,49 @@ export async function setPaymentStatus(
     .eq("id", id);
   if (error) throw new Error(`setPaymentStatus failed: ${error.message}`);
 }
+
+export async function getPaymentById(id: string): Promise<PaymentRow | null> {
+  const db = getDb();
+  const { data, error } = await db
+    .from("payments")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`getPaymentById failed: ${error.message}`);
+  return data as PaymentRow | null;
+}
+
+export async function listPaymentsForBooking(
+  bookingId: string,
+): Promise<PaymentRow[]> {
+  const db = getDb();
+  const { data, error } = await db
+    .from("payments")
+    .select("*")
+    .eq("booking_id", bookingId)
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(`listPaymentsForBooking failed: ${error.message}`);
+  return (data ?? []) as PaymentRow[];
+}
+
+/**
+ * Stores the Pesapal tracking id + hosted-checkout URL on a pending attempt
+ * and marks it `initiated` (the guest may now open the payment page).
+ */
+export async function initiatePayment(
+  id: string,
+  providerRef: string,
+  redirectUrl: string,
+): Promise<void> {
+  const db = getDb();
+  const { error } = await db
+    .from("payments")
+    .update({
+      provider_ref: providerRef,
+      redirect_url: redirectUrl,
+      status: "initiated",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) throw new Error(`initiatePayment failed: ${error.message}`);
+}
