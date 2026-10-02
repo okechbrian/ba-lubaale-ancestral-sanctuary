@@ -117,6 +117,10 @@ export default function ApplyPage() {
             discovery conversation. Please do not book flights until we confirm
             the boat.
           </p>
+          <p className="mt-3 max-w-xl text-cream/80">
+            If approved, a deposit link is sent by email. This form does not
+            take payment.
+          </p>
         </div>
       </section>
 
