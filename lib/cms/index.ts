@@ -8,12 +8,14 @@ import {
   hostBlockSchema,
   landBlockSchema,
   momentsBlockSchema,
+  testimonialsBlockSchema,
 } from "@/lib/cms/blocks";
 
-/** Every owner-editable block: settings key → zod schema (save validates). */
+/** Every owner-editable block: settings key  zod schema (save validates). */
 export const CMS_REGISTRY = {
   [CMS_KEYS.moments]: momentsBlockSchema,
   [CMS_KEYS.faq]: faqBlockSchema,
+  [CMS_KEYS.testimonials]: testimonialsBlockSchema,
   [CMS_KEYS.theLand]: landBlockSchema,
   [CMS_KEYS.theHost]: hostBlockSchema,
   [CMS_KEYS.theCave]: caveBlockSchema,

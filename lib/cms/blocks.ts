@@ -49,10 +49,33 @@ export const faqBlockSchema = z
   .strict();
 export type FaqBlock = z.infer<typeof faqBlockSchema>;
 
+/**
+ * One guest voice. Strings may be empty: an empty quote is a disabled slot
+ * the homepage skips. Never write a quote that was not actually said.
+ */
+export const testimonialSlotSchema = z
+  .object({
+    quote: z.string().max(600),
+    author: z.string().max(160),
+  })
+  .strict();
+export type TestimonialSlot = z.infer<typeof testimonialSlotSchema>;
+
+/** Homepage guest voices — exactly three slots; empty slots stay hidden. */
+export const testimonialsBlockSchema = z
+  .object({
+    one: testimonialSlotSchema,
+    two: testimonialSlotSchema,
+    three: testimonialSlotSchema,
+  })
+  .strict();
+export type TestimonialsBlock = z.infer<typeof testimonialsBlockSchema>;
+
 /** Settings-table keys used by the content overrides (P2 CMS). */
 export const CMS_KEYS = {
   moments: "content:moments",
   faq: "content:faq",
+  testimonials: "content:testimonials",
   theLand: "content:the-land",
   theHost: "content:the-host",
   theCave: "content:the-cave",

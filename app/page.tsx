@@ -4,8 +4,9 @@ import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
 import { MomentsStrip } from "@/components/MomentsStrip";
 import { resolveContent } from "@/lib/cms";
-import { momentsBlockSchema } from "@/lib/cms/blocks";
+import { momentsBlockSchema, testimonialsBlockSchema } from "@/lib/cms/blocks";
 import { momentsDefault } from "@/content/moments";
+import { testimonialsDefault } from "@/content/testimonials";
 
 export const revalidate = 60;
 
@@ -16,11 +17,15 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const { moments } = await resolveContent(
-    "content:moments",
-    momentsBlockSchema,
-    momentsDefault,
-  );
+  const [{ moments }, { one, two, three }] = await Promise.all([
+    resolveContent("content:moments", momentsBlockSchema, momentsDefault),
+    resolveContent(
+      "content:testimonials",
+      testimonialsBlockSchema,
+      testimonialsDefault,
+    ),
+  ]);
+  const voices = [one, two, three].filter((v) => v.quote.trim() !== "");
 
   return (
     <>
@@ -370,6 +375,34 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ─── Section 7b: Guest voices (hidden while every slot is empty) ─── */}
+      {voices.length > 0 && (
+        <section className="bg-dusk py-20 sm:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h2 className="text-center font-display text-3xl font-semibold text-cream">
+              Guest Voices
+            </h2>
+            <div className="mt-12 grid gap-8 sm:grid-cols-3">
+              {voices.map((v) => (
+                <figure
+                  key={v.quote}
+                  className="flex flex-col rounded-md border border-cream/15 bg-cream/5 p-6"
+                >
+                  <blockquote className="font-display text-lg leading-relaxed text-cream/90">
+                    &ldquo;{v.quote}&rdquo;
+                  </blockquote>
+                  {v.author.trim() !== "" && (
+                    <figcaption className="mt-4 text-sm text-leaf">
+                      &mdash; {v.author}
+                    </figcaption>
+                  )}
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ─── Section 8: Three Stay Cards ─── */}
       <section className="bg-cream py-20 sm:py-28">

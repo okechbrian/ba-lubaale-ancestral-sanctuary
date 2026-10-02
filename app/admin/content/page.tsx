@@ -11,6 +11,7 @@ import {
   hostBlockSchema,
   landBlockSchema,
   momentsBlockSchema,
+  testimonialsBlockSchema,
 } from "@/lib/cms/blocks";
 import { atelierDefault } from "@/content/atelier";
 import { caveDefault } from "@/content/the-cave";
@@ -18,6 +19,7 @@ import { faqDefault } from "@/content/faq";
 import { hostDefault } from "@/content/the-host";
 import { landDefault } from "@/content/the-land";
 import { momentsDefault } from "@/content/moments";
+import { testimonialsDefault } from "@/content/testimonials";
 
 export const metadata: Metadata = { title: "Content" };
 export const dynamic = "force-dynamic";
@@ -46,6 +48,13 @@ const BLOCKS = [
     faqDefault,
     "FAQ",
     "Questions and answers on /faq. Links: write [label](/path) inside an answer.",
+  ),
+  block(
+    CMS_KEYS.testimonials,
+    testimonialsBlockSchema,
+    testimonialsDefault,
+    "Guest voices",
+    "The guest-voice section on the homepage. Three slots. Only real, said-out-loud quotes - never write a quote that was not actually given. A slot with an empty quote stays hidden; empty all three and the section disappears.",
   ),
   block(
     CMS_KEYS.theLand,
