@@ -17,3 +17,19 @@ export async function assertWindowAvailable(candidate: DateRange): Promise<void>
   const [ranges, blocked] = await Promise.all([getActiveRanges(), getBlockedDays()]);
   assertAvailable(candidate, ranges, blocked);
 }
+
+/** Owner blocks a day (unique). */
+export async function addBlockedDay(day: string, reason?: string): Promise<void> {
+  const db = getDb();
+  const { error } = await db
+    .from("blocked_dates")
+    .upsert({ day, reason: reason || null }, { onConflict: "day" });
+  if (error) throw new Error(`addBlockedDay failed: ${error.message}`);
+}
+
+/** Owner unblocks a day. */
+export async function removeBlockedDay(day: string): Promise<void> {
+  const db = getDb();
+  const { error } = await db.from("blocked_dates").delete().eq("day", day);
+  if (error) throw new Error(`removeBlockedDay failed: ${error.message}`);
+}

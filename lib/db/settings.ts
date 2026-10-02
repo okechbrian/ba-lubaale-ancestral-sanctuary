@@ -3,7 +3,7 @@ import { getDb } from "@/lib/db/client";
 import { DEFAULT_SETTINGS } from "@/lib/booking/pricing";
 import type { Settings } from "@/lib/db/types";
 
-const settingsValueSchema = z.object({
+export const settingsValueSchema = z.object({
   stay_prices: z
     .object({
       essential: z.object({ solo: z.number(), couple: z.number() }),
@@ -52,4 +52,21 @@ export async function getSettings(): Promise<Settings> {
   } catch {
     return DEFAULT_SETTINGS;
   }
+}
+
+/** Owner-save from /admin/settings — partial upsert, validated first. */
+export async function saveSettings(
+  input: z.infer<typeof settingsValueSchema>,
+): Promise<void> {
+  const parsed = settingsValueSchema.parse(input);
+  const db = getDb();
+  const rows: { key: string; value: unknown }[] = [];
+  if (parsed.stay_prices) rows.push({ key: "stay_prices", value: parsed.stay_prices });
+  if (parsed.deposit_percent !== undefined)
+    rows.push({ key: "deposit_percent", value: parsed.deposit_percent });
+  if (parsed.ugx_rate !== undefined)
+    rows.push({ key: "ugx_rate", value: parsed.ugx_rate });
+  if (rows.length === 0) return;
+  const { error } = await db.from("settings").upsert(rows, { onConflict: "key" });
+  if (error) throw new Error(`saveSettings failed: ${error.message}`);
 }
