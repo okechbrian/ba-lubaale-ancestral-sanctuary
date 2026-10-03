@@ -5,6 +5,39 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Payment emails are now written inside the payment transaction, not sent
+  from the webhook.** The IPN used to settle the payment and *then* email the
+  guest — so a crash, deploy or timeout in that window left a **paid guest with
+  no email and no record that anything was owed**. Migration
+  `20261002000005_email_outbox.sql` adds an `email_outbox` table (`status`
+  pending/sent/failed, `attempts`, `resends`, `last_error`, `next_attempt_at`)
+  and extends `apply_payment_completion` with a `p_emails` parameter: the
+  deposit/balance confirmations, the `prepare_guide_guest` guide and the owner
+  notification are inserted **in the same commit** as the payment. Either the
+  payment settles and the mail is durably queued, or nothing happened at all.
+  A unique index on `(payment_id, category)` makes "one email per payment" a
+  database guarantee, so a replayed webhook cannot queue a second copy.
+- **An outbox processor delivers the queue, with retries and backoff.**
+  `GET/POST /api/cron/email-outbox` drains due rows (wired to Vercel Cron every
+  5 minutes via `vercel.json`). Claiming is a database compare-and-set
+  (`claim_email_outbox`: `status='pending'` guard plus `attempts + 1` in one
+  statement), so concurrent runs can never send the same row twice. Failures
+  requeue with exponential backoff (2→4→8→16→32, capped at 60 minutes) and are
+  parked as `failed` after 5 attempts — or immediately when SMTP is simply not
+  configured, because retrying a configuration problem on a timer helps nobody.
+  A missing `CRON_SECRET` refuses the route with 503 rather than exposing an
+  open mail trigger to the internet. Delivery is honestly **at-least-once**: a
+  processor killed between "SMTP accepted it" and "row marked sent" will resend,
+  which is as close to exactly-once as SMTP allows.
+- **Admin: an outbox panel with a Resend button** in `/admin/emails`, above the
+  existing log. Each row shows its status, attempt count, human resend count,
+  last error and next retry time. **Resend** (only on non-sent rows — the
+  database refuses to requeue a delivered email) resets the attempt counter so
+  the backoff starts fresh and delivers inline, so the owner sees the outcome on
+  the same click instead of waiting for the next cron tick.
+
 ### Fixed
 
 - **The booking honeypot is now actually enforced in the route.** The hidden

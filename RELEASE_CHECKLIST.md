@@ -89,6 +89,7 @@ local parity). Any `NEXT_PUBLIC_*` value requires a **redeploy** to take effect.
 | `NEXT_PUBLIC_SITE_URL` | Must be the real production origin (used in every email link) |
 | `SUPABASE_URL` | Hosted project API URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only; never exposed to the client |
+| `CRON_SECRET` | Authorises the email outbox processor (`/api/cron/email-outbox`); without it the route refuses with 503 and queued payment mail never drains on a schedule |
 | `PESAPAL_ENV` | `sandbox` until go-live is signed off |
 | `PESAPAL_CONSUMER_KEY` / `PESAPAL_CONSUMER_SECRET` | From the Pesapal dashboard |
 | `PESAPAL_IPN_URL` | Must equal the IPN URL registered in Pesapal (see §3) |
@@ -124,13 +125,16 @@ local parity). Any `NEXT_PUBLIC_*` value requires a **redeploy** to take effect.
 - [ ] `PESAPAL_IPN_URL` in Vercel is byte-identical to the URL registered in the
       Pesapal dashboard, and it is the deployed endpoint:
       `https://<production-domain>/api/payments/ipn`
+- [ ] `CRON_SECRET` set, so the email outbox processor can run (see §2)
 - [ ] **Deposit test** — full loop on the deployed site:
       - [ ] Guest submits `/apply` → booking row created (paste booking id)
       - [ ] Admin approves → Approve button produces a real Pesapal checkout
             link (paste the link host, not the token)
       - [ ] Payment completed in sandbox → booking `paid`, deposit recorded
+      - [ ] `/admin/emails` shows the payment email queued in the **outbox**
+            (status pending → sent), not lost
       - [ ] Guest received the deposit confirmation email
-      - [ ] **Prepare guide email arrived** (PR #4 only — sent on
+      - [ ] **Prepare guide email arrived** (PR #4 only — queued on
             `payment.kind === "deposit"`)
 - [ ] **Balance test** — same loop for the balance payment
       (`payment.kind === "balance"`), including the balance-paid email.
