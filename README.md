@@ -51,6 +51,32 @@ Repo: https://github.com/okechbrian/ba-lubaale-ancestral-sanctuary
 | Pesapal | Approve disabled with a banner; no payment links generated |
 | Gmail SMTP | emails written to `email_log` as `stubbed`, shown as NOT SENT in admin |
 | WhatsApp number | floating button hidden |
+| Upstash (rate limiting) | outside production: disabled loudly (`x-ratelimit-mode: disabled-missing-config` + one warning per process). **In production `/admin/login` answers 503 `rate_limiter_unavailable`** rather than accept unlimited attempts — set the keys, or `ALLOW_UNTHROTTLED_ADMIN=1` to accept that risk explicitly |
+
+### Abuse protection (rate limiting + client IP)
+
+Per-IP limits live in Upstash Redis over plain REST (`lib/rate-limit.ts`):
+admin login **5 / 15 min** (fail-closed), `POST /api/bookings` **3 / hour**
+(fail-open), `POST /api/subscribers` **5 / 15 min** (fail-open). Every response
+carries `x-ratelimit-mode`, `x-ratelimit-limit`, `x-ratelimit-remaining`, and
+`Retry-After` when a request is actually limited, so the guard's state is
+observable from a browser or `curl` without reading logs.
+
+The bucket key comes from `lib/client-ip.ts`, which trusts **only headers the
+platform rewrites**:
+
+| Order | Source | Trusted because |
+|---|---|---|
+| 1 | `cf-connecting-ip`, `cf-real-ip` | **only** when `TRUST_CLOUDFLARE_IP=1` — Cloudflare overwrites them on its proxy |
+| 2 | `x-vercel-forwarded-for` | written by the Vercel edge |
+| 3 | `x-forwarded-for` **rightmost** entry | XFF is append-based; the platform appends the address it observed, so only the rightmost entry is outside client control |
+| 4 | `x-real-ip` | only when not running on Vercel (`x-vercel-id` / `VERCEL=1` both count as "on Vercel") |
+
+Leave `TRUST_CLOUDFLARE_IP` unset unless Cloudflare really proxies the domain:
+on plain Vercel a client can send `cf-connecting-ip` itself and pick its own
+bucket, which is exactly the bypass the tests in `tests/client-ip.test.ts` and
+`tests/api-abuse.test.ts` now pin shut (rotating spoofed headers still lands in
+one bucket and still gets a 429 on the 6th attempt).
 
 ### Payment email outbox
 
