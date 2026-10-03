@@ -9,7 +9,39 @@ export const DEFAULT_SETTINGS: Settings = {
   },
   depositPercent: 50,
   ugxRate: 3900, // owner-confirmable in /admin/settings before go-live
+  // Vouchers are off until the owner lists the amounts they want to sell. The
+  // site must never invent a voucher price.
+  voucherAmountsUsd: [],
 };
+
+/** Voucher price lookup: only amounts the owner actually configured. */
+export class VoucherPriceError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "VoucherPriceError";
+  }
+}
+
+/**
+ * Resolve a requested voucher amount against the owner's list. Returns null
+ * when vouchers are not on sale at all; throws when an amount is not one of the
+ * configured ones (never "rounds up to the nearest" — that would invent a
+ * price).
+ */
+export function voucherAmountUsd(
+  amountUsd: number,
+  settings: Settings = DEFAULT_SETTINGS,
+): number | null {
+  const offered = settings.voucherAmountsUsd ?? [];
+  if (offered.length === 0) return null;
+  const match = offered.find((amount) => amount === amountUsd);
+  if (match === undefined) {
+    throw new VoucherPriceError(
+      "That voucher amount is not on sale. Choose one of the listed amounts.",
+    );
+  }
+  return match;
+}
 
 export class PricingError extends Error {
   constructor(message: string) {

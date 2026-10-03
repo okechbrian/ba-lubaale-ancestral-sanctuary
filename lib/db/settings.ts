@@ -17,6 +17,19 @@ export const settingsValueSchema = z.object({
     .optional(),
   deposit_percent: z.number().min(1).max(100).optional(),
   ugx_rate: z.number().min(1).optional(),
+  // Fixed voucher prices in USD. Empty = vouchers are not on sale. Capped at 12
+  // entries so a fat-fingered paste cannot turn the page into a menu of 400
+  // prices; each must be a sane whole amount (>= 1, at most 2 decimals).
+  voucher_amounts_usd: z
+    .array(
+      z
+        .number()
+        .min(1, "Voucher amounts must be at least 1 USD")
+        .max(100_000, "Voucher amounts must be at most 100,000 USD")
+        .refine((n) => Number.isInteger(n * 100), "Use at most 2 decimal places"),
+    )
+    .max(12, "At most 12 voucher amounts")
+    .optional(),
 });
 
 type SettingsRows = { key: string; value: unknown }[];
@@ -35,6 +48,7 @@ function fromRows(rows: SettingsRows): Settings {
     stayPrices: v.stay_prices ?? DEFAULT_SETTINGS.stayPrices,
     depositPercent: v.deposit_percent ?? DEFAULT_SETTINGS.depositPercent,
     ugxRate: v.ugx_rate ?? DEFAULT_SETTINGS.ugxRate,
+    voucherAmountsUsd: v.voucher_amounts_usd ?? DEFAULT_SETTINGS.voucherAmountsUsd,
   };
 }
 
@@ -66,6 +80,11 @@ export async function saveSettings(
     rows.push({ key: "deposit_percent", value: parsed.deposit_percent });
   if (parsed.ugx_rate !== undefined)
     rows.push({ key: "ugx_rate", value: parsed.ugx_rate });
+  if (parsed.voucher_amounts_usd !== undefined) {
+    // Sorted + de-duplicated so the public page shows a clean, stable menu.
+    const cleaned = [...new Set(parsed.voucher_amounts_usd)].sort((a, b) => a - b);
+    rows.push({ key: "voucher_amounts_usd", value: cleaned });
+  }
   if (rows.length === 0) return;
   const { error } = await db.from("settings").upsert(rows, { onConflict: "key" });
   if (error) throw new Error(`saveSettings failed: ${error.message}`);

@@ -361,3 +361,93 @@ export function subscriberAlreadySubscribedEmail(unsubToken: string): {
     ].join("\n"),
   };
 }
+
+export interface VoucherEmailInput {
+  /** Pre-formatted for display, e.g. "1A2B 3C4D …". */
+  formattedCode: string;
+  amountUsd: number;
+  /** Who bought it — used only for a personal line. */
+  buyerName?: string | null;
+  /** Set when the voucher is a gift for someone else. */
+  giftedTo?: string | null;
+}
+
+function voucherBodyLines(v: VoucherEmailInput): string[] {
+  return [
+    "Your voucher code:",
+    "",
+    v.formattedCode,
+    "",
+    `Value: USD ${v.amountUsd}`,
+    "",
+    "Keep this code safe — it is the only way to use the voucher, and we cannot",
+    "send it again (we store only a fingerprint of it, never the code itself).",
+    "",
+    "To use it, tell us the code when you apply for a stay and we will apply the",
+    "voucher against your booking.",
+    "",
+    v.giftedTo
+      ? `This voucher is a gift for ${v.giftedTo}.`
+      : "You can pass it on to someone else if you wish — just forward this email.",
+    "",
+    "With care,",
+    "Queen Nalubaale",
+    "Ba Lubaale Ancestral Sanctuary",
+  ];
+}
+
+/** Buyer: the voucher they just paid for. */
+export function voucherIssuedBuyer(v: VoucherEmailInput): {
+  subject: string;
+  text: string;
+} {
+  const hello = v.buyerName?.trim() ? `Hello ${v.buyerName.trim()},` : "Hello,";
+  return {
+    subject: "Your Ba Lubaale voucher",
+    text: [hello, "", "Thank you — your voucher is ready.", "", ...voucherBodyLines(v)].join(
+      "\n",
+    ),
+  };
+}
+
+/** Optional second recipient, when the buyer is gifting the voucher. */
+export function voucherIssuedRecipient(v: VoucherEmailInput): {
+  subject: string;
+  text: string;
+} {
+  return {
+    subject: "Someone has given you a Ba Lubaale voucher",
+    text: [
+      "Hello,",
+      "",
+      "Someone has bought you a voucher for a stay at Ba Lubaale Ancestral Sanctuary.",
+      "",
+      ...voucherBodyLines(v),
+    ].join("\n"),
+  };
+}
+
+/** Owner: a voucher was sold. Contains no code — only the fingerprint. */
+export function voucherSoldOwner(v: {
+  amountUsd: number;
+  buyerEmail: string;
+  recipientEmail: string | null;
+  codeHint: string;
+}): { subject: string; text: string } {
+  return {
+    subject: `Voucher sold — USD ${v.amountUsd}`,
+    text: [
+      "A voucher was paid for and issued.",
+      "",
+      `Amount: USD ${v.amountUsd}`,
+      `Buyer: ${v.buyerEmail}`,
+      v.recipientEmail ? `Gift recipient: ${v.recipientEmail}` : "Gift recipient: none",
+      `Code fingerprint: ...${v.codeHint}`,
+      "",
+      "The code itself is not stored and cannot be retrieved — if the buyer loses",
+      "the email, void the voucher and issue a new one from /admin/vouchers.",
+      "",
+      `Review it at ${SITE()}/admin/vouchers.`,
+    ].join("\n"),
+  };
+}
