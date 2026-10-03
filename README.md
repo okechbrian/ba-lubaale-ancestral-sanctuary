@@ -135,6 +135,32 @@ price of its own.
   choose the booking, mark it redeemed. A voucher cannot be redeemed twice or
   moved to another booking, and an unused one can be voided with a reason.
 
+### Voucher hardening (three failure modes, closed)
+
+1. **The code is redacted once delivered.** The code's only retrievable home is
+   the queued email body — that is what makes a crash after the issuing
+   transaction recoverable, since the digest alone cannot be reversed. After a
+   confirmed send, `mark_email_outbox_sent` overwrites the body with
+   `[redacted after delivery]` **in the same statement** that records success,
+   for any `voucher*` category. It is a database function on purpose: a future
+   caller using a plain `UPDATE` cannot skip it, and it cannot run before the
+   send. Ordinary payment mail is untouched. So a leaked database backup cannot
+   spend a buyer's voucher — only the owner's email can.
+
+2. **A paid voucher that cannot be emailed fails, loudly.** The IPN needs
+   `voucher_requests` for the buyer's address. If that row is missing,
+   `requireVoucherRequest` throws, the webhook answers **503**, and Pesapal
+   retries — the payment stays `initiated` and no code is issued. It used to
+   log an error and ack 200, which claimed "settled and told" for a guest who
+   was never told. And `create_voucher_purchase` now creates the payment and its
+   request row in **one transaction**, so that state is unreachable through the
+   normal checkout path.
+
+3. **Non-object JSON bodies get a 400.** `/api/vouchers` and
+   `/api/group-inquiries` read the honeypot before validating, so `null`,
+   `"text"`, `42` and `[1,2]` were an uncaught `TypeError` (a 500). Both reject
+   non-object bodies up front.
+
 ### Payment email outbox
 
 Payment emails (deposit/balance confirmations, the how-to-prepare guide, the
