@@ -107,7 +107,9 @@ local parity). Any `NEXT_PUBLIC_*` value requires a **redeploy** to take effect.
 
 | Variable | If unset |
 |----------|----------|
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Rate limiting off: one `console.warn` per process + `x-ratelimit-mode: disabled-missing-config` on every response |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Rate limiting off: one `console.warn` per process + `x-ratelimit-mode: disabled-missing-config` on every response. **In production `/admin/login` instead answers 503 `rate_limiter_unavailable`** — so this is a launch blocker, not a nice-to-have |
+| `ALLOW_UNTHROTTLED_ADMIN` | `1` accepts unthrottled admin logins (the explicit, auditable override for the row above). Leave empty |
+| `TRUST_CLOUDFLARE_IP` | Leave **empty** unless Cloudflare really proxies the domain. `1` makes the limiter trust `cf-connecting-ip`; on plain Vercel that header is client-settable, which would let an attacker choose its own rate-limit bucket |
 | `TURNSTILE_SECRET_KEY` / `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Turnstile off: `x-turnstile-mode: disabled-missing-keys` |
 
 - [ ] Every variable above is present in Vercel Production (screenshot of the

@@ -23,6 +23,12 @@ const ENV_KEYS = [
   "ADMIN_SESSION_SECRET",
   "SUPABASE_URL",
   "SUPABASE_SERVICE_ROLE_KEY",
+  // Client-IP trust switches + the production limiter guard.
+  "VERCEL",
+  "VERCEL_ENV",
+  "NODE_ENV",
+  "TRUST_CLOUDFLARE_IP",
+  "ALLOW_UNTHROTTLED_ADMIN",
 ];
 
 // Official Cloudflare Turnstile TEST keys (docs: always pass / always fail).
@@ -161,6 +167,31 @@ describe("POST /api/admin/login — rate limiting", () => {
     );
   });
 
+  it("503s in production when UPSTASH is unconfigured (never silently unthrottled)", async () => {
+    clearProtectionEnv();
+    process.env.VERCEL_ENV = "production";
+
+    const res = await login(loginReq());
+    expect(res.status).toBe(503);
+    expect((await res.json()).error).toBe("rate_limiter_unavailable");
+    expect(res.headers.get("x-ratelimit-mode")).toBe(
+      "fail-closed-missing-config",
+    );
+    // The warn-once registry is process-global and the admin-login bucket
+    // already warned in the first test of this file, so the message text is
+    // asserted in tests/rate-limit.test.ts with a fresh bucket name.
+  });
+
+  it("ALLOW_UNTHROTTLED_ADMIN=1 waives the guard — still loudly", async () => {
+    clearProtectionEnv();
+    process.env.VERCEL_ENV = "production";
+    process.env.ALLOW_UNTHROTTLED_ADMIN = "1";
+
+    const res = await login(loginReq());
+    expect(res.status).toBe(200);
+    expect(res.headers.get("x-ratelimit-mode")).toBe("disabled-missing-config");
+  });
+
   it("429s the 6th attempt within the 5/15min window (real HTTP backend)", async () => {
     const stub = await startUpstashStub();
     try {
@@ -197,6 +228,59 @@ describe("POST /api/admin/login — rate limiting", () => {
       expect((await sixth.json()).error).toBe("rate_limited");
       expect(Number(sixth.headers.get("Retry-After"))).toBeGreaterThan(0);
       expect(sixth.headers.get("x-ratelimit-mode")).toBe("enabled");
+    } finally {
+      await stub.close();
+    }
+  });
+
+  it("cannot be dodged by rotating spoofed client-IP headers", async () => {
+    // The attack this closes: a bot sends its own cf-connecting-ip (and its
+    // own x-real-ip / left-most x-forwarded-for hop) on every request. The old
+    // implementation read cf-connecting-ip first, so each attempt landed in a
+    // brand-new bucket and the 5/15min limit never fired.
+    const stub = await startUpstashStub();
+    try {
+      process.env.UPSTASH_REDIS_REST_URL = stub.url;
+      process.env.UPSTASH_REDIS_REST_TOKEN = "stub-token";
+
+      const attempt = (n: number): Promise<Response> =>
+        login(
+          new Request("http://localhost/api/admin/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "cf-connecting-ip": `6.6.6.${n}`,
+              "x-real-ip": `7.7.7.${n}`,
+              // left entry is attacker-chosen; the right one is what the
+              // platform appended
+              "x-forwarded-for": `8.8.8.${n}, 198.51.100.9`,
+            },
+            body: JSON.stringify({ username: "chief", password: "wrong" }),
+          }),
+        );
+
+      for (let i = 1; i <= 5; i++) {
+        const res = await attempt(i);
+        expect(res.status).toBe(401);
+        expect(res.headers.get("x-ratelimit-mode")).toBe("enabled");
+        expect(res.headers.get("x-ratelimit-remaining")).toBe(String(5 - i));
+      }
+
+      const sixth = await attempt(6);
+      expect(sixth.status).toBe(429);
+      expect((await sixth.json()).error).toBe("rate_limited");
+      expect(Number(sixth.headers.get("Retry-After"))).toBeGreaterThan(0);
+
+      // Proof the bucket never moved: every counter hit the same key, and no
+      // spoofed address appears in any Redis key.
+      const keys = stub.commands
+        .filter((c) => c.startsWith("INCR "))
+        .map((c) => c.split("\n")[0].replace("INCR ", ""));
+      expect(keys).toHaveLength(6);
+      expect(new Set(keys)).toEqual(new Set(["rl:admin-login:198.51.100.9"]));
+      expect(stub.commands.join("\n")).not.toContain("6.6.6.");
+      expect(stub.commands.join("\n")).not.toContain("7.7.7.");
+      expect(stub.commands.join("\n")).not.toContain("8.8.8.");
     } finally {
       await stub.close();
     }

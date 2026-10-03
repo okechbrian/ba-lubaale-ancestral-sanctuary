@@ -9,13 +9,21 @@ import {
   vi,
 } from "vitest";
 import {
+  adminLoginRequiresLimiter,
   checkRateLimit,
+  isProductionEnv,
   rateLimitHeaders,
   type RateLimitOptions,
 } from "@/lib/rate-limit";
 import { startUpstashStub, type UpstashStub } from "./helpers/upstash-stub";
 
-const KEYS = ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"];
+const KEYS = [
+  "UPSTASH_REDIS_REST_URL",
+  "UPSTASH_REDIS_REST_TOKEN",
+  "VERCEL_ENV",
+  "NODE_ENV",
+  "ALLOW_UNTHROTTLED_ADMIN",
+];
 const saved: Record<string, string | undefined> = {};
 const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -75,6 +83,64 @@ describe("checkRateLimit — missing config disables loudly", () => {
     expect(again.allowed).toBe(true);
     expect(again.mode).toBe("disabled-missing-config");
     expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("refuses traffic when onMissingConfig is closed, and still warns loudly", async () => {
+    const decision = await checkRateLimit(
+      opts({ name: "closed-bucket", onMissingConfig: "closed" }),
+    );
+    expect(decision).toEqual({
+      allowed: false,
+      mode: "fail-closed-missing-config",
+      limit: 3,
+      remaining: null,
+      retryAfterSec: null,
+    });
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("REFUSING traffic"),
+    );
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("ALLOW_UNTHROTTLED_ADMIN=1"),
+    );
+    // The bucket name is in the message, so an operator can see which guard
+    // is refusing traffic without reading code.
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("closed-bucket"),
+    );
+    expect(rateLimitHeaders(decision)["x-ratelimit-mode"]).toBe(
+      "fail-closed-missing-config",
+    );
+  });
+});
+
+describe("production guard for the admin login limiter", () => {
+  it("detects production from VERCEL_ENV or NODE_ENV", () => {
+    expect(isProductionEnv({ VERCEL_ENV: "production" })).toBe(true);
+    expect(isProductionEnv({ NODE_ENV: "production" })).toBe(true);
+    expect(isProductionEnv({ VERCEL_ENV: "preview" })).toBe(false);
+    expect(isProductionEnv({})).toBe(false);
+  });
+
+  it("requires the limiter in production unless explicitly waived", () => {
+    expect(
+      adminLoginRequiresLimiter({ VERCEL_ENV: "production" }),
+    ).toBe(true);
+    expect(
+      adminLoginRequiresLimiter({
+        VERCEL_ENV: "production",
+        ALLOW_UNTHROTTLED_ADMIN: "1",
+      }),
+    ).toBe(false);
+    // Only the exact string "1" waives it — "true"/"0" do not.
+    expect(
+      adminLoginRequiresLimiter({
+        VERCEL_ENV: "production",
+        ALLOW_UNTHROTTLED_ADMIN: "true",
+      }),
+    ).toBe(true);
+    // Local dev and previews keep the loud-but-usable disabled state.
+    expect(adminLoginRequiresLimiter({ NODE_ENV: "development" })).toBe(false);
+    expect(adminLoginRequiresLimiter({ VERCEL_ENV: "preview" })).toBe(false);
   });
 });
 
