@@ -8,6 +8,7 @@ import {
   atelierBlockSchema,
   caveBlockSchema,
   faqBlockSchema,
+  forGroupsBlockSchema,
   hostBlockSchema,
   landBlockSchema,
   momentsBlockSchema,
@@ -16,6 +17,7 @@ import {
 import { atelierDefault } from "@/content/atelier";
 import { caveDefault } from "@/content/the-cave";
 import { faqDefault } from "@/content/faq";
+import { forGroupsDefault } from "@/content/for-groups";
 import { hostDefault } from "@/content/the-host";
 import { landDefault } from "@/content/the-land";
 import { momentsDefault } from "@/content/moments";
@@ -55,6 +57,13 @@ const BLOCKS = [
     testimonialsDefault,
     "Guest voices",
     "The guest-voice section on the homepage. Three slots. Only real, said-out-loud quotes - never write a quote that was not actually given. A slot with an empty quote stays hidden; empty all three and the section disappears.",
+  ),
+  block(
+    CMS_KEYS.forGroups,
+    forGroupsBlockSchema,
+    forGroupsDefault,
+    "For groups",
+    "/for-groups — the page tour operators and retreat leaders read. Keep it free of prices, capacity numbers and availability promises: a group visit is quoted in conversation, so any figure written here would be one the site invented.",
   ),
   block(
     CMS_KEYS.theLand,

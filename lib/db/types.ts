@@ -129,6 +129,34 @@ export interface SubscriberRow {
   unsubscribed_at: string | null;
 }
 
+export type StoryRow = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  body: string;
+  cover_image: string | null;
+  cover_alt: string | null;
+  published: boolean;
+  published_at: string | null;
+  author: string | null;
+};
+
+export type GroupInquiryRow = {
+  id: string;
+  created_at: string;
+  name: string;
+  email: string;
+  organisation: string | null;
+  group_size: number | null;
+  window: string | null;
+  message: string;
+  handled: boolean;
+  handled_at: string | null;
+};
+
 /** Owner-editable business settings (validated when read). */
 export interface StayPrices {
   essential: { solo: number; couple: number };
