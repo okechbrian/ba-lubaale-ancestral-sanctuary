@@ -5,6 +5,7 @@ import {
   atelierBlockSchema,
   caveBlockSchema,
   faqBlockSchema,
+  forGroupsBlockSchema,
   hostBlockSchema,
   landBlockSchema,
   momentsBlockSchema,
@@ -20,6 +21,7 @@ export const CMS_REGISTRY = {
   [CMS_KEYS.theHost]: hostBlockSchema,
   [CMS_KEYS.theCave]: caveBlockSchema,
   [CMS_KEYS.atelier]: atelierBlockSchema,
+  [CMS_KEYS.forGroups]: forGroupsBlockSchema,
 } as const;
 
 export class UnknownCmsKeyError extends Error {
