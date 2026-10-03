@@ -6,6 +6,7 @@
  *   - tests/subscribers-integrity.test.ts (double opt-in lifecycle)
  *   - tests/outbox-integrity.test.ts      (transactional email outbox)
  *   - tests/vouchers-integrity.test.ts    (voucher issue, double-issue, redeem)
+ *   - tests/growth-integrity.test.ts       (stories drafts/publish, enquiries)
  *
  * It discovers:
  *   - TEST_SUPABASE_URL            (REST API, from `supabase status -o json`)
@@ -113,6 +114,7 @@ const vitestArgs = args.length
       "tests/subscribers-integrity.test.ts",
       "tests/outbox-integrity.test.ts",
       "tests/vouchers-integrity.test.ts",
+      "tests/growth-integrity.test.ts",
     ];
 const res = spawnSync("npx", ["vitest", ...vitestArgs], {
   cwd: root,
