@@ -40,6 +40,37 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The rate-limit bucket can no longer be chosen by the client.** The client IP
+  was read from `cf-connecting-ip` first — but that header is only meaningful
+  when Cloudflare proxies the request, and on plain Vercel **a client can send
+  it itself**. Any bot could therefore mint a fresh bucket per attempt and walk
+  straight past the admin login limit (5 / 15 min) and the intake limit.
+  `lib/client-ip.ts` now trusts only what the platform rewrites:
+  `cf-connecting-ip` / `cf-real-ip` **only** under the new explicit
+  `TRUST_CLOUDFLARE_IP=1` flag, then `x-vercel-forwarded-for` (written by the
+  Vercel edge), then the **rightmost** `x-forwarded-for` entry (XFF is
+  append-based, so the rightmost hop is the one the client cannot pick — the old
+  code took the *first* hop, the most attacker-controlled value in the header),
+  then `x-real-ip` only when not on Vercel (`VERCEL=1` or an `x-vercel-id`
+  header both count as Vercel). Values are validated as real IP literals —
+  junk is discarded rather than trusted, and a header-less request lands in the
+  shared `"unknown"` bucket instead of escaping throttling. New
+  `tests/client-ip.test.ts` (17 cases) plus an end-to-end login test that
+  rotates spoofed `cf-connecting-ip` / `x-real-ip` / left-most XFF on every
+  attempt and asserts six hits against a **single** Redis key and a 429 on the
+  sixth.
+- **An unconfigured admin login guard now fails closed in production.** Missing
+  `UPSTASH_*` keys used to disable throttling everywhere and merely warn — on a
+  live site that means unlimited password attempts. In production
+  (`VERCEL_ENV=production` / `NODE_ENV=production`) `/api/admin/login` now
+  answers **503 `rate_limiter_unavailable`** with
+  `x-ratelimit-mode: fail-closed-missing-config`, still warning loudly (the
+  message names the bucket and both remedies). `ALLOW_UNTHROTTLED_ADMIN=1` is
+  the explicit escape hatch; local dev, tests and previews keep the previous
+  disabled-but-loud behaviour. Denials are now mapped by mode, so "the guard
+  could not run" always returns 503 and only a real bucket overflow returns 429
+  with `Retry-After`.
+
 - **The booking honeypot is now actually enforced in the route.** The hidden
   `website` field previously only failed inside zod, and the generic 400
   echoed `issues: [{path: "website"}]` — telling bots exactly which field to
