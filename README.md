@@ -52,6 +52,29 @@ Repo: https://github.com/okechbrian/ba-lubaale-ancestral-sanctuary
 | Gmail SMTP | emails written to `email_log` as `stubbed`, shown as NOT SENT in admin |
 | WhatsApp number | floating button hidden |
 
+### Gift vouchers
+
+`/vouchers` sells a fixed-amount voucher toward a stay, through the same Pesapal
+hosted checkout the stays use. The amounts come from `/admin/settings` and
+nowhere else — with none published the page says vouchers are not on sale, and
+the server re-checks the requested amount so a tampered request cannot set a
+price of its own.
+
+- **The code** is 16 bytes of CSPRNG entropy (128 bits) rendered as
+  `1A2B 3C4D …`. Only `SHA-256(code)` is stored; redemption hashes the pasted
+  code in the app and compares in constant time, so a wrong code and an unknown
+  code are indistinguishable. The buyer's copy arrives by email (plus an
+  optional gift recipient), which is why the code also lives in the queued
+  email body — after that transaction commits, the digest is all that is left
+  and the code could never be recovered.
+- **Issuance** happens in `apply_voucher_completion` — provider claim, payment
+  completion, the code and the queued emails in one transaction. A replayed IPN
+  is refused by the claim; a new event id for an already-paid voucher issues
+  nothing (`first_completion = false`); and `vouchers.payment_id` is unique.
+- **Redemption** is an owner action in `/admin/vouchers`: paste the code,
+  choose the booking, mark it redeemed. A voucher cannot be redeemed twice or
+  moved to another booking, and an unused one can be voided with a reason.
+
 ### Payment email outbox
 
 Payment emails (deposit/balance confirmations, the how-to-prepare guide, the
