@@ -53,6 +53,17 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
+  // A JSON body that is not an object — `null`, `"text"`, `42`, `[1,2]` —
+  // reaches the honeypot read below as a property access on a non-object.
+  // Reject it first, so those bodies get the same honest 400 as broken JSON
+  // instead of a 500 from reading `.website` off null.
+  if (typeof body !== "object" || body === null || Array.isArray(body)) {
+    return Response.json(
+      { error: "invalid_request", issues: [] },
+      { status: 400, headers: rlHeaders },
+    );
+  }
+
   const honeypot = (body as { website?: unknown }).website;
   if (typeof honeypot === "string" && honeypot.length > 0) {
     console.warn(`vouchers honeypot triggered ip=${clientIp(request)}`);

@@ -130,6 +130,31 @@ describe("POST /api/vouchers — intake", () => {
     const res = await buyVoucher(post({ ...valid, surprise: true }));
     expect(res.status).toBe(400);
   });
+
+  // A body that parses but is not an object used to reach the honeypot read
+  // as `(null).website` => uncaught TypeError => 500 instead of 400.
+  it.each([
+    ["null", null],
+    ["a string", "just text"],
+    ["a number", 42],
+    ["an array", [1, 2, 3]],
+    ["a boolean", true],
+  ])("400s a non-object body (%s) instead of 500", async (_label, payload) => {
+    const res = await buyVoucher(post(payload));
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toBe("invalid_request");
+  });
+
+  it("400s the literal body 'null' even though it is valid JSON", async () => {
+    const res = await buyVoucher(
+      new Request("http://localhost/api/vouchers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "null",
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
 });
 
 describe("GET /api/vouchers/pending", () => {

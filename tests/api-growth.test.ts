@@ -117,6 +117,33 @@ describe("POST /api/group-inquiries — abuse stack", () => {
     );
   });
 
+  // A JSON body that parses but is not an object used to be a property access
+  // on a non-object (`null.website`) => uncaught TypeError => 500.
+  it.each([
+    ["null", null],
+    ["a string", "just text"],
+    ["a number", 42],
+    ["an array", [1, 2, 3]],
+    ["a boolean", true],
+  ])("400s a non-object body (%s) instead of 500", async (_label, payload) => {
+    const res = await sendInquiry(
+      jsonReq("http://localhost/api/group-inquiries", "POST", payload),
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toBe("invalid_request");
+  });
+
+  it("400s the literal body 'null' even though it is valid JSON", async () => {
+    const res = await sendInquiry(
+      new Request("http://localhost/api/group-inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "null",
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("wins before Turnstile: a bot never reaches Cloudflare", async () => {
     process.env.TURNSTILE_SECRET_KEY = PASSING_SECRET;
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = TEST_SITEKEY;
