@@ -121,6 +121,28 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
     return r.rows[0] as { n: number; body: string | null; status: string | null };
   }
 
+  /** Payment emails queued for the fixture recipient, oldest first. */
+  async function fixtureOutbox(
+    email: string,
+  ): Promise<
+    {
+      category: string;
+      body: string;
+      status: string;
+      attempts: number;
+      sent_at: string | null;
+    }[]
+  > {
+    const r = await pg.query(
+      `select category, body, status, attempts, sent_at
+         from public.email_outbox
+        where recipient = $1
+        order by created_at asc`,
+      [email],
+    );
+    return r.rows as never;
+  }
+
   beforeAll(async () => {
     // Route order in lib/db/client reads env at call time — set ours first.
     process.env.SUPABASE_URL = TEST_URL!;
@@ -146,6 +168,10 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
     await pg.query(
       "delete from public.email_log where to_email = 'it-fixtures@example.test'",
     );
+    // Queued payment mail is asserted by count — clear it too.
+    await pg.query(
+      "delete from public.email_outbox where recipient = 'it-fixtures@example.test'",
+    );
     await pg.query("drop trigger if exists it_booking_fail on public.bookings");
     await pg.query("drop function if exists public.it_booking_fail()");
   }, 30_000);
@@ -156,6 +182,9 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
     await pg.query("delete from public.bookings where name like 'it-fix-%'").catch(() => undefined);
     await pg.query(
       "delete from public.email_log where to_email = 'it-fixtures@example.test'",
+    ).catch(() => undefined);
+    await pg.query(
+      "delete from public.email_outbox where recipient = 'it-fixtures@example.test'",
     ).catch(() => undefined);
     for (const [k, v] of Object.entries(savedEnv)) {
       if (v === undefined) delete process.env[k];
@@ -300,7 +329,7 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
     expect(approved.status).toBe("approved");
   });
 
-  it("deposit IPN sends guest confirmation + prepare guide EXACTLY once", async () => {
+  it("deposit IPN queues guest confirmation + prepare guide EXACTLY once", async () => {
     const uid = randomUUID();
     const tag = `ipnmail-${uid}`;
     const trackingId = `it-${tag}`; // must equal seedPayment's provider_ref
@@ -324,38 +353,40 @@ describe.runIf(HAS_DB)("payment integrity (real local Supabase)", () => {
         }),
       });
 
-    // (1) First delivery: payment settles AND both guest emails go out
-    //     (stubbed — no SMTP in this run — but recorded in email_log).
+    // (1) First delivery: the payment settles AND both guest emails are queued
+    //     in the same transaction. Nothing is sent from the webhook any more —
+    //     that is what makes "paid but never told" impossible.
     const res1 = await ipn(request());
     expect(res1.status).toBe(200);
     expect((await getPaymentById(payment.id))?.status).toBe("completed");
     expect((await getBooking(booking.id))?.status).toBe("paid");
 
-    const confirmation = await fixtureEmails(
-      email,
+    const queued = await fixtureOutbox(email);
+    expect(queued.map((q) => q.category).sort()).toEqual([
       "payment_received_deposit_guest",
-    );
-    expect(confirmation.n).toBe(1);
-    expect(confirmation.status).toBe("stubbed");
-
-    const guide = await fixtureEmails(email, "prepare_guide_guest");
-    expect(guide.n).toBe(1);
-    expect(guide.status).toBe("stubbed");
+      "prepare_guide_guest",
+    ]);
+    for (const row of queued) {
+      expect(row.status).toBe("pending");
+      expect(row.attempts).toBe(0);
+      expect(row.sent_at).toBeNull();
+    }
+    const guide = queued.find((q) => q.category === "prepare_guide_guest")!;
     // The guide is the /prepare content, verbatim — proof the shared content
-    // file reached the guest, not a placeholder.
+    // file reached the queued mail, not a placeholder.
     expect(guide.body).toContain("Digital Sunset");
     expect(guide.body).toContain("Female-Visitor Food Protocol");
     expect(guide.body).toContain("/prepare");
     // Content locks hold in email too: no private phone number.
     expect(guide.body).not.toContain("0706559119");
 
-    // (2) Duplicate delivery (Pesapal retries): acknowledged, no new emails.
+    // Nothing was emailed yet — the outbox processor owns delivery.
+    expect((await fixtureEmails(email, "prepare_guide_guest")).n).toBe(0);
+
+    // (2) Duplicate delivery (Pesapal retries): acknowledged, no second row.
     const res2 = await ipn(request());
     expect(res2.status).toBe(200);
-    expect((await fixtureEmails(email, "prepare_guide_guest")).n).toBe(1);
-    expect(
-      (await fixtureEmails(email, "payment_received_deposit_guest")).n,
-    ).toBe(1);
+    expect(await fixtureOutbox(email)).toHaveLength(2);
     expect(await claimCount(trackingId)).toBe(1);
   });
 });

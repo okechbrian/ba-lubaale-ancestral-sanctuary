@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
  * Runs the integrity integration tests against the REAL local
- * Supabase stack (supabase start in this repo) — no faked database:
+ * Supabase stack (supabase start in this repo) - no faked database:
  *   - tests/payment-integrity.test.ts    (atomic payment apply, IPN emails)
  *   - tests/subscribers-integrity.test.ts (double opt-in lifecycle)
+ *   - tests/outbox-integrity.test.ts      (transactional email outbox)
  *
  * It discovers:
  *   - TEST_SUPABASE_URL            (REST API, from `supabase status -o json`)
@@ -109,6 +110,7 @@ const vitestArgs = args.length
       "run",
       "tests/payment-integrity.test.ts",
       "tests/subscribers-integrity.test.ts",
+      "tests/outbox-integrity.test.ts",
     ];
 const res = spawnSync("npx", ["vitest", ...vitestArgs], {
   cwd: root,
