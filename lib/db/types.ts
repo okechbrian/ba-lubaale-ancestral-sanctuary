@@ -69,6 +69,26 @@ export interface EmailLogRow {
   error: string | null;
 }
 
+export type EmailOutboxStatus = "pending" | "sent" | "failed";
+
+export interface EmailOutboxRow {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  category: string;
+  recipient: string;
+  subject: string;
+  body: string;
+  booking_id: string | null;
+  payment_id: string | null;
+  status: EmailOutboxStatus;
+  attempts: number;
+  resends: number;
+  last_error: string | null;
+  next_attempt_at: string;
+  sent_at: string | null;
+}
+
 export type SubscriberStatus = "pending" | "confirmed" | "unsubscribed";
 
 export interface SubscriberRow {

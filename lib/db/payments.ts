@@ -1,5 +1,6 @@
 import "server-only";
 import { getDb } from "@/lib/db/client";
+import type { OutboxEmailInput } from "@/lib/db/email-outbox";
 import type { BookingStatus, PaymentRow, PaymentStatus } from "@/lib/db/types";
 
 export interface NewPayment {
@@ -69,6 +70,13 @@ export interface ApplyCompletionInput {
   externalId: string;
   paymentId: string;
   redactedPayload?: unknown;
+  /**
+   * Emails to queue in the SAME transaction as the payment completion
+   * (migration 20261002000005). They are written, not sent — the outbox
+   * processor delivers them, which is what makes "settled but never told"
+   * impossible.
+   */
+  emails?: OutboxEmailInput[];
 }
 
 export interface ApplyCompletionResult {
@@ -78,15 +86,16 @@ export interface ApplyCompletionResult {
   payment_status?: PaymentStatus;
   booking_id?: string;
   booking_status?: BookingStatus;
+  emails_queued?: number;
 }
 
 /**
  * Atomic IPN apply — ONE Postgres transaction
- * (migration 20261002000003_payment_integrity.sql: webhook_events claim +
- * payment completion + booking status transition). If ANY step fails the
- * whole transaction rolls back — claim included — so the caller can answer
- * 503 and the provider's retry re-applies everything from a clean slate.
- * A duplicate delivery returns { claimed: false } and changes nothing.
+ * (migrations 20261002000003 + 20261002000005: webhook_events claim +
+ * payment completion + booking status transition + email-outbox rows). If ANY
+ * step fails the whole transaction rolls back — claim included — so the caller
+ * can answer 503 and the provider's retry re-applies everything from a clean
+ * slate. A duplicate delivery returns { claimed: false } and changes nothing.
  */
 export async function applyPaymentCompletion(
   input: ApplyCompletionInput,
@@ -97,6 +106,7 @@ export async function applyPaymentCompletion(
     p_external_id: input.externalId,
     p_payment_id: input.paymentId,
     p_redacted_payload: input.redactedPayload ?? null,
+    p_emails: input.emails ?? [],
   });
   if (error) {
     const err = new Error(
