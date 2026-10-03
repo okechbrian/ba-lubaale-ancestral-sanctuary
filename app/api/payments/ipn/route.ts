@@ -8,7 +8,7 @@ import {
   setPaymentStatus,
 } from "@/lib/db/payments";
 import { getBooking } from "@/lib/db/bookings";
-import { getVoucherRequest } from "@/lib/db/vouchers";
+import { requireVoucherRequest } from "@/lib/db/vouchers";
 import {
   generateVoucherCode,
   hashVoucherCode,
@@ -128,16 +128,12 @@ async function completeVoucherPayment(args: {
 }): Promise<void> {
   const { payment, trackingId, merchantRef, type, statusCode } = args;
 
-  // Where the code must go. The buyer's address lives on the payment's linked
-  // voucher request — see prepareVoucherEmails, which reads it from the row.
-  const request = await getVoucherRequest(payment.id);
-  if (!request) {
-    console.error(
-      `voucher payment ${payment.id} has no voucher request row — ` +
-        `issuing nothing; investigate before acking.`,
-    );
-    return;
-  }
+  // Where the code must go. This THROWS when the row is missing rather than
+  // logging and continuing: a paid voucher we cannot email is not a settled
+  // voucher, and acking 200 would tell the provider the guest has been told.
+  // Throwing lands in the catch below, which 503s, so Pesapal retries and the
+  // voucher completes once the row exists.
+  const request = await requireVoucherRequest(payment.id);
 
   const code = generateVoucherCode();
   const codeHash = hashVoucherCode(code);
