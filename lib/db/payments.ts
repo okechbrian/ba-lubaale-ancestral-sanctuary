@@ -1,6 +1,6 @@
 import "server-only";
 import { getDb } from "@/lib/db/client";
-import type { PaymentRow } from "@/lib/db/types";
+import type { BookingStatus, PaymentRow, PaymentStatus } from "@/lib/db/types";
 
 export interface NewPayment {
   booking_id: string;
@@ -62,6 +62,50 @@ export async function setPaymentStatus(
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw new Error(`setPaymentStatus failed: ${error.message}`);
+}
+
+export interface ApplyCompletionInput {
+  provider: string;
+  externalId: string;
+  paymentId: string;
+  redactedPayload?: unknown;
+}
+
+export interface ApplyCompletionResult {
+  claimed: boolean;
+  first_completion: boolean;
+  payment_id?: string;
+  payment_status?: PaymentStatus;
+  booking_id?: string;
+  booking_status?: BookingStatus;
+}
+
+/**
+ * Atomic IPN apply — ONE Postgres transaction
+ * (migration 20261002000003_payment_integrity.sql: webhook_events claim +
+ * payment completion + booking status transition). If ANY step fails the
+ * whole transaction rolls back — claim included — so the caller can answer
+ * 503 and the provider's retry re-applies everything from a clean slate.
+ * A duplicate delivery returns { claimed: false } and changes nothing.
+ */
+export async function applyPaymentCompletion(
+  input: ApplyCompletionInput,
+): Promise<ApplyCompletionResult> {
+  const db = getDb();
+  const { data, error } = await db.rpc("apply_payment_completion", {
+    p_provider: input.provider,
+    p_external_id: input.externalId,
+    p_payment_id: input.paymentId,
+    p_redacted_payload: input.redactedPayload ?? null,
+  });
+  if (error) {
+    const err = new Error(
+      `applyPaymentCompletion failed: ${error.message}`,
+    ) as Error & { code?: string };
+    err.code = error.code;
+    throw err;
+  }
+  return (data ?? {}) as ApplyCompletionResult;
 }
 
 export async function getPaymentById(id: string): Promise<PaymentRow | null> {

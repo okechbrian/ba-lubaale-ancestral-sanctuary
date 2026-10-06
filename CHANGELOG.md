@@ -5,8 +5,106 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The booking honeypot is now actually enforced in the route.** The hidden
+  `website` field previously only failed inside zod, and the generic 400
+  echoed `issues: [{path: "website"}]` — telling bots exactly which field to
+  leave empty. `POST /api/bookings` now checks the honeypot immediately after
+  the rate limiter: a filled value logs a loud `console.warn` with the client
+  IP, returns a generic 400 that never names the field, and stores nothing.
+- **Payment completion is now one atomic database operation.** Migration
+  `20261002000003_payment_integrity.sql` adds the `apply_payment_completion`
+  RPC: webhook claim + payment completion + booking status transition commit
+  in a SINGLE Postgres transaction. If any step fails, everything — the claim
+  included — rolls back and the IPN returns 503, so Pesapal's retry re-applies
+  from a clean slate; a duplicate delivery returns `claimed: false` and changes
+  nothing. Confirmation emails run after commit (an SMTP failure logs, never
+  half-commits a payment). The multi-statement "payment marked, booking stuck"
+  window is gone.
+- **Approved/paid bookings can never overlap.** `btree_gist` EXCLUDE
+  constraint `bookings_no_overlap` on `daterange(check_in, check_out, '[)')`
+  (half-open, matching the availability rules — back-to-back stays stay legal).
+  Approving now pre-checks the window and returns a clear **409
+  `overlapping_booking`** before any external call; a lost approval race hits
+  the constraint itself and maps to the same 409 (`OverlappingBookingError`,
+  SQLSTATE 23P01). Pending/declined requests remain exempt.
+- **Integration tests on a real database (no fakes).**
+  `tests/payment-integrity.test.ts` + `npm run test:integrity` run against the
+  local Supabase stack (`supabase start` + `supabase db reset`): (1) a
+  BEFORE UPDATE trigger fails the booking step after the payment step →
+  asserts zero rows changed (payment still `initiated`, no claim), then the
+  retry fully recovers (`completed` + `paid` + exactly one claim); (2) two
+  overlapping approvals → route 409 + constraint rejection of the direct
+  update + a back-to-back approval still succeeds. Without the env vars the
+  suite skips with a notice — it never fakes a pass.
+
 ### Added
 
+- **Guest voices on the homepage (admin-editable, never invented).** Three
+  fixed testimonial slots in `settings` under `content:testimonials`
+  (zod-validated, schema-strict), edited in Admin → Content with the blurb
+  spelling out the rule: only real, said-out-loud quotes; a slot with an
+  empty quote stays hidden and emptying all three removes the section
+  entirely. The in-repo default is three empty slots, so nothing fake is ever
+  published. Rendered as a `bg-dusk` section between the host block and the
+  Immersions; revalidates within a minute like the other blocks.
+- **"How to prepare" email, sent automatically when a deposit clears.**
+  `content/prepare.ts` is now the single source for the `/prepare` page AND
+  `howToPrepareGuest()` in `lib/email/templates.ts` - the guide email carries
+  every section (arrival, pack/leave-behind lists, digital sunset,
+  substance-free, food protocol, photography, important) verbatim plus links
+  to `/prepare` and `/arrive`, so page and email can never drift apart.
+  Triggered inside the IPN's `first_completion` block only for
+  `kind === "deposit"`, in the same try/catch as the other confirmation
+  emails (an SMTP failure logs, never fails the webhook). Covered by a real
+  integration test: deposit IPN → exactly one `prepare_guide_guest` row in
+  `email_log` (status `stubbed` without SMTP), duplicate delivery adds none.
+- **Mailing list with double opt-in (footer signup box).**
+  `POST /api/subscribers` (rate-limited 5 / 15 min per IP, **fail-open**,
+  disabled loudly when Upstash keys are missing; honeypot checked before
+  zod; no Turnstile - the confirm click is the spam brake) always answers
+  the same generic **202 `pending_confirmation`** for any valid address, so
+  nothing can be enumerated. Migration `20261002000004_subscribers.sql` adds
+  `subscribers` (unique lowercased email, `pending/confirmed/unsubscribed`,
+  separate confirm and unsubscribe tokens, RLS on with no policies). Flow:
+  signup → confirm email → `GET /subscribe/confirm` flips to confirmed and
+  sends the welcome email **which carries the unsubscribe link** →
+  `GET /subscribe/unsubscribe` opts out in one click; both link routes are
+  branded HTML with honest status codes (400 missing token, 404 unknown
+  token, 503 no database, 500 on error) and `no-store`/`noindex`. Re-subscribing
+  after unsubscribing rotates both tokens, so every older link honestly 404s.
+  The box lives in the global footer (`components/SubscribeBox.tsx`) with the
+  same hidden `website` honeypot as `/apply`. Lifecycle covered end-to-end on
+  a real database (`tests/subscribers-integrity.test.ts`, runs in
+  `npm run test:integrity`).
+- **Rate limiting on the two public write endpoints** (Upstash Redis over
+  plain REST — no SDK; host-agnostic, where Vercel KV would lock the site to
+  Vercel): `/api/admin/login` 5 attempts / 15 min per IP, `POST /api/bookings`
+  3 / hour per IP, bucketed per client IP (`lib/rate-limit.ts`). Documented
+  failure policy: bookings **fail-open** during backend errors (intake stays
+  up, `x-ratelimit-mode: fail-open`), admin login **fail-closed** (503
+  `rate_limiter_unavailable` — brute-force protection wins). Missing
+  `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` disables each bucket
+  **loudly**: one `console.warn` per process plus an
+  `x-ratelimit-mode: disabled-missing-config` header on every response —
+  never a silent bypass, never a fake "enabled". 429 responses carry
+  `Retry-After` and `retry_after`.
+- **Cloudflare Turnstile on `/apply`, verified server-side.** The widget
+  (explicit render, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`) sends the token as
+  `cf_turnstile_response`; `POST /api/bookings` verifies it against
+  `https://challenges.cloudflare.com/turnstile/v0/siteverify` (the historical
+  `siteverify.cloudflare.com` host no longer exists) **after** schema
+  validation so an invalid form never burns the single-use token, and the
+  client resets the widget after every failed submit. Enforcement requires
+  BOTH keys (a secret without a sitekey would brick the form) and is
+  fail-closed when configured: no token -> 403 `turnstile_required`,
+  rejected -> 403 `turnstile_failed`, Cloudflare unreachable -> 503
+  `turnstile_unavailable`. Missing keys disable verification **loudly**
+  (`x-turnstile-mode: disabled-missing-keys` + warn) — an unverified token is
+  only ever accepted when the feature is visibly off. Tests hit the real
+  siteverify endpoint with Cloudflare's official always-pass/always-fail keys
+  (no mocked captcha) and skip with a notice when the network is unavailable.
 - **Owner CMS — content overrides (P2, foundation).** `lib/cms/` resolves
   owner-edited blocks from the `settings` table (`content:*` keys, zod-validated)
   and falls back to in-repo defaults when the database is missing **or** a saved

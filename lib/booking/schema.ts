@@ -36,7 +36,9 @@ export const bookingRequestSchema = z.object({
   complementaryCheck: z.literal(true, {
     message: "You must acknowledge the complementary-care disclaimer",
   }),
-  website: z.string().max(0).optional(), // honeypot
+  website: z.string().max(0).optional(), // honeypot (route enforces it first)
+  /** Cloudflare Turnstile token — verified server-side when both keys are set. */
+  cf_turnstile_response: z.string().max(2048).optional(),
 });
 
 export type BookingRequest = z.infer<typeof bookingRequestSchema>;

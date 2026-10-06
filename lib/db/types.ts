@@ -69,6 +69,20 @@ export interface EmailLogRow {
   error: string | null;
 }
 
+export type SubscriberStatus = "pending" | "confirmed" | "unsubscribed";
+
+export interface SubscriberRow {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  email: string; // stored normalized (trimmed, lowercased)
+  status: SubscriberStatus;
+  confirm_token: string;
+  unsub_token: string;
+  confirmed_at: string | null;
+  unsubscribed_at: string | null;
+}
+
 /** Owner-editable business settings (validated when read). */
 export interface StayPrices {
   essential: { solo: number; couple: number };

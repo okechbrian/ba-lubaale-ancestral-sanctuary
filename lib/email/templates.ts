@@ -1,4 +1,5 @@
 import type { BookingRow } from "@/lib/db/types";
+import { prepareDefault } from "@/content/prepare";
 
 const SITE = () => process.env.NEXT_PUBLIC_SITE_URL || "https://ba-lubaale.vercel.app";
 
@@ -185,6 +186,61 @@ export function depositReceivedGuest(
   };
 }
 
+/**
+ * How-to-prepare guide, auto-sent when the deposit clears. Built from the
+ * SAME content/prepare.ts that renders /prepare, so page and email can never
+ * drift apart. No prices, no phone numbers — protocol text and links only.
+ */
+export function howToPrepareGuest(
+  booking: BookingRow,
+): { subject: string; text: string } {
+  const p = prepareDefault;
+  return {
+    subject: `How to prepare for your stay (${booking.check_in} to ${booking.check_out})`,
+    text: [
+      `Hello ${booking.name},`,
+      "",
+      `Your deposit is received and your stay (${booking.check_in} to ${booking.check_out})`,
+      "is confirmed. Here is everything to know before you arrive — always",
+      `current at ${SITE()}/prepare.`,
+      "",
+      `${p.arrival.heading}`,
+      ...p.arrival.paragraphs,
+      "",
+      `${p.arrival.link.label}: ${SITE()}${p.arrival.link.href}`,
+      "",
+      `${p.packing.heading}`,
+      "",
+      `${p.packing.packTitle}:`,
+      ...p.packing.pack.map((item) => `- ${item}`),
+      "",
+      `${p.packing.leaveTitle}:`,
+      ...p.packing.leaveBehind.map((item) => `- ${item}`),
+      "",
+      `${p.digitalSunset.heading}`,
+      p.digitalSunset.body,
+      "",
+      `${p.substanceFree.heading}`,
+      p.substanceFree.body,
+      "",
+      `${p.foodProtocol.heading}`,
+      ...p.foodProtocol.paragraphs,
+      "",
+      `${p.photography.heading}`,
+      p.photography.body,
+      "",
+      `${p.important.heading}`,
+      ...p.important.paragraphs,
+      "",
+      `Full guide: ${SITE()}/prepare`,
+      "",
+      "With joy,",
+      "Queen Nalubaale",
+      "Ba Lubaale Ancestral Sanctuary",
+    ].join("\n"),
+  };
+}
+
 /** Balance completed — fully paid. */
 export function balanceReceivedGuest(
   booking: BookingRow,
@@ -228,6 +284,80 @@ export function ownerPaymentReceived(
       `Review anytime: ${SITE()}/admin`,
       "",
       "This is an automated notification from the sanctuary website.",
+    ].join("\n"),
+  };
+}
+
+/** Double opt-in: the link that actually adds the address to the list. */
+export function subscriberConfirmEmail(confirmToken: string): {
+  subject: string;
+  text: string;
+} {
+  const confirmUrl = `${SITE()}/subscribe/confirm?token=${confirmToken}`;
+  return {
+    subject: "Confirm your subscription — Ba Lubaale Ancestral Sanctuary",
+    text: [
+      "Hello,",
+      "",
+      "Someone asked to add this address to the sanctuary mailing list.",
+      "",
+      "Confirm the subscription here:",
+      confirmUrl,
+      "",
+      "Nothing is ever sent until you confirm. If you did not request this,",
+      "ignore this email — the address simply stays off the list.",
+      "",
+      "With care,",
+      "Queen Nalubaale",
+      "Ba Lubaale Ancestral Sanctuary",
+    ].join("\n"),
+  };
+}
+
+/** Sent once, when the confirm link is clicked. Carries the unsubscribe link. */
+export function subscriberWelcomeEmail(unsubToken: string): {
+  subject: string;
+  text: string;
+} {
+  const unsubUrl = `${SITE()}/subscribe/unsubscribe?token=${unsubToken}`;
+  return {
+    subject: "You're subscribed — Ba Lubaale Ancestral Sanctuary",
+    text: [
+      "Hello,",
+      "",
+      "You are on the list. Expect occasional notes from the sanctuary:",
+      "stories from the land and the household, and the dates we open.",
+      "",
+      "Leave the list at any time here:",
+      unsubUrl,
+      "",
+      "With care,",
+      "Queen Nalubaale",
+      "Ba Lubaale Ancestral Sanctuary",
+    ].join("\n"),
+  };
+}
+
+/** Address already confirmed — a fresh request changes nothing. */
+export function subscriberAlreadySubscribedEmail(unsubToken: string): {
+  subject: string;
+  text: string;
+} {
+  const unsubUrl = `${SITE()}/subscribe/unsubscribe?token=${unsubToken}`;
+  return {
+    subject: "You're already subscribed — Ba Lubaale Ancestral Sanctuary",
+    text: [
+      "Hello,",
+      "",
+      "This address is already on the sanctuary mailing list, so there was",
+      "nothing new to confirm.",
+      "",
+      "Leave the list at any time here:",
+      unsubUrl,
+      "",
+      "With care,",
+      "Queen Nalubaale",
+      "Ba Lubaale Ancestral Sanctuary",
     ].join("\n"),
   };
 }

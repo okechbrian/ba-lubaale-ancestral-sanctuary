@@ -7,10 +7,12 @@ import {
   hostBlockSchema,
   landBlockSchema,
   momentsBlockSchema,
+  testimonialsBlockSchema,
 } from "@/lib/cms/blocks";
 import { parseInlineLinks } from "@/components/InlineText";
 import { faqDefault } from "@/content/faq";
 import { momentsDefault } from "@/content/moments";
+import { testimonialsDefault } from "@/content/testimonials";
 import { landDefault } from "@/content/the-land";
 import { hostDefault } from "@/content/the-host";
 import { caveDefault } from "@/content/the-cave";
@@ -58,6 +60,12 @@ describe("content defaults validate", () => {
     expect(atelierBlockSchema.safeParse(atelierDefault).success).toBe(true);
   });
 
+  it("testimonials default passes its schema (three empty slots)", () => {
+    expect(
+      testimonialsBlockSchema.safeParse(testimonialsDefault).success,
+    ).toBe(true);
+  });
+
   it("rejects broken shapes (bad save can never publish)", () => {
     expect(faqBlockSchema.safeParse({ items: [] }).success).toBe(false);
     expect(faqBlockSchema.safeParse({ items: [{ q: "x" }] }).success).toBe(false);
@@ -69,6 +77,35 @@ describe("content defaults validate", () => {
     expect(
       momentsBlockSchema.safeParse({
         moments: [{ src: "/images/a.jpg", alt: "", caption: "y" }],
+      }).success,
+    ).toBe(false);
+    // testimonials: strict three slots, strings only, no extra keys.
+    expect(
+      testimonialsBlockSchema.safeParse({
+        one: { quote: "Said out loud", author: "A guest" },
+        two: { quote: "", author: "" },
+        three: { quote: "", author: "" },
+      }).success,
+    ).toBe(true);
+    expect(
+      testimonialsBlockSchema.safeParse({
+        one: { quote: 42, author: "" },
+        two: { quote: "", author: "" },
+        three: { quote: "", author: "" },
+      }).success,
+    ).toBe(false);
+    expect(
+      testimonialsBlockSchema.safeParse({
+        one: { quote: "", author: "" },
+        two: { quote: "", author: "" },
+        three: { quote: "", author: "" },
+        four: { quote: "", author: "" },
+      }).success,
+    ).toBe(false);
+    expect(
+      testimonialsBlockSchema.safeParse({
+        one: { quote: "", author: "" },
+        two: { quote: "", author: "" },
       }).success,
     ).toBe(false);
   });

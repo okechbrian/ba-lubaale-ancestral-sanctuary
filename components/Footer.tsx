@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { site } from "@/content/site";
 import { channel, films } from "@/content/teaching";
+import { SubscribeBox } from "@/components/SubscribeBox";
 
 export function Footer() {
   return (
@@ -105,6 +106,11 @@ export function Footer() {
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Mailing list signup (double opt-in) */}
+        <div className="mt-10 border-t border-cream/10 pt-6">
+          <SubscribeBox />
         </div>
 
         {/* Legal lines */}

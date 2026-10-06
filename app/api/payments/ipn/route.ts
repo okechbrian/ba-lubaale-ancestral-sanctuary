@@ -1,13 +1,13 @@
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
 import { claimWebhookEvent, releaseWebhookEvent } from "@/lib/db/webhook-events";
 import {
-  completePayment,
+  applyPaymentCompletion,
   getPaymentById,
   getPaymentByRef,
   setPaymentStatus,
 } from "@/lib/db/payments";
-import { getBooking, updateBookingStatus } from "@/lib/db/bookings";
-import { bookingStatusAfterPayment, verifyRemotePayment } from "@/lib/payments/state";
+import { getBooking } from "@/lib/db/bookings";
+import { verifyRemotePayment } from "@/lib/payments/state";
 import {
   PesapalApiError,
   PesapalNotConfiguredError,
@@ -17,6 +17,7 @@ import { sendAndLog } from "@/lib/email/sender";
 import {
   balanceReceivedGuest,
   depositReceivedGuest,
+  howToPrepareGuest,
   ownerPaymentReceived,
 } from "@/lib/email/templates";
 
@@ -38,8 +39,9 @@ function ackBody(trackingId: string, merchantRef: string, type: string): Respons
  * HMAC signature, so nothing here is trusted: we look up OUR payment row by
  * the tracking id, re-query GetTransactionStatus with our own bearer token,
  * cross-check currency/amount/reference, and only then complete the payment.
- * Idempotency: webhook_events unique claim; a failed apply releases the claim
- * so the retry can run. Always acks 200 when it understood the event.
+ * Completion applies claim + payment + booking in ONE database transaction —
+ * any failure rolls all of it back and returns 503 so the provider retries.
+ * Always acks 200 when it understood the event.
  */
 async function handle(params: {
   trackingId: string;
@@ -89,61 +91,95 @@ async function handle(params: {
 
   let claimed = false;
   try {
-    claimed = await claimWebhookEvent(CLAIM_PROVIDER, trackingId, {
-      type,
-      merchant_reference: merchantRef,
-      status_code: remote.statusCode,
-    });
-    if (!claimed) return ackBody(trackingId, merchantRef, type);
-
     if (outcome.status === "completed") {
-      const firstCompletion = await completePayment(payment.id);
-      if (firstCompletion) {
-        const booking = await getBooking(payment.booking_id);
-        if (booking) {
-          const nextStatus = bookingStatusAfterPayment(
-            booking.status,
-            payment.kind,
-            "completed",
-          );
-          if (nextStatus !== booking.status) {
-            await updateBookingStatus(booking.id, nextStatus);
-            booking.status = nextStatus;
-          }
-          const guest =
-            payment.kind === "deposit"
-              ? depositReceivedGuest(booking, {
-                  totalUsd: Number(booking.amount_usd ?? payment.amount_usd),
-                  depositUsd: Number(payment.amount_usd),
-                })
-              : balanceReceivedGuest(
-                  booking,
-                  Number(booking.amount_usd ?? payment.amount_usd),
-                );
-          await sendAndLog(
-            `payment_received_${payment.kind}_guest`,
-            booking.email,
-            guest.subject,
-            guest.text,
-          );
-          const owner = process.env.OWNER_NOTIFY_EMAIL;
-          if (owner) {
-            const note = ownerPaymentReceived(booking, payment);
+      // ONE atomic transaction (RPC apply_payment_completion): webhook claim
+      // + payment completion + booking status. If ANY step throws, everything
+      // — the claim included — rolls back and we 503 below, so Pesapal's
+      // retry re-applies from a clean slate. Nothing can half-commit.
+      const applied = await applyPaymentCompletion({
+        provider: CLAIM_PROVIDER,
+        externalId: trackingId,
+        paymentId: payment.id,
+        redactedPayload: {
+          type,
+          merchant_reference: merchantRef,
+          status_code: remote.statusCode,
+        },
+      });
+      if (!applied.claimed) {
+        return ackBody(trackingId, merchantRef, type); // duplicate delivery
+      }
+      if (applied.first_completion) {
+        // The payment is durably committed now. Confirmation emails run
+        // OUTSIDE the transaction: an SMTP failure must not fail the webhook
+        // (it is logged here; the booking and payment stay settled).
+        try {
+          const booking = await getBooking(payment.booking_id);
+          if (booking) {
+            const guest =
+              payment.kind === "deposit"
+                ? depositReceivedGuest(booking, {
+                    totalUsd: Number(booking.amount_usd ?? payment.amount_usd),
+                    depositUsd: Number(payment.amount_usd),
+                  })
+                : balanceReceivedGuest(
+                    booking,
+                    Number(booking.amount_usd ?? payment.amount_usd),
+                  );
             await sendAndLog(
-              `payment_received_${payment.kind}_owner`,
-              owner,
-              note.subject,
-              note.text,
+              `payment_received_${payment.kind}_guest`,
+              booking.email,
+              guest.subject,
+              guest.text,
             );
+            if (payment.kind === "deposit") {
+              // Deposit paid = stay confirmed: send the how-to-prepare guide
+              // (same content as /prepare). Inside the same try/catch: an
+              // email failure never fails the webhook.
+              const guide = howToPrepareGuest(booking);
+              await sendAndLog(
+                "prepare_guide_guest",
+                booking.email,
+                guide.subject,
+                guide.text,
+              );
+            }
+            const owner = process.env.OWNER_NOTIFY_EMAIL;
+            if (owner) {
+              const note = ownerPaymentReceived(booking, payment);
+              await sendAndLog(
+                `payment_received_${payment.kind}_owner`,
+                owner,
+                note.subject,
+                note.text,
+              );
+            }
           }
+        } catch (emailErr) {
+          console.error(
+            "payment confirmation email failed:",
+            emailErr instanceof Error ? emailErr.message : "unknown",
+          );
         }
       }
-    } else if (outcome.status === "failed") {
+      return ackBody(trackingId, merchantRef, type);
+    }
+
+    if (outcome.status === "failed") {
+      claimed = await claimWebhookEvent(CLAIM_PROVIDER, trackingId, {
+        type,
+        merchant_reference: merchantRef,
+        status_code: remote.statusCode,
+      });
+      if (!claimed) return ackBody(trackingId, merchantRef, type);
       await setPaymentStatus(payment.id, "failed");
+      return ackBody(trackingId, merchantRef, type);
     }
 
     return ackBody(trackingId, merchantRef, type);
   } catch (err) {
+    // Only the failed-status branch claims outside the RPC; the completed
+    // branch's claim lives inside the rolled-back transaction.
     if (claimed) {
       await releaseWebhookEvent(CLAIM_PROVIDER, trackingId).catch(() => undefined);
     }

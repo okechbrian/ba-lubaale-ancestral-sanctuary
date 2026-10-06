@@ -81,6 +81,40 @@ describe("PUT /api/admin/content", () => {
     expect((await res.json()).error).toBe("database_not_configured");
   });
 
+  it("validates the guest-voices block (testimonials)", async () => {
+    const bad = await PUT(
+      putReq(
+        {
+          key: "content:testimonials",
+          value: {
+            one: { quote: 7, author: "" },
+            two: { quote: "", author: "" },
+            three: { quote: "", author: "" },
+          },
+        },
+        await cookie(),
+      ),
+    );
+    expect(bad.status).toBe(400);
+    expect((await bad.json()).error).toBe("invalid_content");
+
+    const good = await PUT(
+      putReq(
+        {
+          key: "content:testimonials",
+          value: {
+            one: { quote: "Said out loud", author: "A guest" },
+            two: { quote: "", author: "" },
+            three: { quote: "", author: "" },
+          },
+        },
+        await cookie(),
+      ),
+    );
+    expect(good.status).toBe(503); // valid shape; only the DB is missing
+    expect((await good.json()).error).toBe("database_not_configured");
+  });
+
   it("400s on invalid JSON", async () => {
     const res = await PUT(
       new Request("http://localhost/api/admin/content", {
