@@ -58,7 +58,7 @@ export const prepareDefault = {
   important: {
     heading: "Important",
     paragraphs: [
-      "Fish feeding and chamber work are guided by the host — never self-serve. You are shown what to do, and when.",
+      "Fish feeding and chamber work are guided by the host and are never self-serve. You are shown what to do, and when.",
       "Sessions here are traditional, energetic, and artisanal. They complement and do not replace medical or psychiatric care. The sanctuary does not provide emergency or clinical services.",
     ],
   },

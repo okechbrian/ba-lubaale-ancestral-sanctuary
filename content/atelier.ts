@@ -11,7 +11,7 @@ export const atelierDefault: AtelierBlock = {
   bark: {
     heading: "Bark Cloth — Olubugo",
     paragraphs: [
-      "The bark of the mutuba tree is beaten with wooden mallets until it becomes a soft, wearable cloth. This is one of Uganda's oldest textile traditions — UNESCO recognised. At the sanctuary, guests learn to measure, cut, and sew bark cloth into garments, wall hangings, and talisman wraps.",
+      "The bark of the mutuba tree is beaten with wooden mallets until it becomes a soft, wearable cloth. This is one of Uganda's oldest textile traditions, which are recognised by UNESCO. At the sanctuary, guests learn to measure, cut, and sew bark cloth into garments, wall hangings, and talisman wraps.",
       "You do not only speak the intention. You weave it, sew it, and carry it home.",
     ],
     image: {
@@ -68,7 +68,7 @@ export const atelierDefault: AtelierBlock = {
   worn: {
     heading: "Worn Craft",
     intro:
-      "Cowrie strands, seed beads, and kente-stripe cloth — worn during ceremonies and made by hand at the sanctuary.",
+      "Cowrie strands, seed beads, and kente-stripe cloth are worn during ceremonies and made by hand at the sanctuary.",
     images: [
       {
         src: "/images/cowrie-two.jpg",

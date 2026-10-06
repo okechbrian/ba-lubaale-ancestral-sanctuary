@@ -13,9 +13,9 @@ export const landDefault: LandBlock = {
   overview: {
     heading: "A Living Place",
     paragraphs: [
-      "Ba Lubaale Ancestral Sanctuary Kiwamirembe is a living place — ground to approach the Lubaale of Ssese and Lake Nalubaale in a single visit, with the host holding the door.",
+      "Ba Lubaale Ancestral Sanctuary Kiwamirembe is a living place, serving as ground to approach the Lubaale of Ssese and Lake Nalubaale in a single visit, with the host holding the door.",
       "It is older than the people now standing on it. It was passed to me in 1998. I am the one telling the story.",
-      "The forest, the spring, the fire, the herd, and more than a hundred caves are here. Three of the caves are open to guests — Nalubaale, Lubaale Musisi, and Lubaale Wanema. The rest are visited only after a calling. [See the three open caves →](/the-cave)",
+      "The forest, the spring, the fire, the herd, and more than a hundred caves are here. Three of the caves are open to guests, namely Nalubaale, Lubaale Musisi, and Lubaale Wanema. The rest are visited only after a calling. [See the three open caves →](/the-cave)",
     ],
     image: {
       src: "/images/lake-house.jpg",
@@ -25,7 +25,7 @@ export const landDefault: LandBlock = {
   features: [
     {
       title: "The Lake House",
-      body: "Organic meals cooked from the island — fish, herbs, farm milk, matooke, sweet potato.",
+      body: "Organic meals cooked from the island, including fish, herbs, farm milk, matooke, and sweet potato.",
       image: {
         src: "/images/lake-house.jpg",
         alt: "The Lake House on stilts over Lake Victoria",
@@ -33,7 +33,7 @@ export const landDefault: LandBlock = {
     },
     {
       title: "The Forest",
-      body: "Tropical forest set against the grassland that surrounds it. An ancient tree stands inside, and the spring rises in its roots. Birds, monkeys, butterflies — and the sound of water that is not always seen. Weaver nests hang in the branches above the path to the cave.",
+      body: "Tropical forest set against the grassland that surrounds it. An ancient tree stands inside, and the spring rises in its roots. Birds, monkeys, and butterflies are present, along with the sound of water that is not always seen. Weaver nests hang in the branches above the path to the cave.",
       image: {
         src: "/images/forest-canopy.jpg",
         alt: "Dense canopy of indigenous trees in the sanctuary forest",
@@ -41,7 +41,7 @@ export const landDefault: LandBlock = {
     },
     {
       title: "The Ancestral Spring",
-      body: "Root water rising beneath tree roots. Used for cleansing before and after cave sessions. Not a tourist attraction — a working part of the sanctuary practice.",
+      body: "Root water rising beneath tree roots. Used for cleansing before and after cave sessions. This is not a tourist attraction, but a working part of the sanctuary practice.",
     },
     {
       title: "The Herd",
@@ -87,7 +87,7 @@ export const landDefault: LandBlock = {
   forest: {
     heading: "The Forest",
     paragraphs: [
-      "Tropical forest against the grassland that surrounds it. An ancient tree stands inside, and the spring rises in its roots — clean water, sacred and healing. Birds, monkeys, butterflies, and the sound of water that is not always seen.",
+      "Tropical forest against the grassland that surrounds it. An ancient tree stands inside, and the spring rises in its roots, providing clean water that is both sacred and healing. Birds, monkeys, butterflies, and the sound of water that is not always seen.",
       "Trails wind through the canopy to the far shore. Bicycle paths for those who want to move. Still spots for those who want to sit.",
     ],
     images: [
@@ -115,6 +115,6 @@ export const landDefault: LandBlock = {
   tortoise: {
     heading: "The Resident Tortoise",
     blurb:
-      "Mutaka on the stony shore. Silent. Patient. Older than any of us can say.",
+      "Mutaka rests on the stony shore, silent and patient, and older than any of us can say.",
   },
 };

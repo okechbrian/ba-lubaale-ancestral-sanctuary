@@ -65,7 +65,7 @@ export function SubscribeBox() {
         Stay in Touch
       </p>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-cream/70">
-        Occasional notes from the sanctuary — stories from the land and the
+        Occasional notes from the sanctuary, featuring stories from the land and the
         household, and the dates we open. Confirm through your email;
         unsubscribe any time.
       </p>
@@ -73,7 +73,7 @@ export function SubscribeBox() {
       {state.kind === "done" ? (
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <p className="text-sm font-semibold text-leaf">
-            Almost there — check your inbox and confirm your subscription.
+            Almost there! Please check your inbox and confirm your subscription.
           </p>
           <button
             type="button"

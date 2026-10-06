@@ -7,7 +7,7 @@ import InlineText from "@/components/InlineText";
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Food, safety, what to bring, one household, photography, and cancellation — answered plainly.",
+    "Food, safety, what to bring, one household, photography, and cancellation, all answered plainly.",
 };
 
 export const revalidate = 60;

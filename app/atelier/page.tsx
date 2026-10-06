@@ -9,7 +9,7 @@ import InlineText from "@/components/InlineText";
 export const metadata: Metadata = {
   title: "Atelier",
   description:
-    "Bark cloth, banana fibre, cowrie — craft as healing, intention made tangible.",
+    "Using bark cloth, banana fibre, and cowrie, we explore craft as healing and make intention tangible.",
 };
 
 export const revalidate = 60;

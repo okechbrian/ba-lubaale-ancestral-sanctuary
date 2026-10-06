@@ -24,7 +24,7 @@ export const faqDefault: FaqBlock = {
     },
     {
       q: "Can several groups visit at once?",
-      paragraphs: ["No. One household at a time. Private. Screened. Application-gated."],
+      paragraphs: ["No, we welcome only one household at a time to ensure a private and screened experience based on the application."],
     },
     {
       q: "May I take photographs?",

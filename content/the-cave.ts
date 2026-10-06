@@ -11,7 +11,7 @@ export const caveDefault: CaveBlock = {
   intro: {
     heading: "More Than a Hundred Caves",
     paragraphs: [
-      "Ssese holds more than a hundred caves. Only three are open to guests. The rest are visited only after a calling from themselves — they are never offered as an add-on to a booking, and they are not listed here.",
+      "Ssese holds more than a hundred caves. Only three are open to guests. The rest are visited only after a calling from themselves, as they are never offered as an add-on to a booking and are not listed here.",
       "Sessions are guided by the host. You do not enter alone. You do not enter on a schedule. The cave keeps its own time.",
     ],
     image: {
@@ -24,8 +24,8 @@ export const caveDefault: CaveBlock = {
     items: [
       {
         title: "Nalubaale Chamber",
-        tagline: "motherhood, marriage, prosperity — closeness after cleansing",
-        body: "Belonging to Nalongo Nalubaale, the twin mother — a Queen and mother to creation. People appeal to her for childbearing, marriage, and prosperity. You may visit the cave; closeness to her requires deep spiritual and physical cleansing.",
+        tagline: "focusing on motherhood, marriage, and prosperity, and achieving closeness after cleansing",
+        body: "Belonging to Nalongo Nalubaale, the twin mother, who is a Queen and mother to creation. People appeal to her for childbearing, marriage, and prosperity. You may visit the cave; closeness to her requires deep spiritual and physical cleansing.",
       },
       {
         title: "Lubaale Musisi Chamber",

@@ -9,7 +9,7 @@ import InlineText from "@/components/InlineText";
 export const metadata: Metadata = {
   title: "The Cave",
   description:
-    "More than a hundred caves on Ssese, three open to guests — Nalubaale, Musisi, and Wanema. Guided sessions only. No photography.",
+    "More than a hundred caves on Ssese, three of which are open to guests: Nalubaale, Musisi, and Wanema. Guided sessions only. No photography.",
 };
 
 export const revalidate = 60;

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Immersions",
   description:
-    "Three-day, five-day, and whole-island immersions — private, screened, one household at a time.",
+    "Three-day, five-day, and whole-island immersions, which are private, screened, and limited to one household at a time.",
 };
 
 export default function ImmersionsPage() {
@@ -67,7 +67,7 @@ export default function ImmersionsPage() {
               </div>
               <ul className="mt-6 space-y-2 text-sm text-ink/70">
                 <li>A cottage</li>
-                <li>Two Lake House readings — diagnostic and fish feeding</li>
+                <li>Two Lake House readings, including diagnostic and fish feeding</li>
                 <li>One cave healing session</li>
                 <li>Daily root-water cleansing</li>
                 <li>Fireplace release</li>

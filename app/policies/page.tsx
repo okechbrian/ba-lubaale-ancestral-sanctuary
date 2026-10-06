@@ -89,10 +89,10 @@ export default function PoliciesPage() {
             Sanctuary Rules
           </h2>
           <ul className="mt-6 space-y-3 text-cream/70">
-            <li>Digital sunset — phones silent in the Lake House, none in the cave</li>
-            <li>No litter — carry what you bring, respect the land</li>
+            <li>Observe a digital sunset: phones must be silent in the Lake House, none in the cave</li>
+            <li>Please do not litter; carry what you bring, respect the land</li>
             <li>No harming plants or animals</li>
-            <li>Fire and cave sessions are guided only — never enter alone</li>
+            <li>Fire and cave sessions are guided only, and you must never enter alone</li>
             <li>Shoes off on sacred ground</li>
             <li>No photography inside the cave or shrines</li>
             <li>No alcohol or recreational drugs</li>

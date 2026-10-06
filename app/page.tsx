@@ -13,7 +13,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Ba Lubaale Ancestral Sanctuary Kiwamirembe",
   description:
-    "A screened ancestral sanctuary on the Ssese Islands of Lake Victoria, Uganda — cave work, root-water cleansing, bark cloth and fibre craft, and quiet time with land and herd.",
+    "A screened ancestral sanctuary on the Ssese Islands of Lake Victoria, Uganda, offering cave work, root-water cleansing, bark cloth and fibre craft, and quiet time with the land and herd.",
 };
 
 export default async function HomePage() {
@@ -86,7 +86,7 @@ export default async function HomePage() {
           <p className="mx-auto mt-3 max-w-2xl text-center text-ink/70">
             Tropical forest against grassland, fed by a spring in the roots of
             an ancient tree. Free-roaming goats and cows. Naturally fed lake
-            fish. An ancient resident tortoise, Mutaka — seen most afternoons.
+            fish. An ancient resident tortoise, Mutaka, who is seen most afternoons.
             And more than a hundred caves, three of them open to guests.
           </p>
 
@@ -174,7 +174,7 @@ export default async function HomePage() {
               <h3 className="font-display text-xl text-ink">Solitude Lovers</h3>
               <p className="mt-3 text-sm text-ink/70">
                 People ready to sit with themselves in silence, beside the fire
-                and the stones — grounded back to their roots.
+                and the stones, where they can be grounded back to their roots.
               </p>
             </div>
 
@@ -201,7 +201,7 @@ export default async function HomePage() {
                 Retreat Groups
               </h3>
               <p className="mt-3 text-sm text-ink/70">
-                A spiritual family — no lies, no hypocrisy. Such a group can
+                A spiritual family built on truth and without hypocrisy. Such a group can
                 choose to visit the sanctuary and its grounds together.
               </p>
             </div>
@@ -229,7 +229,7 @@ export default async function HomePage() {
                 Seekers of Healing &amp; Enrichment
               </h3>
               <p className="mt-3 text-sm text-ink/70">
-                People tired, stuck, or carrying a lot — ready to shed, let go,
+                People who feel tired, stuck, or are carrying a heavy burden, and are now ready to shed, let go,
                 and start fresh. If that is you, send the application.
               </p>
             </div>
@@ -265,7 +265,7 @@ export default async function HomePage() {
               <p className="mt-3 text-sm leading-relaxed text-cream/70">
                 Enter the cave. Sit by the fire. Work with breath, voice, bark
                 cloth, and cowrie. The sessions are traditional, energetic, and
-                artisanal — guided by the host.
+                artisanal, guided by the host.
               </p>
             </div>
 
@@ -351,7 +351,7 @@ export default async function HomePage() {
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
           <Image
             src="/images/host-portrait-headwrap.jpg"
-            alt="Queen Nalubaale — seer, healer, and master artisan"
+            alt="Queen Nalubaale, a seer, healer, and master artisan"
             width={288}
             height={288}
             className="h-56 w-56 rounded-full object-cover sm:h-72 sm:w-72"
