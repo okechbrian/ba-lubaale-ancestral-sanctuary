@@ -172,8 +172,8 @@ impossible: a crash after the commit leaves the mail queued, not lost.
 
 A processor delivers the queue:
 
-- **Route** — `GET|POST /api/cron/email-outbox`, called by Vercel Cron every 5
-  minutes (`vercel.json`). Requires `Authorization: Bearer $CRON_SECRET`; with
+- **Route** — `GET|POST /api/cron/email-outbox`, called by Vercel Cron daily at
+  08:00 UTC (`vercel.json`). Requires `Authorization: Bearer $CRON_SECRET`; with
   `CRON_SECRET` unset it refuses (503 `cron_secret_missing`) instead of being an
   open mail trigger.
 - **Retries** — a failed send requeues with exponential backoff (2, 4, 8, 16, 32
@@ -186,9 +186,14 @@ A processor delivers the queue:
   last error and next retry, and a **Resend** button for failed rows (delivered
   rows cannot be resent).
 
-> Vercel's free (Hobby) plan allows only one cron per **day**. Until the project
-> is on a paid plan, delivery happens on the next manual `POST` or via Resend in
-> `/admin/emails`; queued rows are never lost either way.
+> **Schedule is capped at once a day by the hosting plan.** Vercel's Hobby plan
+> rejects any cron expression that fires more than once per day — and it rejects
+> it by *failing the whole deployment*, silently for git pushes (no failed
+> deployment is even created, so nothing shows up in the dashboard). `vercel.json`
+> therefore ships `0 8 * * *`. Changing it back to `*/5 * * * *` requires a Pro
+> plan ($20/mo); on Hobby, delivery happens at the daily tick, on the next manual
+> `POST`, or immediately via Resend in `/admin/emails`. Queued rows are never lost
+> either way.
 
 ### Payments (Pesapal, hosted checkout)
 

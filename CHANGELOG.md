@@ -78,6 +78,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The 5-minute outbox cron made every deployment on this branch fail.** Vercel's
+  Hobby plan rejects any cron expression that fires more than once per day, and it
+  rejects it by failing the **entire deployment** — including git pushes, where
+  the failure is *silent*: no deployment is created, so nothing appears in the
+  dashboard's failed list and a branch simply stops getting previews. `vercel.json`
+  now ships `0 8 * * *` (daily, 08:00 UTC) instead of `*/5 * * * *`, which is the
+  fastest schedule the current plan accepts. This is a hosting-plan limit, not a
+  delivery-design change: the queue, its backoff and its at-least-once semantics
+  are untouched, and a paid plan can restore the 5-minute schedule by editing one
+  line. Until then the owner can also drain the queue on demand from the Resend
+  button in `/admin/emails`.
+
 - **The rate-limit bucket can no longer be chosen by the client.** The client IP
   was read from `cf-connecting-ip` first — but that header is only meaningful
   when Cloudflare proxies the request, and on plain Vercel **a client can send
