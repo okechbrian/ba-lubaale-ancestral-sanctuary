@@ -3,6 +3,14 @@
 
 Copy everything between the START and END markers into the agent as the project constitution. Do not summarise it away. If a later message conflicts with this document, this document wins unless the owner explicitly overrides a named decision.
 
+> **OWNER OVERRIDE — 2 Oct 2026 (booking brief):** the owner has explicitly
+> overridden the named STACK/limits decisions ("no CMS", "Formspree",
+> "Do not add a database, auth, e-commerce cart, blog engine..."). The site is
+> now a booking-and-payment product: Supabase database, /admin login, Pesapal
+> payments, transactional email, and later a shop, members area and stories —
+> per the owner's 4-priority brief. Everything else here stays locked
+> (design, copy, nav order, prices, no invented testimonials, no secrets in git).
+
 ---
 
 START MASTER PROMPT
