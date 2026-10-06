@@ -11,15 +11,20 @@ import "server-only";
  * - `onFailure: "closed"` — backend errors reject with 503
  *   `rate_limiter_unavailable` (protection first; used for admin login).
  *
- * Missing UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN does NOT fail
- * either way: the feature is DISABLED LOUDLY — one console.warn per process
- * per bucket plus `x-ratelimit-mode: disabled-missing-config` on every
- * response, so the disabled state is never silent and never fakes "enabled".
+ * Missing UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN is a separate knob
+ * (`onMissingConfig`, default `"allow"`): by default the bucket is DISABLED
+ * LOUDLY — one console.warn per process per bucket plus
+ * `x-ratelimit-mode: disabled-missing-config` on every response, so the
+ * disabled state is never silent and never fakes "enabled". The admin login
+ * bucket opts into `"closed"` in production (see `adminLoginRequiresLimiter`):
+ * an unconfigured brute-force guard must not accept unlimited attempts on a
+ * live site.
  */
 
 export type RateLimitMode =
   | "enabled"
   | "disabled-missing-config"
+  | "fail-closed-missing-config"
   | "fail-open"
   | "fail-closed";
 
@@ -38,7 +43,52 @@ export interface RateLimitOptions {
   windowSec: number;
   /** Policy when the Redis backend itself errors at runtime. */
   onFailure: "open" | "closed";
+  /**
+   * Policy when the Redis credentials are missing from the environment.
+   * `"allow"` (default) disables the bucket loudly; `"closed"` refuses
+   * traffic (503) so a production login can never run unthrottled.
+   */
+  onMissingConfig?: "allow" | "closed";
   ip: string;
+}
+
+/**
+ * The environment slice these policies read. Structurally narrower than
+ * `NodeJS.ProcessEnv` so callers (and tests) can pass a plain object.
+ */
+export interface RateLimitEnv {
+  VERCEL_ENV?: string;
+  NODE_ENV?: string;
+  ALLOW_UNTHROTTLED_ADMIN?: string;
+  [key: string]: string | undefined;
+}
+
+/**
+ * True when this process is serving production traffic (a real deployment,
+ * not a local build or test run).
+ */
+export function isProductionEnv(env: RateLimitEnv = process.env): boolean {
+  return env.VERCEL_ENV === "production" || env.NODE_ENV === "production";
+}
+
+/**
+ * Whether the admin login bucket must refuse traffic when Upstash is
+ * unconfigured.
+ *
+ * In production: YES — an admin console with no brute-force guard is worse
+ * than one that answers 503 `rate_limiter_unavailable`, and 503 is honest
+ * about why. `ALLOW_UNTHROTTLED_ADMIN=1` is the explicit, auditable escape
+ * hatch for an operator who accepts that risk (self-hosted, no Redis, one
+ * admin behind a VPN).
+ *
+ * Outside production (local dev, tests, preview builds) the bucket stays
+ * disabled-loudly so local work never needs a Redis instance.
+ */
+export function adminLoginRequiresLimiter(
+  env: RateLimitEnv = process.env,
+): boolean {
+  if (env.ALLOW_UNTHROTTLED_ADMIN === "1") return false;
+  return isProductionEnv(env);
 }
 
 const warned = new Set<string>();
@@ -61,17 +111,33 @@ function sanitizeIp(ip: string): string {
   return clean || "unknown";
 }
 
+/**
+ * Send one or more Redis commands as a single JSON pipeline.
+ *
+ * The wire format matters and is NOT guessable: the Upstash REST API parses
+ * every request body as JSON. An earlier version of this file posted
+ * `text/plain` with newline-separated commands
+ * (`INCR <key>\nEXPIRE <key> 900 NX`), which a real database rejects with
+ * `HTTP 400 invalid character 'I' looking for beginning of value` while the
+ * in-repo test stub happily accepted it - so the limiter was never exercised
+ * against a real Upstash. Every call must therefore be a JSON array of
+ * argument arrays posted to `/pipeline`, and `tests/rate-limit.test.ts` pins
+ * that shape so it cannot quietly regress.
+ *
+ * `/pipeline` also accepts a single command, so DEL and PTTL share this path
+ * rather than growing a second URL style.
+ */
 async function upstash(
   cfg: { url: string; token: string },
-  command: string,
+  commands: string[][],
 ): Promise<unknown> {
-  const res = await fetch(cfg.url, {
+  const res = await fetch(`${cfg.url.replace(/\/+$/, "")}/pipeline`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${cfg.token}`,
-      "Content-Type": "text/plain",
+      "Content-Type": "application/json",
     },
-    body: command,
+    body: JSON.stringify(commands),
     signal: AbortSignal.timeout(3000),
   });
   if (!res.ok) throw new Error(`upstash http ${res.status}`);
@@ -103,6 +169,23 @@ export async function checkRateLimit(
 ): Promise<RateLimitDecision> {
   const cfg = redisConfig();
   if (!cfg) {
+    if (opts.onMissingConfig === "closed") {
+      warnOnce(
+        `rate-limit:${opts.name}`,
+        `[rate-limit] ${opts.name} has NO Redis config in production and is ` +
+          `REFUSING traffic (x-ratelimit-mode=fail-closed-missing-config, ` +
+          `503 rate_limiter_unavailable). Set UPSTASH_REDIS_REST_URL and ` +
+          `UPSTASH_REDIS_REST_TOKEN to restore throttling, or set ` +
+          `ALLOW_UNTHROTTLED_ADMIN=1 to accept unthrottled admin logins.`,
+      );
+      return {
+        allowed: false,
+        mode: "fail-closed-missing-config",
+        limit: opts.limit,
+        remaining: null,
+        retryAfterSec: null,
+      };
+    }
     warnOnce(
       `rate-limit:${opts.name}`,
       `[rate-limit] ${opts.name} is DISABLED — UPSTASH_REDIS_REST_URL / ` +
@@ -120,10 +203,10 @@ export async function checkRateLimit(
 
   const key = `rl:${opts.name}:${sanitizeIp(opts.ip)}`;
   try {
-    const json = await upstash(
-      cfg,
-      `INCR ${key}\nEXPIRE ${key} ${opts.windowSec} NX`,
-    );
+    const json = await upstash(cfg, [
+      ["INCR", key],
+      ["EXPIRE", key, String(opts.windowSec), "NX"],
+    ]);
     const [incr, expire] = entriesOf(json);
     const n = asNumber(incr?.result);
     if (n === null || incr?.error) {
@@ -132,14 +215,14 @@ export async function checkRateLimit(
     if (expire?.error) {
       // The TTL never got set — remove the counter so a permanently-open
       // window can never lock an IP out, then apply the failure policy.
-      await upstash(cfg, `DEL ${key}`).catch(() => undefined);
+      await upstash(cfg, [["DEL", key]]).catch(() => undefined);
       throw new Error(`expire: ${expire.error}`);
     }
 
     if (n > opts.limit) {
       let retryAfterSec = opts.windowSec;
       try {
-        const pttl = entriesOf(await upstash(cfg, `PTTL ${key}`))[0];
+        const pttl = entriesOf(await upstash(cfg, [["PTTL", key]]))[0];
         const ms = asNumber(pttl?.result);
         if (ms !== null && ms > 0) retryAfterSec = Math.max(1, Math.ceil(ms / 1000));
       } catch {

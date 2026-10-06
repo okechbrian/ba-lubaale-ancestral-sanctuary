@@ -51,6 +51,66 @@ Repo: https://github.com/okechbrian/ba-lubaale-ancestral-sanctuary
 | Pesapal | Approve disabled with a banner; no payment links generated |
 | Gmail SMTP | emails written to `email_log` as `stubbed`, shown as NOT SENT in admin |
 | WhatsApp number | floating button hidden |
+| Upstash (rate limiting) | outside production: disabled loudly (`x-ratelimit-mode: disabled-missing-config` + one warning per process). **In production `/admin/login` answers 503 `rate_limiter_unavailable`** rather than accept unlimited attempts — set the keys, or `ALLOW_UNTHROTTLED_ADMIN=1` to accept that risk explicitly |
+
+### Abuse protection (rate limiting + client IP)
+
+Per-IP limits live in Upstash Redis over plain REST (`lib/rate-limit.ts`):
+admin login **5 / 15 min** (fail-closed), `POST /api/bookings` **3 / hour**
+(fail-open), `POST /api/subscribers` **5 / 15 min** (fail-open). Every response
+carries `x-ratelimit-mode`, `x-ratelimit-limit`, `x-ratelimit-remaining`, and
+`Retry-After` when a request is actually limited, so the guard's state is
+observable from a browser or `curl` without reading logs.
+
+The bucket key comes from `lib/client-ip.ts`, which trusts **only headers the
+platform rewrites**:
+
+| Order | Source | Trusted because |
+|---|---|---|
+| 1 | `cf-connecting-ip`, `cf-real-ip` | **only** when `TRUST_CLOUDFLARE_IP=1` — Cloudflare overwrites them on its proxy |
+| 2 | `x-vercel-forwarded-for` | written by the Vercel edge |
+| 3 | `x-forwarded-for` **rightmost** entry | XFF is append-based; the platform appends the address it observed, so only the rightmost entry is outside client control |
+| 4 | `x-real-ip` | only when not running on Vercel (`x-vercel-id` / `VERCEL=1` both count as "on Vercel") |
+
+Leave `TRUST_CLOUDFLARE_IP` unset unless Cloudflare really proxies the domain:
+on plain Vercel a client can send `cf-connecting-ip` itself and pick its own
+bucket, which is exactly the bypass the tests in `tests/client-ip.test.ts` and
+`tests/api-abuse.test.ts` now pin shut (rotating spoofed headers still lands in
+one bucket and still gets a 429 on the 6th attempt).
+
+### Payment email outbox
+
+Payment emails (deposit/balance confirmations, the how-to-prepare guide, the
+owner notification) are **queued inside the transaction that settles the
+payment** — `apply_payment_completion` writes them to `email_outbox` in the same
+commit (`supabase/migrations/20261002000005_email_outbox.sql`). The IPN never
+sends mail itself, which is what makes "payment settled, guest never told"
+impossible: a crash after the commit leaves the mail queued, not lost.
+
+A processor delivers the queue:
+
+- **Route** — `GET|POST /api/cron/email-outbox`, called by Vercel Cron daily at
+  08:00 UTC (`vercel.json`). Requires `Authorization: Bearer $CRON_SECRET`; with
+  `CRON_SECRET` unset it refuses (503 `cron_secret_missing`) instead of being an
+  open mail trigger.
+- **Retries** — a failed send requeues with exponential backoff (2, 4, 8, 16, 32
+  minutes, capped at 60). After 5 attempts the row is parked as `failed`, or
+  immediately when SMTP is not configured at all.
+- **Concurrency** — claiming is a database compare-and-set, so parallel cron
+  ticks cannot send the same row twice. Delivery is at-least-once: a crash
+  between "SMTP accepted it" and "row marked sent" resends on the next run.
+- **Owner control** — `/admin/emails` lists the queue with status, attempts,
+  last error and next retry, and a **Resend** button for failed rows (delivered
+  rows cannot be resent).
+
+> **Schedule is capped at once a day by the hosting plan.** Vercel's Hobby plan
+> rejects any cron expression that fires more than once per day — and it rejects
+> it by *failing the whole deployment*, silently for git pushes (no failed
+> deployment is even created, so nothing shows up in the dashboard). `vercel.json`
+> therefore ships `0 8 * * *`. Changing it back to `*/5 * * * *` requires a Pro
+> plan ($20/mo); on Hobby, delivery happens at the daily tick, on the next manual
+> `POST`, or immediately via Resend in `/admin/emails`. Queued rows are never lost
+> either way.
 
 ### Payments (Pesapal, hosted checkout)
 
@@ -66,6 +126,10 @@ Repo: https://github.com/okechbrian/ba-lubaale-ancestral-sanctuary
    marks the booking approved and emails the guest one message containing the
    hosted link (cards · MTN Momo · Airtel Money). Balance links appear after
    the deposit completes.
+4. Payment confirmations are queued in `email_outbox` by the very transaction
+   that settles the payment, then delivered by the outbox processor — set
+   `CRON_SECRET` so the cron job can drain the queue (see "Payment email
+   outbox").
 
 **IPN security note (important):** Pesapal's v3 IPN has **no HMAC
 signature** — anything could POST to it. The site therefore never trusts the

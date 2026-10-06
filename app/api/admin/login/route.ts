@@ -4,7 +4,11 @@ import {
   createSessionToken,
 } from "@/lib/admin/session";
 import { clientIp } from "@/lib/client-ip";
-import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
+import {
+  adminLoginRequiresLimiter,
+  checkRateLimit,
+  rateLimitHeaders,
+} from "@/lib/rate-limit";
 
 /** Constant-time-ish string compare (never logs or echoes credentials). */
 function matches(a: string, b: string): boolean {
@@ -15,28 +19,37 @@ function matches(a: string, b: string): boolean {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  // Brute-force guard: 5 attempts / 15 min per IP. FAIL-CLOSED — if the
-  // Upstash backend is down, login answers 503 rate_limiter_unavailable
-  // instead of accepting unlimited attempts. Missing UPSTASH keys disable
-  // the limiter LOUDLY (x-ratelimit-mode: disabled-missing-config + warn).
+  // Brute-force guard: 5 attempts / 15 min per IP, bucketed by the
+  // spoof-resistant client IP (see lib/client-ip.ts — a client cannot pick its
+  // own bucket by sending cf-connecting-ip).
+  //
+  // FAIL-CLOSED twice over, because this guards the admin console:
+  //  - Upstash unreachable -> 503 rate_limiter_unavailable
+  //  - Upstash UNCONFIGURED in production -> also 503 (no guard is not an
+  //    acceptable silent state on a live site). ALLOW_UNTHROTTLED_ADMIN=1 is
+  //    the explicit escape hatch; outside production the bucket is simply
+  //    DISABLED LOUDLY (x-ratelimit-mode: disabled-missing-config + warn).
   const rl = await checkRateLimit({
     name: "admin-login",
     limit: 5,
     windowSec: 15 * 60,
     onFailure: "closed",
+    onMissingConfig: adminLoginRequiresLimiter() ? "closed" : "allow",
     ip: clientIp(request),
   });
   const rlHeaders = rateLimitHeaders(rl);
-  if (!rl.allowed && rl.mode === "fail-closed") {
+  if (!rl.allowed) {
+    // Only a real bucket overflow is a 429; every "the guard itself could not
+    // run" mode is a 503, so the caller is never told to merely retry later.
+    if (rl.mode === "enabled") {
+      return Response.json(
+        { error: "rate_limited", retry_after: rl.retryAfterSec },
+        { status: 429, headers: rlHeaders },
+      );
+    }
     return Response.json(
       { error: "rate_limiter_unavailable" },
       { status: 503, headers: rlHeaders },
-    );
-  }
-  if (!rl.allowed) {
-    return Response.json(
-      { error: "rate_limited", retry_after: rl.retryAfterSec },
-      { status: 429, headers: rlHeaders },
     );
   }
 

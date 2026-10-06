@@ -5,7 +5,107 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Payment emails are now written inside the payment transaction, not sent
+  from the webhook.** The IPN used to settle the payment and *then* email the
+  guest — so a crash, deploy or timeout in that window left a **paid guest with
+  no email and no record that anything was owed**. Migration
+  `20261002000005_email_outbox.sql` adds an `email_outbox` table (`status`
+  pending/sent/failed, `attempts`, `resends`, `last_error`, `next_attempt_at`)
+  and extends `apply_payment_completion` with a `p_emails` parameter: the
+  deposit/balance confirmations, the `prepare_guide_guest` guide and the owner
+  notification are inserted **in the same commit** as the payment. Either the
+  payment settles and the mail is durably queued, or nothing happened at all.
+  A unique index on `(payment_id, category)` makes "one email per payment" a
+  database guarantee, so a replayed webhook cannot queue a second copy.
+- **An outbox processor delivers the queue, with retries and backoff.**
+  `GET/POST /api/cron/email-outbox` drains due rows (wired to Vercel Cron every
+  5 minutes via `vercel.json`). Claiming is a database compare-and-set
+  (`claim_email_outbox`: `status='pending'` guard plus `attempts + 1` in one
+  statement), so concurrent runs can never send the same row twice. Failures
+  requeue with exponential backoff (2→4→8→16→32, capped at 60 minutes) and are
+  parked as `failed` after 5 attempts — or immediately when SMTP is simply not
+  configured, because retrying a configuration problem on a timer helps nobody.
+  A missing `CRON_SECRET` refuses the route with 503 rather than exposing an
+  open mail trigger to the internet. Delivery is honestly **at-least-once**: a
+  processor killed between "SMTP accepted it" and "row marked sent" will resend,
+  which is as close to exactly-once as SMTP allows.
+- **Admin: an outbox panel with a Resend button** in `/admin/emails`, above the
+  existing log. Each row shows its status, attempt count, human resend count,
+  last error and next retry time. **Resend** (only on non-sent rows — the
+  database refuses to requeue a delivered email) resets the attempt counter so
+  the backoff starts fresh and delivers inline, so the owner sees the outcome on
+  the same click instead of waiting for the next cron tick.
+
 ### Fixed
+
+- **The rate limiter could not talk to a real Upstash database.** It posted
+  `Content-Type: text/plain` with newline-separated commands
+  (`INCR <key>` / `EXPIRE <key> 900 NX`), but the Upstash REST API JSON-parses
+  every request body and answers that with
+  `HTTP 400 invalid character 'I' looking for beginning of value`. With real
+  `UPSTASH_REDIS_REST_*` values configured, every limit check therefore threw:
+  - `POST /api/admin/login` → **503 `rate_limiter_unavailable`**. The admin
+    console stayed unreachable even with correct credentials, because that
+    bucket is deliberately fail-closed.
+  - `POST /api/bookings`, `/api/subscribers`, `/api/group-inquiries`,
+    `/api/vouchers` → fail-open, so they kept working but were **never actually
+    rate-limited**. Five advertised limits were inert.
+
+  The bug survived a green test suite because `tests/helpers/upstash-stub.ts`
+  split the request body on newlines — the stub encoded the *same* wrong wire
+  format as the code under test, so nothing ever disagreed with anything.
+  `lib/rate-limit.ts` now posts a JSON array of argument arrays to `/pipeline`
+  (`[["INCR",key],["EXPIRE",key,"900","NX"]]`, verified against a live database),
+  which also carries `DEL` and `PTTL` on the same path instead of growing a
+  second URL style. The stub now **rejects** a non-JSON body exactly as Upstash
+  does, and `tests/rate-limit.test.ts` pins the endpoint, content type and body
+  shape — so a future "simplification" back to plain text fails CI loudly instead
+  of shipping silently. Reverting the fix locally turns 6 of those tests red.
+
+- **The 5-minute outbox cron made every deployment on this branch fail.** Vercel's
+  Hobby plan rejects any cron expression that fires more than once per day, and it
+  rejects it by failing the **entire deployment** — including git pushes, where
+  the failure is *silent*: no deployment is created, so nothing appears in the
+  dashboard's failed list and a branch simply stops getting previews. `vercel.json`
+  now ships `0 8 * * *` (daily, 08:00 UTC) instead of `*/5 * * * *`, which is the
+  fastest schedule the current plan accepts. This is a hosting-plan limit, not a
+  delivery-design change: the queue, its backoff and its at-least-once semantics
+  are untouched, and a paid plan can restore the 5-minute schedule by editing one
+  line. Until then the owner can also drain the queue on demand from the Resend
+  button in `/admin/emails`.
+
+- **The rate-limit bucket can no longer be chosen by the client.** The client IP
+  was read from `cf-connecting-ip` first — but that header is only meaningful
+  when Cloudflare proxies the request, and on plain Vercel **a client can send
+  it itself**. Any bot could therefore mint a fresh bucket per attempt and walk
+  straight past the admin login limit (5 / 15 min) and the intake limit.
+  `lib/client-ip.ts` now trusts only what the platform rewrites:
+  `cf-connecting-ip` / `cf-real-ip` **only** under the new explicit
+  `TRUST_CLOUDFLARE_IP=1` flag, then `x-vercel-forwarded-for` (written by the
+  Vercel edge), then the **rightmost** `x-forwarded-for` entry (XFF is
+  append-based, so the rightmost hop is the one the client cannot pick — the old
+  code took the *first* hop, the most attacker-controlled value in the header),
+  then `x-real-ip` only when not on Vercel (`VERCEL=1` or an `x-vercel-id`
+  header both count as Vercel). Values are validated as real IP literals —
+  junk is discarded rather than trusted, and a header-less request lands in the
+  shared `"unknown"` bucket instead of escaping throttling. New
+  `tests/client-ip.test.ts` (17 cases) plus an end-to-end login test that
+  rotates spoofed `cf-connecting-ip` / `x-real-ip` / left-most XFF on every
+  attempt and asserts six hits against a **single** Redis key and a 429 on the
+  sixth.
+- **An unconfigured admin login guard now fails closed in production.** Missing
+  `UPSTASH_*` keys used to disable throttling everywhere and merely warn — on a
+  live site that means unlimited password attempts. In production
+  (`VERCEL_ENV=production` / `NODE_ENV=production`) `/api/admin/login` now
+  answers **503 `rate_limiter_unavailable`** with
+  `x-ratelimit-mode: fail-closed-missing-config`, still warning loudly (the
+  message names the bucket and both remedies). `ALLOW_UNTHROTTLED_ADMIN=1` is
+  the explicit escape hatch; local dev, tests and previews keep the previous
+  disabled-but-loud behaviour. Denials are now mapped by mode, so "the guard
+  could not run" always returns 503 and only a real bucket overflow returns 429
+  with `Retry-After`.
 
 - **The booking honeypot is now actually enforced in the route.** The hidden
   `website` field previously only failed inside zod, and the generic 400

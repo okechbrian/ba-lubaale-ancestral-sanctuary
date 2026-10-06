@@ -13,13 +13,14 @@ import {
   PesapalNotConfiguredError,
   getTransactionStatus,
 } from "@/lib/payments/pesapal";
-import { sendAndLog } from "@/lib/email/sender";
 import {
   balanceReceivedGuest,
   depositReceivedGuest,
   howToPrepareGuest,
   ownerPaymentReceived,
 } from "@/lib/email/templates";
+import type { OutboxEmailInput } from "@/lib/db/email-outbox";
+import type { BookingRow } from "@/lib/db/types";
 
 export const dynamic = "force-dynamic";
 
@@ -35,12 +36,78 @@ function ackBody(trackingId: string, merchantRef: string, type: string): Respons
 }
 
 /**
+ * Compose the emails this completion owes. They are only *queued* here — the
+ * outbox processor delivers them (see lib/email/outbox.ts). Never throws into
+ * the payment path: a template problem must not roll back a settled payment,
+ * so a failure is logged loudly and returns whatever could be built.
+ */
+function composePaymentEmails(
+  booking: BookingRow,
+  payment: { kind: string; amount_usd: string },
+): OutboxEmailInput[] {
+  const emails: OutboxEmailInput[] = [];
+  try {
+    const guest =
+      payment.kind === "deposit"
+        ? depositReceivedGuest(booking, {
+            totalUsd: Number(booking.amount_usd ?? payment.amount_usd),
+            depositUsd: Number(payment.amount_usd),
+          })
+        : balanceReceivedGuest(
+            booking,
+            Number(booking.amount_usd ?? payment.amount_usd),
+          );
+    emails.push({
+      category: `payment_received_${payment.kind}_guest`,
+      to: booking.email,
+      subject: guest.subject,
+      body: guest.text,
+    });
+
+    if (payment.kind === "deposit") {
+      // Deposit paid = stay confirmed: also send the how-to-prepare guide
+      // (same content as /prepare).
+      const guide = howToPrepareGuest(booking);
+      emails.push({
+        category: "prepare_guide_guest",
+        to: booking.email,
+        subject: guide.subject,
+        body: guide.text,
+      });
+    }
+
+    const owner = process.env.OWNER_NOTIFY_EMAIL;
+    if (owner) {
+      const note = ownerPaymentReceived(
+        booking,
+        payment as Parameters<typeof ownerPaymentReceived>[1],
+      );
+      emails.push({
+        category: `payment_received_${payment.kind}_owner`,
+        to: owner,
+        subject: note.subject,
+        body: note.text,
+      });
+    }
+  } catch (err) {
+    console.error(
+      "payment email composition failed (payment stays settled):",
+      err instanceof Error ? err.message : "unknown",
+    );
+  }
+  return emails;
+}
+
+/**
  * Shared IPN handler (POST body or query params). Pesapal's IPN carries no
  * HMAC signature, so nothing here is trusted: we look up OUR payment row by
  * the tracking id, re-query GetTransactionStatus with our own bearer token,
  * cross-check currency/amount/reference, and only then complete the payment.
- * Completion applies claim + payment + booking in ONE database transaction —
- * any failure rolls all of it back and returns 503 so the provider retries.
+ * Completion applies claim + payment + booking + the confirmation emails
+ * (queued in `email_outbox`) in ONE database transaction — any failure rolls
+ * all of it back and returns 503 so the provider retries. Nothing is sent from
+ * this request: a separate processor delivers the queued mail, which is what
+ * makes "payment settled, guest never told" impossible.
  * Always acks 200 when it understood the event.
  */
 async function handle(params: {
@@ -92,10 +159,17 @@ async function handle(params: {
   let claimed = false;
   try {
     if (outcome.status === "completed") {
+      // Read the booking BEFORE the transaction: the email bodies need it, and
+      // the emails must be a parameter so they land in the same commit.
+      const booking = await getBooking(payment.booking_id);
+      const emails = booking ? composePaymentEmails(booking, payment) : [];
+
       // ONE atomic transaction (RPC apply_payment_completion): webhook claim
-      // + payment completion + booking status. If ANY step throws, everything
-      // — the claim included — rolls back and we 503 below, so Pesapal's
-      // retry re-applies from a clean slate. Nothing can half-commit.
+      // + payment completion + booking status + email-outbox rows. If ANY step
+      // throws, everything — the claim included — rolls back and we 503 below,
+      // so Pesapal's retry re-applies from a clean slate. Nothing can
+      // half-commit, and a settled payment can never lose its email: the rows
+      // are durable before this request returns, even if the process dies here.
       const applied = await applyPaymentCompletion({
         provider: CLAIM_PROVIDER,
         externalId: trackingId,
@@ -105,62 +179,10 @@ async function handle(params: {
           merchant_reference: merchantRef,
           status_code: remote.statusCode,
         },
+        emails,
       });
       if (!applied.claimed) {
         return ackBody(trackingId, merchantRef, type); // duplicate delivery
-      }
-      if (applied.first_completion) {
-        // The payment is durably committed now. Confirmation emails run
-        // OUTSIDE the transaction: an SMTP failure must not fail the webhook
-        // (it is logged here; the booking and payment stay settled).
-        try {
-          const booking = await getBooking(payment.booking_id);
-          if (booking) {
-            const guest =
-              payment.kind === "deposit"
-                ? depositReceivedGuest(booking, {
-                    totalUsd: Number(booking.amount_usd ?? payment.amount_usd),
-                    depositUsd: Number(payment.amount_usd),
-                  })
-                : balanceReceivedGuest(
-                    booking,
-                    Number(booking.amount_usd ?? payment.amount_usd),
-                  );
-            await sendAndLog(
-              `payment_received_${payment.kind}_guest`,
-              booking.email,
-              guest.subject,
-              guest.text,
-            );
-            if (payment.kind === "deposit") {
-              // Deposit paid = stay confirmed: send the how-to-prepare guide
-              // (same content as /prepare). Inside the same try/catch: an
-              // email failure never fails the webhook.
-              const guide = howToPrepareGuest(booking);
-              await sendAndLog(
-                "prepare_guide_guest",
-                booking.email,
-                guide.subject,
-                guide.text,
-              );
-            }
-            const owner = process.env.OWNER_NOTIFY_EMAIL;
-            if (owner) {
-              const note = ownerPaymentReceived(booking, payment);
-              await sendAndLog(
-                `payment_received_${payment.kind}_owner`,
-                owner,
-                note.subject,
-                note.text,
-              );
-            }
-          }
-        } catch (emailErr) {
-          console.error(
-            "payment confirmation email failed:",
-            emailErr instanceof Error ? emailErr.message : "unknown",
-          );
-        }
       }
       return ackBody(trackingId, merchantRef, type);
     }
