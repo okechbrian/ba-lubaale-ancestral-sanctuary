@@ -1,8 +1,7 @@
 import "server-only";
 import { getSettings } from "@/lib/db/settings";
 import {
-  insertVoucherPayment,
-  insertVoucherRequest,
+  insertVoucherPurchase,
   setVoucherPaymentInitiated,
   VoucherUnavailableError,
 } from "@/lib/db/vouchers";
@@ -41,20 +40,12 @@ export async function createVoucherCheckout(
   const amountUgx = ugxAmount(amountUsd, settings);
 
   // The unique voucher_requests.payment_id makes this the single request for
-  // this payment: a retry updates in place instead of creating a second one.
-  const payment = await insertVoucherPayment({
+  // this payment. Created atomically with the payment row: a crash between two
+  // inserts used to leave a paid voucher with nobody to email.
+  const payment = await insertVoucherPurchase({
     amountUsd,
     amountUgx,
     providerRef: `pending-${crypto.randomUUID()}`,
-    buyerEmail: input.buyerEmail,
-    recipientEmail: input.recipientEmail ?? null,
-  });
-
-  // What was asked for, so the IPN can compose the emails later. Written before
-  // the provider call: if Pesapal rejects the order the cascade removes it.
-  await insertVoucherRequest({
-    paymentId: payment.id,
-    amountUsd,
     buyerEmail: input.buyerEmail,
     buyerName: input.buyerName ?? null,
     recipientEmail: input.recipientEmail ?? null,

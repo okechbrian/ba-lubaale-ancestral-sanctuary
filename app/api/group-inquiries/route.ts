@@ -48,6 +48,16 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
+  // Not an object (`null`, `"text"`, `42`, `[1,2]`)? The honeypot read below
+  // would be a property access on a non-object and throw a 500. Give it the
+  // same honest 400 as unparseable JSON.
+  if (typeof body !== "object" || body === null || Array.isArray(body)) {
+    return Response.json(
+      { error: "invalid_request", issues: [] },
+      { status: 400, headers: rlHeaders },
+    );
+  }
+
   const honeypot = (body as { website?: unknown }).website;
   if (typeof honeypot === "string" && honeypot.length > 0) {
     console.warn(`group-inquiries honeypot triggered ip=${ip}`);

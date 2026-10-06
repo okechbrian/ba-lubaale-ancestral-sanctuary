@@ -14,7 +14,7 @@ import { randomUUID } from "node:crypto";
 import { Client } from "pg";
 import { getDb } from "@/lib/db/client";
 import { applyVoucherCompletion } from "@/lib/db/payments";
-import { insertVoucherPayment, insertVoucherRequest } from "@/lib/db/vouchers";
+import { insertVoucherPurchase } from "@/lib/db/vouchers";
 import {
   findVoucherByCode,
   redeemVoucherByCode,
@@ -56,7 +56,10 @@ describe.runIf(HAS_DB)("vouchers (real local Supabase)", () => {
   // other suites.
   let windowOffsetDays = 0;
 
-  /** A completed voucher purchase, ready for the issue RPC. */
+  /**
+   * A voucher purchase ready for the issue RPC. Uses the ATOMIC creation RPC,
+   * so this is the same state the real checkout produces.
+   */
   async function seedVoucherPayment(opts: {
     amountUsd?: number;
     buyerEmail?: string;
@@ -64,21 +67,39 @@ describe.runIf(HAS_DB)("vouchers (real local Supabase)", () => {
     buyerName?: string | null;
   } = {}) {
     const amountUsd = opts.amountUsd ?? 250;
-    const payment = await insertVoucherPayment({
+    return insertVoucherPurchase({
       amountUsd,
       amountUgx: Math.round(amountUsd * 3900),
       providerRef: `it-voucher-${randomUUID()}`,
       buyerEmail: opts.buyerEmail ?? "it-buyer@example.test",
-      recipientEmail: opts.recipientEmail ?? null,
-    });
-    await insertVoucherRequest({
-      paymentId: payment.id,
-      amountUsd,
-      buyerEmail: opts.buyerEmail ?? "it-buyer@example.test",
       buyerName: opts.buyerName ?? "Test Buyer",
       recipientEmail: opts.recipientEmail ?? null,
     });
-    return payment;
+  }
+
+  /**
+   * A payment with NO voucher_requests row — the state the IPN must refuse.
+   * Built by hand because `insertVoucherPurchase` cannot produce it.
+   */
+  async function seedOrphanPayment(): Promise<{ id: string }> {
+    const db = getDb();
+    const { data, error } = await db
+      .from("payments")
+      .insert({
+        booking_id: null,
+        subject_kind: "voucher",
+        kind: "deposit",
+        amount_usd: 250,
+        amount_ugx: 975000,
+        currency: "UGX",
+        provider: "pesapal",
+        provider_ref: `it-orphan-${randomUUID()}`,
+        status: "initiated",
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(`seedOrphanPayment failed: ${error.message}`);
+    return data as { id: string };
   }
 
   async function seedBooking(tag: string): Promise<{ id: string }> {

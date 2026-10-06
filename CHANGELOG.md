@@ -5,6 +5,44 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **A delivered voucher code is overwritten in the database, not by app
+  convention.** A voucher code lives in exactly one retrievable place — the
+  queued email body — because after the issuing transaction commits the SHA-256
+  digest is all that remains and the code could never be recovered from it. That
+  is what makes a crash after commit recoverable, but it also meant anyone with
+  database read access (a leak, a stale backup, a support query) could spend a
+  buyer's voucher. `mark_email_outbox_sent` now overwrites the body with
+  `[redacted after delivery]` **in the same statement that records the
+  successful delivery**, for any `category` beginning with `voucher`. Doing it
+  in SQL means the guarantee cannot be skipped by a future caller marking a row
+  sent with a plain `UPDATE`, and cannot fire before the send. Ordinary payment
+  mail keeps its body — it carries no secret. Verified against a real database:
+  the code is present in the body handed to the transport, absent from
+  `email_outbox` afterwards, absent from `email_log` at every point, and
+  nothing the `/admin/emails` panel reads contains it (the only code-derived
+  value anywhere is the 4-character hint on the voucher row).
+- **A paid voucher with no `voucher_requests` row now fails loudly.** The IPN
+  needs that row for the buyer's address, so it could not email the code — and
+  the old path logged an error and still acked **200**, meaning "settled and
+  told" for a guest who was never told. `completeVoucherPayment` now throws
+  (`VoucherRequestMissingError`), the webhook answers **503**, Pesapal retries,
+  and the payment stays `initiated` with no voucher issued. Verified: 503 +
+  `ipn_failed`, payment untouched, zero vouchers; and once the row is restored
+  the same payment completes normally.
+- **A voucher purchase creates both rows in one transaction.** The payment and
+  its `voucher_requests` row used to be two separate inserts, leaving a real
+  window in which a crash produced a payment the IPN could never fulfil.
+  `create_voucher_purchase` inserts both or neither, so "paid but nobody can be
+  told" is a state the database can no longer reach. A duplicate `provider_ref`
+  is proven to leave exactly one payment and one request, never two requests.
+- **Non-object JSON bodies are a 400, not a 500.** `POST /api/vouchers` and
+  `POST /api/group-inquiries` read the honeypot property before validating, so a
+  body of `null`, `"text"`, `42` or `[1,2]` was a property access on a
+  non-object and threw an uncaught `TypeError`. Both now reject a non-object
+  body up front with the same honest 400 as unparseable JSON.
+
 ### Added
 
 - **Payment emails are now written inside the payment transaction, not sent

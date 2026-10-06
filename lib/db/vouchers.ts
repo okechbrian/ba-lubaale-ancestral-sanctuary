@@ -8,6 +8,7 @@ export interface NewVoucherPayment {
   amountUgx: number;
   providerRef: string;
   buyerEmail: string;
+  buyerName?: string | null;
   recipientEmail?: string | null;
 }
 
@@ -20,9 +21,12 @@ export interface VoucherRequestInput {
 }
 
 /**
- * Records what the buyer asked for, next to the payment row. The IPN needs the
- * recipient addresses and name to compose the emails, and a payment row does
- * not carry them. Holds no code.
+ * Attaches a voucher_requests row to an EXISTING payment.
+ *
+ * NOT the normal path — `insertVoucherPurchase` creates both rows atomically.
+ * This exists to repair a payment that predates the atomic RPC, and to let a
+ * test construct the "payment without a request" state that the IPN is required
+ * to reject.
  */
 export async function insertVoucherRequest(
   input: VoucherRequestInput,
@@ -60,11 +64,37 @@ export async function getVoucherRequest(
   return (data as VoucherRequestRow | null) ?? null;
 }
 
+export class VoucherRequestMissingError extends Error {
+  constructor(paymentId: string) {
+    super(
+      `Voucher payment ${paymentId} has no voucher_requests row — the code ` +
+        `cannot be emailed. Refusing to complete the payment.`,
+    );
+    this.name = "VoucherRequestMissingError";
+  }
+}
+
 export class VoucherUnavailableError extends Error {
   constructor() {
     super("Vouchers are not available right now.");
     this.name = "VoucherUnavailableError";
   }
+}
+
+/**
+ * Read a voucher request, or THROW.
+ *
+ * Used by the IPN. A paid voucher whose request row is missing cannot be
+ * emailed to anyone, so failing here (and therefore 503-ing the webhook) is the
+ * only honest outcome: the provider retries, and once the row is restored the
+ * voucher completes. Acking 200 would mean "settled and told", which is false.
+ */
+export async function requireVoucherRequest(
+  paymentId: string,
+): Promise<VoucherRequestRow> {
+  const row = await getVoucherRequest(paymentId);
+  if (!row) throw new VoucherRequestMissingError(paymentId);
+  return row;
 }
 
 export class VoucherCheckoutNotAllowedError extends Error {
@@ -75,30 +105,32 @@ export class VoucherCheckoutNotAllowedError extends Error {
 }
 
 /**
- * Records a voucher purchase as a payment row (no booking: a voucher is
- * redeemed against a stay later, or gifted to someone else).
+ * Records a voucher purchase as a payment row PLUS its matching
+ * voucher_requests row, in ONE transaction (`create_voucher_purchase`).
+ *
+ * They used to be two inserts, which left a paid voucher with no request row —
+ * and the IPN needs that row for the recipient address, so it could not email
+ * the code. Atomic creation means "paid but nobody can be told" is not a state
+ * the database can reach.
+ *
+ * A voucher is not tied to a stay, so booking_id is null.
  */
-export async function insertVoucherPayment(
+export async function insertVoucherPurchase(
   input: NewVoucherPayment,
 ): Promise<{ id: string }> {
   const db = getDb();
-  const { data, error } = await db
-    .from("payments")
-    .insert({
-      booking_id: null,
-      subject_kind: "voucher",
-      kind: "deposit", // the whole voucher price is charged up front
-      amount_usd: input.amountUsd,
-      amount_ugx: input.amountUgx,
-      currency: "UGX",
-      provider: "pesapal",
-      provider_ref: input.providerRef,
-      status: "pending",
-    })
-    .select("id")
-    .single();
-  if (error) throw new Error(`insertVoucherPayment failed: ${error.message}`);
-  return data as { id: string };
+  const { data, error } = await db.rpc("create_voucher_purchase", {
+    p_amount_usd: input.amountUsd,
+    p_amount_ugx: input.amountUgx,
+    p_provider_ref: input.providerRef,
+    p_buyer_email: input.buyerEmail,
+    p_buyer_name: input.buyerName ?? null,
+    p_recipient_email: input.recipientEmail ?? null,
+  });
+  if (error) throw new Error(`insertVoucherPurchase failed: ${error.message}`);
+  const row = (data ?? {}) as { id?: string };
+  if (!row.id) throw new Error("insertVoucherPurchase returned no payment id");
+  return { id: row.id };
 }
 
 export async function setVoucherPaymentInitiated(

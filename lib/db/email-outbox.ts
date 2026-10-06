@@ -43,20 +43,22 @@ export async function claimOutboxRow(id: string): Promise<EmailOutboxRow | null>
   return ((data ?? [])[0] as EmailOutboxRow | undefined) ?? null;
 }
 
+/**
+ * Record a successful delivery.
+ *
+ * Delegates to `mark_email_outbox_sent`, a DATABASE function, because for
+ * voucher categories it overwrites the body with "[redacted after delivery]" in
+ * the same statement. That redaction is deliberately not app code: a future
+ * caller marking a row sent with a plain UPDATE could not skip it, and the
+ * redeemable code cannot be read back out of the database once delivered.
+ */
 export async function markOutboxSent(id: string): Promise<void> {
   const db = getDb();
-  const now = new Date().toISOString();
-  const { error } = await db
-    .from("email_outbox")
-    .update({
-      status: "sent",
-      sent_at: now,
-      last_error: null,
-      next_attempt_at: now,
-      updated_at: now,
-    })
-    .eq("id", id);
+  const { data, error } = await db.rpc("mark_email_outbox_sent", { p_id: id });
   if (error) throw new Error(`markOutboxSent failed: ${error.message}`);
+  if (!((data ?? []) as unknown[]).length) {
+    throw new Error(`markOutboxSent: no outbox row ${id}`);
+  }
 }
 
 /**
