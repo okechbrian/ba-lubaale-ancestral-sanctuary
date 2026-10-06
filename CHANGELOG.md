@@ -78,6 +78,30 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The rate limiter could not talk to a real Upstash database.** It posted
+  `Content-Type: text/plain` with newline-separated commands
+  (`INCR <key>` / `EXPIRE <key> 900 NX`), but the Upstash REST API JSON-parses
+  every request body and answers that with
+  `HTTP 400 invalid character 'I' looking for beginning of value`. With real
+  `UPSTASH_REDIS_REST_*` values configured, every limit check therefore threw:
+  - `POST /api/admin/login` → **503 `rate_limiter_unavailable`**. The admin
+    console stayed unreachable even with correct credentials, because that
+    bucket is deliberately fail-closed.
+  - `POST /api/bookings`, `/api/subscribers`, `/api/group-inquiries`,
+    `/api/vouchers` → fail-open, so they kept working but were **never actually
+    rate-limited**. Five advertised limits were inert.
+
+  The bug survived a green test suite because `tests/helpers/upstash-stub.ts`
+  split the request body on newlines — the stub encoded the *same* wrong wire
+  format as the code under test, so nothing ever disagreed with anything.
+  `lib/rate-limit.ts` now posts a JSON array of argument arrays to `/pipeline`
+  (`[["INCR",key],["EXPIRE",key,"900","NX"]]`, verified against a live database),
+  which also carries `DEL` and `PTTL` on the same path instead of growing a
+  second URL style. The stub now **rejects** a non-JSON body exactly as Upstash
+  does, and `tests/rate-limit.test.ts` pins the endpoint, content type and body
+  shape — so a future "simplification" back to plain text fails CI loudly instead
+  of shipping silently. Reverting the fix locally turns 6 of those tests red.
+
 - **The 5-minute outbox cron made every deployment on this branch fail.** Vercel's
   Hobby plan rejects any cron expression that fires more than once per day, and it
   rejects it by failing the **entire deployment** — including git pushes, where

@@ -185,6 +185,90 @@ describe("checkRateLimit — enabled against a real (stub) HTTP backend", () => 
   });
 });
 
+describe("Upstash wire format (regression: the limiter shipped broken)", () => {
+  // The limiter once posted `text/plain` newline-separated commands, which a
+  // real Upstash rejects with HTTP 400 ("invalid character ... looking for
+  // beginning of value") because its REST API JSON-parses every body. The old
+  // test stub split on newlines and so agreed with the wrong format, which is
+  // exactly why 175 green tests shipped a limiter that had never once talked
+  // to a real database. These tests pin the real contract so that cannot recur.
+  let stub: UpstashStub;
+
+  beforeAll(async () => {
+    stub = await startUpstashStub();
+  });
+
+  beforeEach(() => {
+    useStub(stub);
+  });
+
+  afterAll(async () => {
+    await stub.close();
+  });
+
+  it("posts JSON to /pipeline — never text/plain to the bare URL", async () => {
+    await checkRateLimit(opts({ name: "wire", ip: "198.51.100.1" }));
+
+    const reqs = stub.rawRequests.filter((r) => r.url !== "/favicon.ico");
+    expect(reqs.length).toBeGreaterThan(0);
+    for (const r of reqs) {
+      expect(r.url).toBe("/pipeline");
+      expect(r.contentType).toContain("application/json");
+      // The body must be a JSON array of argument arrays.
+      const parsed = JSON.parse(r.body);
+      expect(Array.isArray(parsed)).toBe(true);
+      for (const cmd of parsed) {
+        expect(Array.isArray(cmd)).toBe(true);
+        expect(typeof cmd[0]).toBe("string");
+      }
+    }
+  });
+
+  it("counts in one atomic INCR + EXPIRE NX pipeline", async () => {
+    await checkRateLimit(opts({ name: "wire2", ip: "198.51.100.2", windowSec: 60 }));
+
+    const body = JSON.parse(stub.rawRequests.at(-1)!.body);
+    expect(body[0][0]).toBe("INCR");
+    expect(body[0][1]).toBe("rl:wire2:198.51.100.2");
+    expect(body[1][0]).toBe("EXPIRE");
+    expect(body[1][1]).toBe("rl:wire2:198.51.100.2");
+    expect(body[1][2]).toBe("60");
+    expect(body[1][3]).toBe("NX");
+  });
+
+  it("sends PTTL as the same JSON pipeline shape when denying", async () => {
+    // Exhaust the bucket, so the denial path must ask Redis for the TTL.
+    await checkRateLimit(opts({ name: "wire3", ip: "198.51.100.3" }));
+    await checkRateLimit(opts({ name: "wire3", ip: "198.51.100.3" }));
+    await checkRateLimit(opts({ name: "wire3", ip: "198.51.100.3" }));
+    const denied = await checkRateLimit(opts({ name: "wire3", ip: "198.51.100.3" }));
+    expect(denied.allowed).toBe(false);
+
+    const pttl = stub.rawRequests
+      .map((r) => JSON.parse(r.body))
+      .find((b) => Array.isArray(b) && b[0]?.[0] === "PTTL");
+    expect(pttl).toBeDefined();
+    expect(pttl[0][1]).toBe("rl:wire3:198.51.100.3");
+    for (const r of stub.rawRequests) expect(r.contentType).toContain("application/json");
+  });
+
+  it("the stub rejects a text/plain body the way real Upstash does", async () => {
+    // Guards the guard: if this stub ever goes lenient again, a future
+    // text/plain regression in lib/rate-limit.ts would sail through CI.
+    const res = await fetch(`${stub.url}/pipeline`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer stub-token",
+        "Content-Type": "text/plain",
+      },
+      body: "INCR rl:x\nEXPIRE rl:x 900 NX",
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(String(body.error)).toContain("JSON");
+  });
+});
+
 describe("checkRateLimit — runtime backend failure honors the policy", () => {
   it("fail-open: allows with mode fail-open and logs the error", async () => {
     process.env.UPSTASH_REDIS_REST_URL = "http://127.0.0.1:9";

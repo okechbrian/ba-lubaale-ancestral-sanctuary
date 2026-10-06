@@ -6,11 +6,19 @@ import type { AddressInfo } from "node:net";
  * the commands `lib/rate-limit.ts` uses (INCR, EXPIRE NX, PTTL, DEL) with
  * Upstash's JSON reply shapes. Real HTTP, real client code — only the remote
  * storage is scripted. Optionally simulates an EXPIRE backend error.
+ *
+ * It is deliberately STRICT about the wire format: a real Upstash parses every
+ * request body as JSON, so a `text/plain` body is rejected here exactly as it
+ * would be in production. An earlier, lenient stub accepted newline-separated
+ * plain text, which meant the limiter's real-world incompatibility with Upstash
+ * stayed invisible to CI.
  */
 export interface UpstashStub {
   url: string;
-  /** Every command body received, in arrival order. */
+  /** Every command received, in arrival order, as "INCR key" strings. */
   commands: string[];
+  /** Exact wire bytes of every request, for asserting the Upstash contract. */
+  rawRequests: { url: string; contentType: string; body: string }[];
   close: () => Promise<void>;
 }
 
@@ -19,6 +27,7 @@ export async function startUpstashStub(
 ): Promise<UpstashStub> {
   const counters = new Map<string, { n: number; expiresAt: number | null }>();
   const commands: string[] = [];
+  const rawRequests: UpstashStub["rawRequests"] = [];
   const failExpire = opts.failExpire ?? false;
 
   function entry(key: string) {
@@ -30,8 +39,8 @@ export async function startUpstashStub(
     return e;
   }
 
-  function handle(cmd: string): { result?: unknown; error?: string } {
-    const parts = cmd.split(/\s+/);
+  function handle(args: string[]): { result?: unknown; error?: string } {
+    const parts = args;
     switch (parts[0]) {
       case "INCR": {
         let e = entry(parts[1]);
@@ -72,14 +81,57 @@ export async function startUpstashStub(
         res.end('{"error":"unauthorized"}');
         return;
       }
-      const cmds = body
-        .split("\n")
-        .map((s) => s.trim())
-        .filter(Boolean);
+
+      // Mirror the real Upstash REST API, which parses EVERY request body as
+      // JSON and expects a JSON array of argument arrays. This stub used to
+      // accept newline-separated `text/plain` commands instead, which meant it
+      // agreed with a wire format no real Upstash accepts - the limiter was
+      // never actually exercised against a real database and shipped broken.
+      // Anything that is not a JSON array is now rejected the way Upstash
+      // rejects it, so the test suite cannot mask this class of bug again.
+      const contentType = String(req.headers["content-type"] ?? "");
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        res.writeHead(400, { "content-type": "application/json" });
+        res.end(
+          JSON.stringify({
+            error:
+              "invalid character looking for beginning of value - the real " +
+              "Upstash REST API parses every request body as JSON, so a " +
+              `text/plain body (${contentType}) is never valid here either`,
+          }),
+        );
+        return;
+      }
+      if (
+        !Array.isArray(parsed) ||
+        parsed.some((c) => !Array.isArray(c) || typeof c[0] !== "string")
+      ) {
+        res.writeHead(400, { "content-type": "application/json" });
+        res.end(
+          JSON.stringify({
+            error:
+              'unsupported arg type - expected a JSON array of argument arrays, e.g. [["INCR","key"]]',
+          }),
+        );
+        return;
+      }
+
+      // Record as "INCR key" strings so existing assertions keep reading the
+      // same way, while `rawRequests` keeps the exact wire bytes.
+      const cmds = parsed.map((c) => (c as string[]).join(" "));
       commands.push(...cmds);
-      const results = cmds.map(handle);
+      rawRequests.push({
+        url: req.url ?? "",
+        contentType,
+        body,
+      });
+
+      const results = parsed.map((c) => handle(c as string[]));
       res.writeHead(200, { "content-type": "application/json" });
-      res.end(results.length === 1 ? JSON.stringify(results[0]) : JSON.stringify(results));
+      res.end(JSON.stringify(results));
     });
   });
 
@@ -89,6 +141,7 @@ export async function startUpstashStub(
   return {
     url: `http://127.0.0.1:${port}`,
     commands,
+    rawRequests,
     close: () =>
       new Promise<void>((resolve, reject) =>
         server.close((err) => (err ? reject(err) : resolve())),
