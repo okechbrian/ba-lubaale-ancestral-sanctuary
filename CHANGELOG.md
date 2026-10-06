@@ -7,6 +7,50 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Owner CMS — content overrides (P2, foundation).** `lib/cms/` resolves
+  owner-edited blocks from the `settings` table (`content:*` keys, zod-validated)
+  and falls back to in-repo defaults when the database is missing **or** a saved
+  value fails validation — a bad save can never publish broken content. Public
+  pages re-render every 60 s (`revalidate`), so edits appear without redeploy.
+- **FAQ is data-driven** (`content/faq.ts`, `app/faq/page.tsx` maps items with
+  alternating section colours) and **homepage gallery moved to
+  `content/moments.ts`** — `MomentsStrip` now takes `moments` as a prop.
+  Both blocks are admin-editable at `/admin/content`.
+- **Inline link syntax for owner copy:** `[label](/href)` in edited paragraphs
+  renders as a link (`components/InlineText.tsx`); only `/relative` and
+  `https://` hrefs are honoured — unsafe schemes render literally.
+- **CMS tests** (`tests/cms.test.ts`): defaults validate, broken shapes are
+  rejected, no-database fallback returns defaults, link parsing is safe.
+- **Story pages are data-driven:** `/the-land`, `/the-host`, `/the-cave` and
+  `/atelier` now render from `content/the-land.ts`, `content/the-host.ts`,
+  `content/the-cave.ts`, `content/atelier.ts` (verbatim defaults, zod-typed
+  schemas in `lib/cms/blocks.ts`) via `resolveContent` with 60 s revalidation.
+  Every section heading, paragraph, card and image slot (src + alt) is an
+  owner-editable field; layout, aspect ratios and anchors stay in the code.
+  Prices, policies, FAQ-of-record and brand titles remain outside casual CMS
+  reach (prices live in `/admin/settings`; policies stay in the repo).
+- **Admin content editor (`/admin/content`).** One tab for every owner-editable
+  block (homepage gallery, FAQ, The Land, The Host, The Cave, Atelier): a
+  generic schema-driven form with reorderable lists, image pickers fed from the
+  photo library (`public/images`), alt-text fields, dirty-state tracking and a
+  "Revert to default" action. Saving goes through `PUT /api/admin/content`
+  (admin session required) — the server validates against the block schema
+  before writing, rejects bad shapes with field-level issues
+  (`400 invalid_content`) and reports a missing database honestly
+  (`503 database_not_configured`). `DELETE` clears an override so the site
+  falls back to the in-repo content. Every write also validates client-side
+  via `tests/api-content.test.ts` (auth, unknown keys, schema rejection,
+  missing-DB behaviour).
+- **CMS photo uploads (Supabase Storage).** `POST /api/admin/content/images`
+  (admin session) stores owner photos in a public `cms` bucket
+  (migration `20261002000002_add_cms_storage.sql`: 8 MB limit, jpeg/png/webp/
+  avif, no write policies — service role only). Photos are downscaled in the
+  browser to ≤2400px WebP before upload; the image picker merges repo photos
+  with bucket uploads and gains an "Upload a new photo" button with honest
+  error messages for size, type and missing database
+  (`tests/api-images.test.ts`). `next.config.ts` allows `*.supabase.co`
+  images.
+
 - **Booking data layer (Supabase).** Migration `supabase/migrations/20261002000000_init_booking_schema.sql`
   defines `bookings`, `payments` (deposit/balance, unique completed rows per
   booking), `webhook_events` (idempotency), `blocked_dates`, `settings`

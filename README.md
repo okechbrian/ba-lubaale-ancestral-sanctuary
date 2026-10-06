@@ -34,10 +34,10 @@ Repo: https://github.com/okechbrian/ba-lubaale-ancestral-sanctuary
 1. `npm install`
 2. Copy `.env.example` → `.env.local` and fill values (every key documents what
    happens when it is empty — the app never fakes an integration).
-3. Create the Supabase project and apply
-   `supabase/migrations/20261002000000_init_booking_schema.sql` (SQL editor, or
-   `supabase db push`). Put `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in env —
-   server-only, never exposed to the browser (RLS is on with no policies).
+3. Create the Supabase project and apply every file in
+   `supabase/migrations/` (SQL editor, or `supabase db push`). Put
+   `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in env — server-only, never
+   exposed to the browser (RLS is on with no policies).
 4. Scripts: `npm run dev` · `lint` · `typecheck` · `test` · `build`.
    CI (`.github/workflows/ci.yml`) runs lint + test + build on every push/PR,
    with no secrets required.
@@ -74,5 +74,25 @@ the payment. Mismatched or unknown events are acknowledged but never applied;
 failed applies release the claim so retries work. Webhook bodies are stored
 redacted (no card or phone data), and nothing payment-related is logged with
 payer details.
+
+### Owner CMS (content & photos)
+
+`/admin/content` (admin login required) edits the words and photographs of the
+site without a deploy: homepage gallery, FAQ, The Land, The Host, The Cave and
+Atelier. Each block is a schema-driven form with reorderable lists, alt-text
+fields and a photo picker fed by the repo library (`public/images`) **plus**
+owner uploads stored in Supabase Storage's public `cms` bucket (client-side
+resize to ≤2400px WebP; the API enforces type + 8 MB limits server-side).
+
+- Saves go through `PUT /api/admin/content` and are validated against the
+  block schema before writing — a bad save is rejected with field-level issues,
+  never published.
+- Anything untouched keeps the in-repo default; **Revert to default** clears an
+  override.
+- Public pages re-render within 60 seconds.
+- Missing Supabase → saves and uploads fail honestly (`503`), the site keeps
+  showing the committed content.
+
+Prices stay in `/admin/settings`; policies and legal copy stay in the repo.
 
 Change history: [CHANGELOG.md](./CHANGELOG.md).

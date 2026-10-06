@@ -3,6 +3,11 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
 import { MomentsStrip } from "@/components/MomentsStrip";
+import { resolveContent } from "@/lib/cms";
+import { momentsBlockSchema } from "@/lib/cms/blocks";
+import { momentsDefault } from "@/content/moments";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Ba Lubaale Ancestral Sanctuary Kiwamirembe",
@@ -10,7 +15,13 @@ export const metadata: Metadata = {
     "A screened ancestral sanctuary on the Ssese Islands of Lake Victoria, Uganda — cave work, root-water cleansing, bark cloth and fibre craft, and quiet time with land and herd.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { moments } = await resolveContent(
+    "content:moments",
+    momentsBlockSchema,
+    momentsDefault,
+  );
+
   return (
     <>
       {/* ─── Section 1: Hero ─── */}
@@ -56,7 +67,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── Section 2b: Sanctuary Moments ─── */}
-      <MomentsStrip />
+      <MomentsStrip moments={moments} />
 
       {/* ─── Section 3: Four Land Gateways ─── */}
       <section

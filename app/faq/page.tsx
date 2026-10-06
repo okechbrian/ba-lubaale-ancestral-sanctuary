@@ -1,5 +1,8 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import { resolveContent } from "@/lib/cms";
+import { faqBlockSchema } from "@/lib/cms/blocks";
+import { faqDefault } from "@/content/faq";
+import InlineText from "@/components/InlineText";
 
 export const metadata: Metadata = {
   title: "FAQ",
@@ -7,7 +10,15 @@ export const metadata: Metadata = {
     "Food, safety, what to bring, one household, photography, and cancellation — answered plainly.",
 };
 
-export default function FaqPage() {
+export const revalidate = 60;
+
+export default async function FaqPage() {
+  const { items } = await resolveContent(
+    "content:faq",
+    faqBlockSchema,
+    faqDefault,
+  );
+
   return (
     <>
       {/* Hero */}
@@ -23,100 +34,36 @@ export default function FaqPage() {
         </div>
       </section>
 
-      {/* Food */}
-      <section className="bg-cream py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-semibold text-ink">
-            Do female visitors really avoid chicken and eggs?
-          </h2>
-          <p className="mt-4 text-ink/70">
-            As a house and cultural rule, female visitors do not eat chicken or
-            eggs while at the sanctuary. This is a traditional protocol. It is
-            stated plainly here and on the application form.
-          </p>
-        </div>
-      </section>
-
-      {/* Safety */}
-      <section className="bg-mist py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-semibold text-ink">
-            Is the sanctuary a clinic?
-          </h2>
-          <p className="mt-4 text-ink/70">
-            No. The sanctuary does not provide medical or emergency services.
-            Sessions here are traditional, energetic, and artisanal. They
-            complement and do not replace medical or psychiatric care. The
-            sanctuary does not provide emergency or clinical services.
-          </p>
-        </div>
-      </section>
-
-      {/* What to bring */}
-      <section className="bg-cream py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-semibold text-ink">
-            What should I bring?
-          </h2>
-          <p className="mt-4 text-ink/70">
-            Light, modest clothing. Long-leg coverings for sacred ground. A
-            head covering for sun. Easy-off shoes — shoes off on sacred ground,
-            and phones are silenced in the Lake House and never allowed in the
-            cave.
-          </p>
-          <p className="mt-4 text-ink/70">
-            The digital sunset protocol means no screens after dark. Leave
-            behind expectations of Wi-Fi or signal, a heavy schedule, alcohol
-            or recreational drugs, and the need to document everything.
-          </p>
-        </div>
-      </section>
-
-      {/* One household */}
-      <section className="bg-mist py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-semibold text-ink">
-            Can several groups visit at once?
-          </h2>
-          <p className="mt-4 text-ink/70">
-            No. One household at a time. Private. Screened.
-            Application-gated.
-          </p>
-        </div>
-      </section>
-
-      {/* Photography */}
-      <section className="bg-cream py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-semibold text-ink">
-            May I take photographs?
-          </h2>
-          <p className="mt-4 text-ink/70">
-            Photography and recording are not permitted inside the cave or
-            shrines. Outside the sacred spaces, photographs are welcome but
-            never staged. Do not photograph other guests without permission.
-          </p>
-        </div>
-      </section>
-
-      {/* Cancellation */}
-      <section className="bg-dusk py-16 sm:py-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-semibold text-cream">
-            What about cancellation?
-          </h2>
-          <p className="mt-4 text-cream/70">
-            Terms are confirmed in writing after approval.
-          </p>
-          <p className="mt-4 text-cream/70">
-            The full terms are on the{" "}
-            <Link href="/policies" className="font-semibold text-leaf hover:underline">
-              Policies
-            </Link>{" "}
-            page.
-          </p>
-        </div>
-      </section>
+      {items.map((item, i) => {
+        const last = i === items.length - 1;
+        const dark = last;
+        return (
+          <section
+            key={item.q}
+            className={`py-16 sm:py-20 ${
+              dark ? "bg-dusk" : i % 2 === 0 ? "bg-cream" : "bg-mist"
+            }`}
+          >
+            <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+              <h2
+                className={`font-display text-3xl font-semibold ${
+                  dark ? "text-cream" : "text-ink"
+                }`}
+              >
+                {item.q}
+              </h2>
+              {item.paragraphs.map((p, j) => (
+                <p
+                  key={j}
+                  className={`mt-4 ${dark ? "text-cream/70" : "text-ink/70"}`}
+                >
+                  <InlineText text={p} />
+                </p>
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </>
   );
 }
