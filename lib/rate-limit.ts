@@ -111,17 +111,33 @@ function sanitizeIp(ip: string): string {
   return clean || "unknown";
 }
 
+/**
+ * Send one or more Redis commands as a single JSON pipeline.
+ *
+ * The wire format matters and is NOT guessable: the Upstash REST API parses
+ * every request body as JSON. An earlier version of this file posted
+ * `text/plain` with newline-separated commands
+ * (`INCR <key>\nEXPIRE <key> 900 NX`), which a real database rejects with
+ * `HTTP 400 invalid character 'I' looking for beginning of value` while the
+ * in-repo test stub happily accepted it - so the limiter was never exercised
+ * against a real Upstash. Every call must therefore be a JSON array of
+ * argument arrays posted to `/pipeline`, and `tests/rate-limit.test.ts` pins
+ * that shape so it cannot quietly regress.
+ *
+ * `/pipeline` also accepts a single command, so DEL and PTTL share this path
+ * rather than growing a second URL style.
+ */
 async function upstash(
   cfg: { url: string; token: string },
-  command: string,
+  commands: string[][],
 ): Promise<unknown> {
-  const res = await fetch(cfg.url, {
+  const res = await fetch(`${cfg.url.replace(/\/+$/, "")}/pipeline`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${cfg.token}`,
-      "Content-Type": "text/plain",
+      "Content-Type": "application/json",
     },
-    body: command,
+    body: JSON.stringify(commands),
     signal: AbortSignal.timeout(3000),
   });
   if (!res.ok) throw new Error(`upstash http ${res.status}`);
@@ -187,10 +203,10 @@ export async function checkRateLimit(
 
   const key = `rl:${opts.name}:${sanitizeIp(opts.ip)}`;
   try {
-    const json = await upstash(
-      cfg,
-      `INCR ${key}\nEXPIRE ${key} ${opts.windowSec} NX`,
-    );
+    const json = await upstash(cfg, [
+      ["INCR", key],
+      ["EXPIRE", key, String(opts.windowSec), "NX"],
+    ]);
     const [incr, expire] = entriesOf(json);
     const n = asNumber(incr?.result);
     if (n === null || incr?.error) {
@@ -199,14 +215,14 @@ export async function checkRateLimit(
     if (expire?.error) {
       // The TTL never got set — remove the counter so a permanently-open
       // window can never lock an IP out, then apply the failure policy.
-      await upstash(cfg, `DEL ${key}`).catch(() => undefined);
+      await upstash(cfg, [["DEL", key]]).catch(() => undefined);
       throw new Error(`expire: ${expire.error}`);
     }
 
     if (n > opts.limit) {
       let retryAfterSec = opts.windowSec;
       try {
-        const pttl = entriesOf(await upstash(cfg, `PTTL ${key}`))[0];
+        const pttl = entriesOf(await upstash(cfg, [["PTTL", key]]))[0];
         const ms = asNumber(pttl?.result);
         if (ms !== null && ms > 0) retryAfterSec = Math.max(1, Math.ceil(ms / 1000));
       } catch {
