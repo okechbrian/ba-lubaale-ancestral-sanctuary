@@ -78,6 +78,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The merge gate told you to verify the wrong things.** `RELEASE_CHECKLIST.md`
+  had drifted well behind the schema it was supposed to gate: it listed **five**
+  migrations when there are nine, and told you to expect **7 rows** from a
+  seven-table query when the database now has **12 tables**. A reader who
+  followed it literally would have "verified" a database that was missing
+  `email_outbox`, `vouchers`, `voucher_requests`, `stories`, `group_inquiries`
+  and `subscribers`, and would never have checked the eight RPCs at all. It
+  also listed a merge order ending at #4, and omitted `SMTP_HOST`/`SMTP_PORT`.
+
+  It now lists all nine migrations with what each creates, and flags the two
+  traps the schema actually contains: `…00003` creates a **4-argument**
+  `apply_payment_completion` that `…00005` must drop (out of order, the name
+  becomes an ambiguous overload and every `.rpc()` breaks), and applying
+  migrations through MCP leaves the ledger stamped with wall-clock versions
+  that match no migration filename — so `supabase db push` tries to re-apply
+  all nine. The verification block grew from one query to eight checks,
+  including a ledger query that must return zero in *both* directions.
+
 - **The rate limiter could not talk to a real Upstash database.** It posted
   `Content-Type: text/plain` with newline-separated commands
   (`INCR <key>` / `EXPIRE <key> 900 NX`), but the Upstash REST API JSON-parses
