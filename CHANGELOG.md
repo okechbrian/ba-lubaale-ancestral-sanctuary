@@ -141,6 +141,38 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Gift vouchers, sold through the existing Pesapal pipeline.** `/vouchers`
+  offers only the amounts the owner published in `/admin/settings`; with none
+  configured the page and the API say vouchers are not on sale rather than
+  inventing a price (the server re-checks the amount, so a tampered request
+  cannot set its own). A voucher purchase is a payment row with no booking —
+  migration `20261002000006_vouchers.sql` makes `payments.booking_id`
+  nullable and adds `subject_kind`. The IPN takes a voucher branch and issues
+  the code through `apply_voucher_completion`, which commits **claim +
+  payment completion + the code + the queued emails** in one transaction.
+- **Codes are 128 bits of CSPRNG output, stored hashed.** `lib/vouchers/code.ts`
+  generates 16 random bytes rendered as eight hex groups (`1A2B 3C4D …`, an
+  unambiguous alphabet), and stores only `SHA-256(code)` in `code_hash` — a
+  database dump yields nothing redeemable. Lookup hashes in the app and matches
+  on the digest, then verifies once more with `crypto.timingSafeEqual`, so a
+  wrong code and an unknown code are indistinguishable and nothing
+  short-circuits. The buyer receives the code by email (a second copy goes to an
+  optional gift recipient); the owner's copy carries only the last four
+  characters, so a voucher cannot be read out of the admin console or a
+  database row.
+- **Double-issue is impossible, three times over.** A replayed webhook is
+  refused by the provider-event claim; a *different* event id for an
+  already-completed payment finds `first_completion = false` and issues nothing;
+  and `vouchers.payment_id` is unique as the final backstop against any
+  interleaving. Verified against a real database with concurrent issue
+  attempts (`tests/vouchers-integrity.test.ts`).
+- **Owner redemption in `/admin/vouchers`.** Paste the code, choose the booking
+  it pays for, mark it redeemed. The code is what gets submitted (never an id
+  the browser could tamper with), the booking must exist and not be declined,
+  and `redeem_voucher` only transitions `issued → redeemed`, so a voucher
+  cannot be redeemed twice or re-pointed at another booking. An unused voucher
+  can be voided with a reason. The page shows status, value, buyer, gift
+  recipient and redemption, and only ever the code's last four characters.
 - **Guest voices on the homepage (admin-editable, never invented).** Three
   fixed testimonial slots in `settings` under `content:testimonials`
   (zod-validated, schema-strict), edited in Admin → Content with the blurb

@@ -39,7 +39,9 @@ export interface PaymentRow {
   id: string;
   created_at: string;
   updated_at: string;
-  booking_id: string;
+  booking_id: string | null; // null for a voucher purchase
+  /** "stay" = deposit/balance for a booking, "voucher" = gift voucher. */
+  subject_kind: "stay" | "voucher";
   kind: PaymentKind;
   amount_usd: string;
   amount_ugx: string;
@@ -50,6 +52,30 @@ export interface PaymentRow {
   redirect_url: string | null;
   status: PaymentStatus;
   paid_at: string | null;
+}
+
+export type VoucherStatus = "issued" | "redeemed" | "void";
+
+export interface VoucherRow {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  /** SHA-256 hex of the code. The code itself is never stored. */
+  code_hash: string;
+  /** Last four characters, for display only. */
+  code_hint: string;
+  payment_id: string;
+  amount_usd: string;
+  amount_ugx: string;
+  currency: string;
+  buyer_email: string;
+  recipient_email: string | null;
+  status: VoucherStatus;
+  issued_at: string;
+  redeemed_at: string | null;
+  redeemed_booking_id: string | null;
+  voided_at: string | null;
+  void_reason: string | null;
 }
 
 export interface BlockedDateRow {
@@ -114,4 +140,10 @@ export interface Settings {
   stayPrices: StayPrices;
   depositPercent: number;
   ugxRate: number;
+  /**
+   * Fixed voucher prices in USD, exactly as the owner typed them in
+   * /admin/settings. Empty (the default) means vouchers are not on sale — the
+   * site never invents a price.
+   */
+  voucherAmountsUsd: number[];
 }

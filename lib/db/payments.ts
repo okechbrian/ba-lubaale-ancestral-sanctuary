@@ -97,6 +97,59 @@ export interface ApplyCompletionResult {
  * can answer 503 and the provider's retry re-applies everything from a clean
  * slate. A duplicate delivery returns { claimed: false } and changes nothing.
  */
+export interface ApplyVoucherCompletionInput {
+  provider: string;
+  externalId: string;
+  paymentId: string;
+  /** SHA-256 hex of the freshly generated code — the code is never stored. */
+  codeHash: string;
+  codeHint: string;
+  buyerEmail: string;
+  recipientEmail?: string | null;
+  redactedPayload?: unknown;
+  emails?: OutboxEmailInput[];
+}
+
+export interface ApplyVoucherCompletionResult {
+  claimed: boolean;
+  first_completion: boolean;
+  issued: boolean;
+  payment_id?: string;
+  payment_status?: PaymentStatus;
+  voucher_id?: string;
+  code_hint?: string;
+}
+
+/**
+ * Atomic voucher issue (migration 20261002000006): provider claim + payment
+ * completion + one unique code + the queued emails, in a single transaction.
+ *
+ * Double-issue is closed twice over: the webhook claim refuses a replayed
+ * event, and `v_first` means a *second, previously unseen* event for the same
+ * already-completed payment issues nothing. `vouchers.payment_id` is unique as
+ * the final backstop.
+ */
+export async function applyVoucherCompletion(
+  input: ApplyVoucherCompletionInput,
+): Promise<ApplyVoucherCompletionResult> {
+  const db = getDb();
+  const { data, error } = await db.rpc("apply_voucher_completion", {
+    p_provider: input.provider,
+    p_external_id: input.externalId,
+    p_payment_id: input.paymentId,
+    p_code_hash: input.codeHash,
+    p_code_hint: input.codeHint,
+    p_buyer_email: input.buyerEmail,
+    p_recipient_email: input.recipientEmail ?? null,
+    p_redacted_payload: input.redactedPayload ?? null,
+    p_emails: input.emails ?? [],
+  });
+  if (error) {
+    throw new Error(`applyVoucherCompletion failed: ${error.message}`);
+  }
+  return (data ?? {}) as ApplyVoucherCompletionResult;
+}
+
 export async function applyPaymentCompletion(
   input: ApplyCompletionInput,
 ): Promise<ApplyCompletionResult> {

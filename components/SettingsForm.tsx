@@ -31,6 +31,14 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries(initial.map((f) => [f.name, String(f.value)])),
   );
+  // Voucher amounts are a LIST (the owner decides what is for sale), edited
+  // one number per line. Empty = vouchers are not on sale; the site never
+  // invents a price.
+  const [vouchers, setVouchers] = useState<string[]>(
+    settings.voucherAmountsUsd.length > 0
+      ? settings.voucherAmountsUsd.map(String)
+      : [""],
+  );
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -39,7 +47,7 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
     setBusy(true);
     setMsg(null);
     const num = (name: string) => Number(values[name]);
-    const payload = {
+    const payload: { settings: Record<string, unknown> } = {
       settings: {
         stay_prices: {
           essential: { solo: num("essential.solo"), couple: num("essential.couple") },
@@ -59,6 +67,20 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
       setBusy(false);
       return;
     }
+    // Blank lines are ignored so an owner can tidy the list freely.
+    const voucherAmounts = vouchers
+      .map((v) => Number(v.trim()))
+      .filter((n) => Number.isFinite(n) && n > 0);
+    const badVoucher = vouchers.some(
+      (v) => v.trim() !== "" && (!Number.isFinite(Number(v)) || Number(v) <= 0),
+    );
+    if (badVoucher) {
+      setMsg({ ok: false, text: "Voucher amounts must be positive numbers." });
+      setBusy(false);
+      return;
+    }
+    payload.settings.voucher_amounts_usd = [...new Set(voucherAmounts)];
+
     try {
       const res = await fetch("/api/admin/settings", {
         method: "POST",
@@ -109,6 +131,52 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
           </div>
         ))}
       </div>
+      <fieldset className="rounded-md border border-mist bg-white p-4">
+        <legend className="px-1 text-xs font-medium text-ink/60">
+          Voucher amounts (USD)
+        </legend>
+        <p className="text-xs text-ink/50">
+          One amount per line. These are the only voucher prices the site will
+          ever offer — leave every line empty to keep vouchers off sale.
+        </p>
+        <div className="mt-3 space-y-2">
+          {vouchers.map((value, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input
+                type="number"
+                min={1}
+                step="0.01"
+                value={value}
+                onChange={(e) =>
+                  setVouchers((prev) =>
+                    prev.map((v, j) => (j === i ? e.target.value : v)),
+                  )
+                }
+                className="w-40 rounded-md border border-mist bg-cream px-3 py-2 text-sm text-ink focus:border-bark focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setVouchers((prev) =>
+                    prev.length === 1 ? [""] : prev.filter((_, j) => j !== i),
+                  )
+                }
+                className="text-xs font-semibold text-ember"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => setVouchers((prev) => [...prev, ""])}
+          className="mt-3 text-xs font-semibold text-lake"
+        >
+          + Add an amount
+        </button>
+      </fieldset>
+
       <div className="flex items-center gap-4">
         <button
           type="submit"

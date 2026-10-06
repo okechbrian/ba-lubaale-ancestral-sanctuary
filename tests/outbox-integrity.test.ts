@@ -15,7 +15,14 @@
  *
  * Without those env vars the suite SKIPS with a notice — it never fakes a pass.
  */
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+} from "vitest";
 import { randomUUID } from "node:crypto";
 import { Client } from "pg";
 import { getDb } from "@/lib/db/client";
@@ -39,26 +46,16 @@ if (!HAS_DB) {
   );
 }
 
-/** A transport that records every delivery attempt it is asked to make. */
-function recordingSender(
-  behaviour: "deliver" | "fail" = "deliver",
-): OutboxSender & { calls: EmailOutboxRow[] } {
-  const calls: EmailOutboxRow[] = [];
-  const sender = async (row: EmailOutboxRow) => {
-    calls.push(row);
-    return behaviour === "deliver"
-      ? { delivered: true }
-      : { delivered: false, error: "smtp_connection_refused" };
-  };
-  return Object.assign(sender, { calls });
-}
+/** Distinct recipient per suite, so a parallel worker's rows never interfere. */
+const RECIPIENT = "it-outbox@example.test";
 
 describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
   let pg: Client;
   const savedEnv: Record<string, string | undefined> = {};
 
   // Approved bookings may never overlap (bookings_no_overlap), so each fixture
-  // gets its own window. Day 0 of 2028 is far from the other suites' 2027 dates.
+  // gets its own window. Day 0 of 2028 is far from the 2027 dates the other
+  // suites use.
   let windowOffsetDays = 0;
 
   async function seedBooking(tag: string): Promise<{ id: string }> {
@@ -116,13 +113,13 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
   const emails = (tag: string) => [
     {
       category: `payment_received_deposit_guest_${tag}`,
-      to: "it-outbox@example.test",
+      to: RECIPIENT,
       subject: `Deposit received ${tag}`,
       body: "Your stay is confirmed.",
     },
     {
       category: `prepare_guide_guest_${tag}`,
-      to: "it-outbox@example.test",
+      to: RECIPIENT,
       subject: `How to prepare ${tag}`,
       body: "Digital Sunset. /prepare",
     },
@@ -139,6 +136,31 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
     return (data ?? []) as EmailOutboxRow[];
   }
 
+  /** Rows of THIS suite, so assertions ignore whatever other files queued. */
+  /** Queue rows from a previous test in THIS file are cleaned in afterEach. */
+  afterEach(async () => {
+    await pg
+      .query("delete from public.email_outbox where recipient = $1", [RECIPIENT])
+      .catch(() => undefined);
+    await pg
+      .query("delete from public.bookings where name like 'it-outbox-%'")
+      .catch(() => undefined);
+  });
+
+  /** A sender that records only what it was asked to deliver for this suite. */
+  function oursSender(
+    behaviour: "deliver" | "fail" = "deliver",
+  ): OutboxSender & { calls: EmailOutboxRow[] } {
+    const calls: EmailOutboxRow[] = [];
+    const sender = async (row: EmailOutboxRow) => {
+      if (row.recipient === RECIPIENT) calls.push(row);
+      return behaviour === "deliver"
+        ? { delivered: true }
+        : { delivered: false, error: "smtp_connection_refused" };
+    };
+    return Object.assign(sender, { calls });
+  }
+
   beforeAll(async () => {
     process.env.SUPABASE_URL = TEST_URL!;
     process.env.SUPABASE_SERVICE_ROLE_KEY = TEST_KEY!;
@@ -151,11 +173,12 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
     await pg.connect();
   }, 30_000);
 
-  // The queue is shared state (which is the point), so each test starts from
-  // an empty one instead of inheriting rows the previous test left queued.
-  beforeEach(async () => {
-    await pg.query("delete from public.bookings where name like 'it-outbox-%'");
-  });
+// These suites share ONE local database and run in parallel workers. Two rules
+  // keep them from colliding:
+//   * fixtures use the unique RECIPIENT below, so cleanup only ever touches our
+  //     own rows (another file's rows are never deleted mid-run); and
+  //   * the processor drains the WHOLE queue, so delivery assertions are scoped
+  //     to our recipient rather than to a global count.
 
   afterAll(async () => {
     await pg
@@ -256,15 +279,12 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
     expect(queued.every((r) => r.attempts === 0)).toBe(true);
 
     // The processor runs later (a cron tick) and delivers what was promised.
-    const sender = recordingSender();
-    const summary = await processEmailOutbox({ sender, limit: 100 });
+    const sender = oursSender();
+    await processEmailOutbox({ sender, limit: 100 });
 
-    expect(summary.sent).toBe(2);
+    // Exactly our two rows, delivered once each.
     expect(sender.calls).toHaveLength(2);
-    expect(sender.calls.map((c) => c.recipient)).toEqual([
-      "it-outbox@example.test",
-      "it-outbox@example.test",
-    ]);
+    expect(sender.calls.every((c) => c.recipient === RECIPIENT)).toBe(true);
 
     const delivered = await outboxFor(payment.id);
     for (const row of delivered) {
@@ -276,9 +296,8 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
 
     // Running the processor again must deliver nothing: the rows are no longer
     // pending, so a settled payment can never produce a second email.
-    const again = recordingSender();
-    const second = await processEmailOutbox({ sender: again, limit: 100 });
-    expect(second.claimed).toBe(0);
+    const again = oursSender();
+    await processEmailOutbox({ sender: again, limit: 100 });
     expect(again.calls).toHaveLength(0);
   });
 
@@ -294,9 +313,9 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
     });
 
     // Attempt 1 fails.
-    const failing = recordingSender("fail");
-    const first = await processEmailOutbox({ sender: failing, limit: 100 });
-    expect(first.retrying).toBe(1);
+    const failing = oursSender("fail");
+    await processEmailOutbox({ sender: failing, limit: 100 });
+    expect(failing.calls).toHaveLength(1);
 
     let row = (await outboxFor(payment.id))[0];
     expect(row.status).toBe("pending"); // still queued for another try
@@ -305,10 +324,10 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
     const backoffUntil = new Date(row.next_attempt_at).getTime();
     expect(backoffUntil).toBeGreaterThan(Date.now() + 60_000); // >= ~2 minutes
 
-    // Attempt 2 is not due yet — a run inside the backoff window does nothing.
-    const tooSoon = recordingSender();
-    const skipped = await processEmailOutbox({ sender: tooSoon, limit: 100 });
-    expect(skipped.claimed).toBe(0);
+    // Attempt 2 is not due yet — a run inside the backoff window does nothing
+    // for our row.
+    const tooSoon = oursSender();
+    await processEmailOutbox({ sender: tooSoon, limit: 100 });
     expect(tooSoon.calls).toHaveLength(0);
 
     // Once the backoff has elapsed the row is delivered.
@@ -318,9 +337,9 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
       .update({ next_attempt_at: new Date(Date.now() - 1000).toISOString() })
       .eq("id", row.id);
 
-    const working = recordingSender();
-    const second = await processEmailOutbox({ sender: working, limit: 100 });
-    expect(second.sent).toBe(1);
+    const working = oursSender();
+    await processEmailOutbox({ sender: working, limit: 100 });
+    expect(working.calls).toHaveLength(1);
 
     row = (await outboxFor(payment.id))[0];
     expect(row.status).toBe("sent");
@@ -341,18 +360,17 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
 
     const id = (await outboxFor(payment.id))[0].id;
 
-    // Burn the whole budget, making each row due immediately.
+    // Burn the whole budget, making each row due immediately. Each run must
+    // advance OUR row by exactly one attempt.
     const db = getDb();
     for (let i = 0; i < OUTBOX_MAX_ATTEMPTS; i++) {
       await db
         .from("email_outbox")
         .update({ next_attempt_at: new Date(Date.now() - 1000).toISOString() })
         .eq("id", id);
-      const run = await processEmailOutbox({
-        sender: recordingSender("fail"),
-        limit: 100,
-      });
-      expect(run.failed + run.retrying).toBe(1);
+      const attempt = oursSender("fail");
+      await processEmailOutbox({ sender: attempt, limit: 100 });
+      expect(attempt.calls).toHaveLength(1);
     }
 
     let row = (await outboxFor(payment.id))[0];
@@ -362,10 +380,8 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
 
     // A parked row is not picked up again on its own — no send, ever again,
     // until a human resends it.
-    const idle = recordingSender();
-    const idleRun = await processEmailOutbox({ sender: idle, limit: 100 });
-    expect(idleRun.claimed).toBe(0);
-    expect(idleRun.sent).toBe(0);
+    const idle = oursSender();
+    await processEmailOutbox({ sender: idle, limit: 100 });
     expect(idle.calls).toHaveLength(0);
     expect((await outboxFor(payment.id))[0].status).toBe("failed");
 
@@ -375,9 +391,9 @@ describe.runIf(HAS_DB)("email outbox (real local Supabase)", () => {
     expect(requeued?.attempts).toBe(0);
     expect(requeued?.resends).toBe(1);
 
-    const working = recordingSender();
-    const resend = await processEmailOutbox({ sender: working, limit: 100 });
-    expect(resend.sent).toBe(1);
+    const working = oursSender();
+    await processEmailOutbox({ sender: working, limit: 100 });
+    expect(working.calls).toHaveLength(1);
 
     row = (await outboxFor(payment.id))[0];
     expect(row.status).toBe("sent");
