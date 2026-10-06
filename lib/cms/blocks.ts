@@ -80,6 +80,7 @@ export const CMS_KEYS = {
   theHost: "content:the-host",
   theCave: "content:the-cave",
   atelier: "content:atelier",
+  forGroups: "content:for-groups",
 } as const;
 
 const heading = z.string().min(1).max(160);
@@ -261,3 +262,69 @@ export const atelierBlockSchema = z
   })
   .strict();
 export type AtelierBlock = z.infer<typeof atelierBlockSchema>;
+
+/**
+ * /for-groups — tour operators and retreat leaders.
+ *
+ * Deliberately carries NO price, capacity or availability claim: groups are
+ * quoted in conversation, and a number written here would be one the site
+ * invented. Everything is editable so the owner can state their own terms.
+ */
+export const forGroupsBlockSchema = z
+  .object({
+    hero: z
+      .object({
+        heading,
+        lead: z.string().min(1).max(700),
+        image: imageRefSchema,
+      })
+      .strict(),
+    intro: z
+      .object({
+        heading,
+        paragraphs: z.array(z.string().min(1).max(2000)).min(1).max(6),
+      })
+      .strict(),
+    /** Who this page is for / what the shape of a group visit is. */
+    offerings: z
+      .array(
+        z
+          .object({
+            title: heading,
+            body: z.string().min(1).max(900),
+            image: imageRefSchema.optional(),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(8),
+    /** Practicalities the operator needs answered before writing to us. */
+    planning: z
+      .object({
+        heading,
+        items: z
+          .array(
+            z
+              .object({
+                title: heading,
+                body: z.string().min(1).max(900),
+              })
+              .strict(),
+          )
+          .min(1)
+          .max(8),
+      })
+      .strict(),
+    /** What to put in the enquiry form. */
+    inquiry: z
+      .object({
+        heading,
+        paragraphs: z.array(z.string().min(1).max(1200)).min(1).max(5),
+      })
+      .strict(),
+    closing: z
+      .object({ heading, paragraphs: z.array(z.string().min(1).max(1200)).min(1).max(4) })
+      .strict(),
+  })
+  .strict();
+export type ForGroupsBlock = z.infer<typeof forGroupsBlockSchema>;

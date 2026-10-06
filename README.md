@@ -78,6 +78,40 @@ bucket, which is exactly the bypass the tests in `tests/client-ip.test.ts` and
 `tests/api-abuse.test.ts` now pin shut (rotating spoofed headers still lands in
 one bucket and still gets a 429 on the 6th attempt).
 
+### For groups (`/for-groups`)
+
+The page tour operators and retreat leaders read. All copy is an ordinary CMS
+block (Admin → Content → "For groups"), so it changes without a deploy; with no
+database it renders the in-repo copy, which is the same page.
+
+The enquiry form reuses the `/apply` abuse stack — rate limit 5 / 15 min per IP
+(fail-open, loud when the limiter is unconfigured), a honeypot checked before
+zod, then Turnstile after zod. The row in `group_inquiries` is the durable
+record; the acknowledgement to the sender and the notification to the owner are
+queued in `email_outbox`, so a slow mail server cannot lose an enquiry.
+
+**No prices and no capacity numbers anywhere on the page** — a group visit is
+quoted in conversation, and a figure written into the CMS would be one the site
+invented. `tests/growth-content.test.ts` fails the build if one appears.
+
+### Stories (`/stories`)
+
+Owner-written notes in the `stories` table, edited at `/admin/stories`: slug
+(auto-filled from the title, editable), title, excerpt, body, cover image + alt
+text, and a `published` flag. Drafts never appear in the listing, on their own
+page, or in the sitemap.
+
+- `datePublished` is stamped the first time a story goes live and never moves,
+  so unpublish/republish cannot back-date it.
+- Each post page emits `schema.org/Article` JSON-LD with an absolute canonical
+  URL. It omits `author` entirely when there is no byline and never emits
+  `aggregateRating` or `review` — we publish nothing we have not measured.
+- Published stories are appended to `sitemap.xml`. With no database those URLs
+  are absent rather than present-and-broken.
+- With no database the index says the archive is temporarily unavailable, and a
+  story page 404s — an unknown slug, a draft and a missing database are all the
+  same answer.
+
 ### Gift vouchers
 
 `/vouchers` sells a fixed-amount voucher toward a stay, through the same Pesapal

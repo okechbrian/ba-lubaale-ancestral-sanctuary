@@ -173,6 +173,36 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   cannot be redeemed twice or re-pointed at another booking. An unused voucher
   can be voided with a reason. The page shows status, value, buyer, gift
   recipient and redemption, and only ever the code's last four characters.
+- **`/for-groups` — tour operators and retreat leaders.** Every word is an
+  ordinary CMS block (Admin → Content → "For groups"), edited without a deploy
+  and re-rendered within a minute. The enquiry form reuses the `/apply` abuse
+  stack in the same order: rate limit (5 / 15 min, fail-open, loud when
+  disabled), honeypot **before** zod so a bot never learns a field name, schema
+  validation, then Turnstile **after** zod so a malformed request never burns a
+  single-use token. The enquiry row is the durable record; an acknowledgement to
+  the sender and a notification to the owner are queued in `email_outbox`, so a
+  broken mail server cannot lose an enquiry already received. The page carries
+  **no prices, no capacity numbers and no availability promises** — a group visit
+  is quoted in conversation, and `tests/growth-content.test.ts` fails if a figure,
+  partner or testimonial ever appears in the copy.
+- **`/stories` — an owner-written archive.** Posts live in Supabase
+  (`stories`: slug, title, excerpt, body, cover image + alt, `published`,
+  `published_at`), written in `/admin/stories` with the slug auto-filled from
+  the title and the same image library/upload as the CMS picker. Drafts are
+  invisible to the listing, the post page and the sitemap. `datePublished` is
+  stamped the first time a story goes live and never moves afterwards, so
+  unpublish/republish cannot back-date it. Each post emits `schema.org/Article`
+  JSON-LD with an absolute canonical URL, deliberately **omitting** `author` when
+  there is no byline (rather than crediting someone who did not write it) and
+  never emitting `aggregateRating` or `review`. Published stories are appended to
+  `sitemap.xml`; with no database the story URLs are simply absent, because a
+  sitemap must never advertise a page that 404s.
+- **Both degrade honestly without a database.** `/for-groups` falls back to its
+  in-repo copy (the same page, and what the owner would see anyway); `/stories`
+  says the archive is temporarily unavailable rather than showing an empty grid
+  that reads as "we have never written anything"; a story page 404s, as do an
+  unknown slug and a draft. The APIs answer an honest 503
+  `database_not_configured` instead of accepting data they cannot store.
 - **Guest voices on the homepage (admin-editable, never invented).** Three
   fixed testimonial slots in `settings` under `content:testimonials`
   (zod-validated, schema-strict), edited in Admin → Content with the blurb

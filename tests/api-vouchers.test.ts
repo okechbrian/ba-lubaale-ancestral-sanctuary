@@ -22,7 +22,6 @@ const ENV_KEYS = [
 
 const PASSING_SECRET = "1x0000000000000000000000000000000AA";
 const TEST_SITEKEY = "1x00000000000000000000AA";
-const DUMMY_TOKEN = "XXXX.XXXX.XXXX-XXXX";
 
 const saved: Record<string, string | undefined> = {};
 const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
