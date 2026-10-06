@@ -14,7 +14,7 @@ export const landDefault: LandBlock = {
     heading: "A Living Place",
     paragraphs: [
       "Ba Lubaale Ancestral Sanctuary Kiwamirembe is a living place, serving as ground to approach the Lubaale of Ssese and Lake Nalubaale in a single visit, with the host holding the door.",
-      "It is older than the people now standing on it. It was passed to me in 1998. I am the one telling the story.",
+      "It is older than the people now standing on it. It was passed to me in 1998.",
       "The forest, the spring, the fire, the herd, and more than a hundred caves are here. Three of the caves are open to guests, namely Nalubaale, Lubaale Musisi, and Lubaale Wanema. The rest are visited only after a calling. [See the three open caves →](/the-cave)",
     ],
     image: {
