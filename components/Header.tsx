@@ -14,6 +14,21 @@ export function Header() {
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navRef = useRef<HTMLElement>(null);
 
+  // Close menus on route change.
+  //
+  // Adjusting state during render rather than in an effect: React re-runs the
+  // component immediately with the new state before committing to the DOM, so
+  // the menus never paint open on the destination route. The previous version
+  // used a `useEffect`, which renders once with the menus still open and then
+  // closes them in a second pass — the extra render this repo's lint gate
+  // flags as a cascading-render hazard, and a visible flash of the old menu.
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (lastPathname !== pathname) {
+    setLastPathname(pathname);
+    setMobileOpen(false);
+    setActiveDropdown(null);
+  }
+
   // Scroll detection for frosted glass navbar
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 15);
@@ -33,12 +48,6 @@ export function Header() {
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
-
-  // Close menus on route change
-  useEffect(() => {
-    setMobileOpen(false);
-    setActiveDropdown(null);
-  }, [pathname]);
 
   // Close dropdown on outside click or Escape key
   useEffect(() => {
