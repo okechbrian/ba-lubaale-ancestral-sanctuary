@@ -7,6 +7,40 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Story cover uploads could never succeed.** `StoryEditor` posted the raw
+  file with `Content-Type: image/jpeg` instead of `multipart/form-data`, so
+  `request.formData()` threw and every attempt returned
+  `400 {"error":"invalid_form"}` — which the UI showed as
+  `Upload failed (invalid_form)`. It then also read `body.url` while the route
+  returned `src`, so it would have failed even with a correct request. Two
+  independent bugs in one function. The CMS image picker was unaffected: it
+  sends proper `FormData` and was verified working.
+
+  Photos now go **straight from the browser to Supabase Storage** via a
+  signed upload URL, so they never pass through a serverless function at all.
+  That fixes this, and it also fixes a limit the old route advertised but could
+  not honour: the route accepted 8 MB while Vercel rejects any request body over
+  **4.5 MB before the handler runs**, so its `413 file_too_large` branch was
+  unreachable and every photo between 4.5 and 8 MB died at the platform with an
+  opaque error. With the bytes bypassing the function, the bucket's own 8 MB
+  limit — which Storage genuinely enforces — becomes reachable for the first
+  time.
+
+- **An unreadable photo now says so instead of being uploaded anyway.** The
+  client-side resize silently returned the *original* file whenever the browser
+  could not decode it, which is how a 6 MB JPEG — or a phone's HEIC, which no
+  browser can decode — reached the server anyway. `prepareImageUpload` now
+  returns an explicit result and refuses: an unsupported type is caught before
+  decoding is even attempted, and each failure has its own message instead of
+  one opaque string.
+
+- **The object path is now built server-side, in one testable place.**
+  `lib/cms/storage-path.ts` owns the policy: a sanitised `[a-z0-9-]` stem, a
+  timestamp prefix so two uploads of `photo.jpg` cannot collide, and the right
+  extension per type. The browser is told where to write, never allowed to
+  choose — so a compromised client cannot steer a write or overwrite anything,
+  and `upsert` can safely stay `false`.
+
 - **A delivered voucher code is overwritten in the database, not by app
   convention.** A voucher code lives in exactly one retrievable place — the
   queued email body — because after the issuing transaction commits the SHA-256
