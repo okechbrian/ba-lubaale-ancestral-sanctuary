@@ -4,128 +4,283 @@ import { channel, films } from "@/content/teaching";
 import { SubscribeBox } from "@/components/SubscribeBox";
 
 export function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="border-t border-mist bg-dusk text-cream">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Brand + blessing */}
-          <div>
-            <p className="font-display text-lg font-semibold">BA LUBAALE</p>
-            <p className="mt-1 text-xs tracking-widest text-bark-soft uppercase">
-              {site.subtitle}
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-cream/70">
-              May the root hold you. May the fire warm you. May the water carry
-              what you are ready to release.
-            </p>
-          </div>
-
-          {/* Links */}
-          <div>
-            <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
-              Sanctuary
-            </p>
-            <ul className="mt-3 space-y-2">
-              {site.footerSecondary.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link
-                  href="/arrive"
-                  className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                >
-                  Arrive
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/faq"
-                  className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                >
-                  FAQ
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Hear her */}
-          <div>
-            <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
-              Hear her
-            </p>
-            <ul className="mt-3 space-y-2">
-              {films.map((film) => (
-                <li key={film.id}>
-                  <Link
-                    href="/the-host#hear-her"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    {film.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <a
-              href={channel.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
+    <footer className="border-t border-mist/40 bg-dusk text-cream">
+      {/* Top blessing & navigation section */}
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-12">
+          {/* Brand + blessing (4 cols) */}
+          <div className="lg:col-span-4 space-y-4">
+            <Link
+              href="/"
+              className="inline-flex flex-col leading-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-bark"
             >
-              {channel.label}
-            </a>
+              <span className="font-display text-2xl font-semibold tracking-wide text-cream">
+                BA LUBAALE
+              </span>
+              <span className="text-[11px] font-medium tracking-[0.25em] text-bark-soft uppercase">
+                {site.subtitle}
+              </span>
+            </Link>
+
+            <p className="font-display text-base italic leading-relaxed text-cream/90 max-w-sm">
+              &ldquo;May the root hold you. May the fire warm you. May the water
+              carry what you are ready to release.&rdquo;
+            </p>
+
+            <p className="text-xs tracking-wider text-bark-soft/80 uppercase">
+              {site.place}
+            </p>
+
+            <div className="pt-2">
+              <Link
+                href="/apply"
+                className="inline-block rounded-md bg-lake px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-cream transition-colors hover:bg-lake/80"
+              >
+                Request an Immersion →
+              </Link>
+            </div>
           </div>
 
-          {/* Contact */}
-          <div>
-            <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
-              Reach Us
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-cream/70">
-              <li>
-                <span className="text-bark-soft">WhatsApp</span>{" "}
-                {site.contact.whatsapp || "Available on request"}
-              </li>
-              <li>
-                <span className="text-bark-soft">Email</span>{" "}
+          {/* Links grid (8 cols) */}
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8">
+            {/* The Sanctuary */}
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
+                The Sanctuary
+              </p>
+              <ul className="mt-4 space-y-2.5">
+                <li>
+                  <Link
+                    href="/the-land"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    The Land
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/the-cave"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    The Cave
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/the-host"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    Queen Nalubaale
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/atelier"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    The Atelier
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/stories"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    Stories from the House
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Experiences & Offerings */}
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
+                Experiences
+              </p>
+              <ul className="mt-4 space-y-2.5">
+                <li>
+                  <Link
+                    href="/immersions"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    Immersions (Retreats)
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/practices"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    Day Practices
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/for-groups"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    For Groups & Delegations
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/vouchers"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    Gift Vouchers
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/apply"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    Apply for a Stay
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Journey & Care */}
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
+                Plan Your Visit
+              </p>
+              <ul className="mt-4 space-y-2.5">
+                <li>
+                  <Link
+                    href="/arrive"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    How to Arrive
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/prepare"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    How to Prepare
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/faq"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    Questions & FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/policies"
+                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
+                  >
+                    Sanctuary Policies
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Teachings & Direct Contact Banner */}
+        <div className="mt-14 border-t border-cream/15 pt-10">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 items-start">
+            {/* Teachings */}
+            <div className="lg:col-span-2">
+              <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
+                Hear Her Teachings
+              </p>
+              <p className="mt-1 text-xs text-cream/60">
+                Oral teachings, reflections, and recordings with Queen Nalubaale
+              </p>
+              <div className="mt-4 flex flex-wrap gap-4">
+                {films.map((film) => (
+                  <Link
+                    key={film.id}
+                    href="/the-host#hear-her"
+                    className="rounded-md border border-cream/15 bg-cream/5 px-3 py-2 text-xs text-cream/80 transition-colors hover:border-leaf/50 hover:text-leaf"
+                  >
+                    <span className="font-semibold text-leaf">▶</span> {film.title}
+                  </Link>
+                ))}
                 <a
-                  href={`mailto:${site.contact.email}`}
-                  className="transition-colors hover:text-leaf"
+                  href={channel.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-md border border-bark-soft/40 bg-bark/10 px-3 py-2 text-xs font-medium text-bark-soft transition-colors hover:bg-bark/20 hover:text-cream"
                 >
-                  {site.contact.email}
+                  YouTube: {channel.label} ↗
                 </a>
-              </li>
-              <li className="pt-2 text-xs text-cream/50">
-                {site.place}
-              </li>
-            </ul>
+              </div>
+            </div>
+
+            {/* Direct Contact */}
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
+                Direct Contact
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-cream/75">
+                <li>
+                  <span className="text-bark-soft">Email:</span>{" "}
+                  <a
+                    href={`mailto:${site.contact.email}`}
+                    className="transition-colors hover:text-leaf underline decoration-cream/30"
+                  >
+                    {site.contact.email}
+                  </a>
+                </li>
+                <li>
+                  <span className="text-bark-soft">WhatsApp:</span>{" "}
+                  {site.contact.whatsapp ? (
+                    <a
+                      href={`https://wa.me/${site.contact.whatsapp}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="transition-colors hover:text-leaf"
+                    >
+                      {site.contact.whatsapp}
+                    </a>
+                  ) : (
+                    <span>Available on request upon accepted application</span>
+                  )}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
         {/* Mailing list signup (double opt-in) */}
-        <div className="mt-10 border-t border-cream/10 pt-6">
+        <div className="mt-12 border-t border-cream/15 pt-8">
           <SubscribeBox />
         </div>
 
-        {/* Legal lines */}
-        <div className="mt-10 border-t border-cream/10 pt-6 text-xs leading-relaxed text-cream/50">
+        {/* Legal & Cultural lines */}
+        <div className="mt-12 border-t border-cream/15 pt-8 text-xs leading-relaxed text-cream/50 space-y-2">
           <p>
             Sessions here are traditional, energetic, and artisanal. They
             complement and do not replace medical or psychiatric care. The
             sanctuary does not provide emergency or clinical services.
           </p>
-          <p className="mt-2">
+          <p>
             Photography and recording are not permitted inside the cave or
             shrines.
           </p>
+          <div className="pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between text-cream/40 text-[11px] gap-2">
+            <p>
+              © {currentYear} Ba Lubaale Ancestral Sanctuary Kiwamirembe. All rights reserved.
+            </p>
+            <p>
+              Ssese Islands · Lake Victoria · Uganda
+            </p>
+          </div>
         </div>
       </div>
     </footer>
   );
 }
+

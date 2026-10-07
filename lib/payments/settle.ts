@@ -28,6 +28,7 @@ import {
   howToPrepareGuest,
   ownerPaymentReceived,
 } from "@/lib/email/templates";
+import { drainOutboxBestEffort } from "@/lib/email/outbox";
 
 export const CLAIM_PROVIDER = "pesapal";
 
@@ -299,7 +300,24 @@ export async function verifyAndSettle(
       claimed = applied.claimed;
     }
 
-    if (claimed) return { result: "settled" };
+    if (claimed) {
+      // The emails were queued in the same commit; best-effort deliver them now
+      // so the guest is not waiting for the daily outbox cron. A mail failure
+      // must never escape: the payment is already settled, and the cron stays
+      // the safety net for whatever does not go out here.
+      try {
+        await drainOutboxBestEffort({
+          reason:
+            payment.subject_kind === "voucher" ? "voucher" : `payment:${type}`,
+        });
+      } catch (err) {
+        console.error(
+          `inline email drain failed (payment already settled; the cron will retry):`,
+          err instanceof Error ? err.message : "unknown",
+        );
+      }
+      return { result: "settled" };
+    }
 
     // The claim was refused. Normally that means a concurrent delivery
     // committed first (the unique insert waits for it), so the payment is now

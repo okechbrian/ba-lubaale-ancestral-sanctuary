@@ -32,6 +32,29 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - Integration tests run the real database with only the provider stubbed
     (`tests/payment-reconcile-integrity.test.ts`): exactly-once while the IPN and
     the sweep race, no completion on any non-COMPLETED answer, voucher parity.
+- **Interactive homepage sections.** Three previously-unreferenced components
+  under `components/home/` are now wired into the homepage:
+
+  - `HomeQuickJump` - a sticky in-page jump nav, so a visitor deep in a long
+    landing page can move between sections without scrolling back up.
+  - `WelcomedSelector` - replaces the flat "Who Is Welcomed" grid with filterable
+    cards (solo / household / group), each linking to its route.
+  - `ThreeActsStepper` - replaces the static three-column Act summary with a
+    tabbed stepper showing narrative, the ritual list per act, and prev/next.
+
+  Sections keep their locked ids and heading order, and the locked non-medical
+  disclaimer ("sessions complement and do not replace medical or psychiatric
+  care") is now rendered directly under the section - the interactive rewrite had
+  dropped it.
+
+  **Owner sign-off pending.** The ritual descriptions in `ThreeActsStepper`
+  (diagnostic readings, foot washing, fire arbitration, intention spoken into
+  bark cloth, consecration of the talisman, the herb blends packed for home)
+  were drafted from practice notes and are **not yet confirmed by the owner as
+  canonical marketing copy**. They should be reviewed before the section is
+  treated as authoritative. Prices, the no-shop rule, and the owner's withheld
+  phone number are untouched, and are asserted by
+  `tests/homepage-sections.test.ts`.
 
 ### Fixed
 

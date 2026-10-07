@@ -24,10 +24,11 @@ function ackBody(trackingId: string, merchantRef: string, type: string): Respons
  *
  * Completion happens in ONE database transaction that also queues the emails in
  * `email_outbox` — any failure rolls all of it back and returns 503 so the
- * provider retries. Nothing is sent from this request: a separate processor
- * delivers the queued mail, which is what makes "payment settled, guest never
- * told" impossible. A voucher purchase (no booking) takes its own path, where
- * the transaction issues the redeemable code.
+ * provider retries. Right after it commits, the shared path delivers a few of
+ * the queued mails best-effort, so the guest hears within this request instead
+ * of at the daily tick; a mail failure never escapes, and whatever is left
+ * waits for the cron. A voucher purchase (no booking) takes its own path,
+ * where the transaction issues the redeemable code.
  * Always acks 200 when it understood the event.
  */
 async function handle(params: {

@@ -166,46 +166,87 @@ price of its own.
 Payment emails (deposit/balance confirmations, the how-to-prepare guide, the
 owner notification) are **queued inside the transaction that settles the
 payment** — `apply_payment_completion` writes them to `email_outbox` in the same
-commit (`supabase/migrations/20261002000005_email_outbox.sql`). The IPN never
-sends mail itself, which is what makes "payment settled, guest never told"
-impossible: a crash after the commit leaves the mail queued, not lost.
+commit (`supabase/migrations/20261002000005_email_outbox.sql`). The commit is
+what makes "payment settled, guest never told" impossible: a crash after it
+leaves the mail queued, not lost.
 
-A processor delivers the queue:
+Delivery has two paths, and the queue is what makes the guarantee:
 
-- **Route** — `GET|POST /api/cron/email-outbox`, called by Vercel Cron daily at
-  08:00 UTC (`vercel.json`). Requires `Authorization: Bearer $CRON_SECRET`; with
-  `CRON_SECRET` unset it refuses (503 `cron_secret_missing`) instead of being an
-  open mail trigger.
+- **Inline, right after settlement** — once a payment or voucher completes, the
+  IPN makes one best-effort attempt to deliver up to 5 queued emails *within the
+  same request* (`drainOutboxBestEffort`). The guest usually hears immediately
+  instead of at the next tick. It is best-effort in both directions: it never
+  throws, because a mail failure must not turn a settled payment into a 503 and
+  invite the provider to retry an already-settled payment; and it does nothing at
+  all when SMTP is unconfigured, because the processor treats
+  `smtp_not_configured` as terminal and would otherwise *park* rows that should
+  stay pending until SMTP exists.
+- **Cron, as the safety net** — `GET|POST /api/cron/email-outbox` drains
+  whatever the inline pass left. Requires `Authorization: Bearer $CRON_SECRET`;
+  with `CRON_SECRET` unset it refuses (503 `cron_secret_missing`) instead of
+  being an open mail trigger. The response echoes the
+  `x-vercel-cron-schedule` header Vercel sends, so the schedule actually in
+  force is observable rather than assumed.
 
-Payment reconciliation (safety net for a lost IPN):
+Everything else about the queue is unchanged:
 
-- **Route** - `GET|POST /api/cron/payment-reconcile`, Vercel Cron daily at 07:30
-  UTC (an hour before the mail drain, so what it settles is delivered the same
-  morning). Same `CRON_SECRET` bearer rule as above. It re-queries Pesapal for
-  every payment still `initiated` after 30 minutes and settles through the same
-  verified, atomic path as the IPN (`lib/payments/settle.ts`).
-- **Admin** - `/admin/payments` lists stuck and failed payments with a
-  **Re-check** button for an immediate answer instead of waiting for the tick.
-  Nothing is ever marked paid except on Pesapal's confirmation of the exact
-  amount.
 - **Retries** — a failed send requeues with exponential backoff (2, 4, 8, 16, 32
   minutes, capped at 60). After 5 attempts the row is parked as `failed`, or
   immediately when SMTP is not configured at all.
-- **Concurrency** — claiming is a database compare-and-set, so parallel cron
-  ticks cannot send the same row twice. Delivery is at-least-once: a crash
+- **Concurrency** — claiming is a database compare-and-set, so an inline pass and
+  a cron tick cannot send the same row twice. Delivery is at-least-once: a crash
   between "SMTP accepted it" and "row marked sent" resends on the next run.
 - **Owner control** — `/admin/emails` lists the queue with status, attempts,
   last error and next retry, and a **Resend** button for failed rows (delivered
   rows cannot be resent).
 
-> **Schedule is capped at once a day by the hosting plan.** Vercel's Hobby plan
-> rejects any cron expression that fires more than once per day — and it rejects
-> it by *failing the whole deployment*, silently for git pushes (no failed
-> deployment is even created, so nothing shows up in the dashboard). `vercel.json`
-> therefore ships `0 8 * * *`. Changing it back to `*/5 * * * *` requires a Pro
-> plan ($20/mo); on Hobby, delivery happens at the daily tick, on the next manual
-> `POST`, or immediately via Resend in `/admin/emails`. Queued rows are never lost
-> either way.
+#### Cron schedule: an environment-driven decision
+
+Vercel parses `vercel.json` as static JSON and **cannot** interpolate an
+environment variable into `crons[].schedule` — in their own community
+discussion, staff state there is no solution for it. Crons are also registered
+from the uploaded file *before* the build runs, so rewriting during
+`npm run build` would be too late. The decision therefore happens at deploy time
+via `scripts/set-cron-schedule.mjs`:
+
+```bash
+node scripts/set-cron-schedule.mjs          # apply $EMAIL_OUTBOX_CRON
+node scripts/set-cron-schedule.mjs --check  # exit 1 if vercel.json disagrees
+```
+
+| Plan | `EMAIL_OUTBOX_CRON` | Schedule | Notes |
+|---|---|---|---|
+| **Hobby** (default) | unset, or `0 8 * * *` | `0 8 * * *` | daily, 08:00 UTC. Valid on every plan. |
+| **Pro** ($20/mo) | `*/5 * * * *` | `*/5 * * * *` | 5-minute drain. Only valid on Pro. |
+
+The default is the daily schedule on purpose. Hobby **rejects** any cron firing
+more than once per day, and it rejects it by *failing the whole deployment* —
+silently for git pushes, so no failed deployment is created, nothing appears in
+the dashboard, and the branch simply stops getting previews. The script warns
+loudly when you choose a sub-daily expression, and `--check` fails so CI or a
+pre-deploy hook can catch the drift.
+
+Losing a tick is a latency problem, not a correctness one: rows stay queued and
+the next tick — or **Resend** in `/admin/emails` — delivers them.
+
+### Payment reconciliation
+
+The second safety net, for a **lost IPN**: if a guest paid but the webhook
+never reached us (provider outage, a deploy, a dropped notification) the
+payment sat `initiated` forever.
+
+- **Sweep** — `GET|POST /api/cron/payment-reconcile`, Vercel Cron daily at
+  07:30 UTC. Same `CRON_SECRET` bearer rule as the mail route. It finds
+  payments `initiated` for more than 30 minutes (and younger than 14 days),
+  re-queries `GetTransactionStatus` for each, and settles through the *same*
+  verified, atomic path as the IPN (`lib/payments/settle.ts#verifyAndSettle`).
+  A provider unreachable means the sweep stops and reports 503 rather than
+  a silent success.
+- **Admin** — `/admin/payments` lists stuck and failed payments with a
+  **Re-check** button for an immediate answer instead of waiting for the tick
+  (`POST /api/admin/payments/[id]/recheck`, session guarded). Nothing here is
+  ever marked paid except on Pesapal's confirmation of the exact amount and
+  currency.
 
 ### Payments (Pesapal, hosted checkout)
 

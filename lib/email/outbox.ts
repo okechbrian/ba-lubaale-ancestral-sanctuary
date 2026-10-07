@@ -6,7 +6,7 @@ import {
   markOutboxSent,
 } from "@/lib/db/email-outbox";
 import type { EmailOutboxRow } from "@/lib/db/types";
-import { getEmailSender } from "@/lib/email/sender";
+import { getEmailSender, isEmailTransportConfigured } from "@/lib/email/sender";
 
 /**
  * Transactional outbox processor.
@@ -162,4 +162,71 @@ export async function processEmailOutbox(
   }
 
   return summary;
+}
+
+/**
+ * How many rows an inline drain may deliver inside one webhook request.
+ *
+ * Bounded on purpose: this runs while the provider waits for our ack, so a
+ * large backlog must never turn into a slow webhook. Anything beyond the
+ * limit stays queued for the cron.
+ */
+export const OUTBOX_INLINE_LIMIT = 5;
+
+/**
+ * Deliver a few queued emails right now, inline, and never throw.
+ *
+ * Used by the IPN so a guest hears about a settled payment within the webhook
+ * rather than waiting for the next cron tick. The cron remains the safety net:
+ * whatever this does not deliver is still queued, and anything it fails is
+ * retried there.
+ *
+ * Two rules make it safe to call from a webhook:
+ *
+ * 1. **It never throws.** The payment is already committed and the emails are
+ *    durably queued. A mail failure is not a reason to tell the provider the
+ *    payment failed, because it would then be retried against an
+ *    already-settled payment. So this swallows everything and logs loudly.
+ *
+ * 2. **It does nothing at all when SMTP is unconfigured.** This one is
+ *    subtle and matters: `processEmailOutbox` treats `smtp_not_configured` as a
+ *    *terminal* failure and parks the row for a manual resend. Draining inline
+ *    with no mail transport would therefore permanently park rows that are
+ *    currently safely `pending` and would have gone out on the cron the moment
+ *    SMTP was configured. Not attempting anything keeps that promise.
+ */
+export async function drainOutboxBestEffort(opts: {
+  /** Short label for logs, e.g. `payment:deposit`. */
+  reason: string;
+  limit?: number;
+  sender?: OutboxSender;
+  now?: Date;
+}): Promise<ProcessSummary | null> {
+  // An injected sender is a test double that decides its own outcome, so only
+  // skip when the REAL transport is the thing that is missing.
+  if (!opts.sender && !isEmailTransportConfigured()) {
+    return null;
+  }
+  try {
+    const summary = await processEmailOutbox({
+      limit: opts.limit ?? OUTBOX_INLINE_LIMIT,
+      ...(opts.sender ? { sender: opts.sender } : {}),
+      ...(opts.now ? { now: opts.now } : {}),
+    });
+    if (summary.sent > 0 || summary.failed > 0 || summary.retrying > 0) {
+      console.log(
+        `[email-outbox] inline drain (${opts.reason}): sent=${summary.sent} ` +
+          `retrying=${summary.retrying} failed=${summary.failed} ` +
+          `skipped=${summary.skipped} — anything left stays queued for the cron.`,
+      );
+    }
+    return summary;
+  } catch (err) {
+    console.error(
+      `[email-outbox] inline drain (${opts.reason}) threw; the webhook still ` +
+        `acks and the cron retries:`,
+      err instanceof Error ? err.message : "unknown",
+    );
+    return null;
+  }
 }

@@ -8,10 +8,22 @@ import {
 export const dynamic = "force-dynamic";
 
 /**
- * Drains the transactional email outbox. Wired to Vercel Cron in
- * `vercel.json` (every five minutes), which invokes the path with a **GET** and
- * an `Authorization: Bearer $CRON_SECRET` header — so both verbs run the queue,
- * and POST is there for a manual kick.
+ * Drains the transactional email outbox. Wired to Vercel Cron via the
+ * `crons` entry in `vercel.json`, which invokes the path with a **GET** and an
+ * `Authorization: Bearer $CRON_SECRET` header — so both verbs run the queue, and
+ * POST is there for a manual kick.
+ *
+ * This is the **safety net**, not the fast path. A settled payment's emails are
+ * normally delivered inline by the IPN (`drainOutboxBestEffort`), so the guest
+ * hears immediately; whatever that did not deliver — or could not — stays queued
+ * here. That is why losing a cron tick degrades latency rather than correctness.
+ *
+ * The schedule itself is a deploy-time decision driven by `EMAIL_OUTBOX_CRON`
+ * through `scripts/set-cron-schedule.mjs`, because Vercel cannot interpolate an
+ * environment variable into `vercel.json`. Daily on Hobby, five-minute on Pro.
+ * The response echoes `x-vercel-cron-schedule`, which Vercel sends on every
+ * invocation, so the schedule actually in force is observable rather than a
+ * guess.
  *
  * Security: this endpoint sends email, so it is never open. Vercel only
  * attaches the bearer header when `CRON_SECRET` is configured; if it is unset
@@ -55,7 +67,14 @@ async function handle(request: Request): Promise<Response> {
 
   try {
     const summary: ProcessSummary = await processEmailOutbox({ limit });
-    return Response.json({ ok: true, ...summary });
+    // Echo the schedule Vercel says fired, so the timing actually in force is
+    // visible in the response instead of being inferred from vercel.json.
+    const fired = request.headers.get("x-vercel-cron-schedule");
+    return Response.json({
+      ok: true,
+      ...summary,
+      ...(fired ? { schedule: fired } : {}),
+    });
   } catch (err) {
     if (err instanceof DatabaseNotConfiguredError) {
       return Response.json({ error: "database_not_configured" }, { status: 503 });
