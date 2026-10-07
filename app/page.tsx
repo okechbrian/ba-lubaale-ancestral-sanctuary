@@ -3,6 +3,9 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
 import { MomentsStrip } from "@/components/MomentsStrip";
+import { HomeQuickJump } from "@/components/home/HomeQuickJump";
+import { WelcomedSelector } from "@/components/home/WelcomedSelector";
+import { ThreeActsStepper } from "@/components/home/ThreeActsStepper";
 import { resolveContent } from "@/lib/cms";
 import { momentsBlockSchema, testimonialsBlockSchema } from "@/lib/cms/blocks";
 import { momentsDefault } from "@/content/moments";
@@ -31,6 +34,9 @@ export default async function HomePage() {
     <>
       {/* ─── Section 1: Hero ─── */}
       <Hero />
+
+      {/* ─── Section 1a: In-page jump nav ─── */}
+      <HomeQuickJump />
 
       {/* ─── Section 1b: Teaching line ─── */}
       <section className="bg-dusk py-8 sm:py-10">
@@ -163,135 +169,35 @@ export default async function HomePage() {
       </section>
 
       {/* ─── Section 4: Who Is Welcomed ─── */}
-      <section className="bg-cream py-20 sm:py-28">
+      <section id="who-is-welcomed" className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-display text-3xl font-semibold text-ink">
             Who Is Welcomed
           </h2>
 
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="text-center">
-              <h3 className="font-display text-xl text-ink">Solitude Lovers</h3>
-              <p className="mt-3 text-sm text-ink/70">
-                People ready to sit with themselves in silence, beside the fire
-                and the stones, where they can be grounded back to their roots.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-display text-xl text-ink">Couples</h3>
-              <p className="mt-3 text-sm text-ink/70">
-                Partners seeking arbitration, a blessing, and a shared craft
-                beside the fire. Work done together, not performed for an
-                audience.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-display text-xl text-ink">Families</h3>
-              <p className="mt-3 text-sm text-ink/70">
-                Households introducing children to living culture, land, herd,
-                and ancestral craft. Reunion, arbitration, and a fresh start.
-                One household at a time.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-display text-xl text-ink">
-                Retreat Groups
-              </h3>
-              <p className="mt-3 text-sm text-ink/70">
-                A spiritual family built on truth and without hypocrisy. Such a group can
-                choose to visit the sanctuary and its grounds together.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-display text-xl text-ink">Team Building</h3>
-              <p className="mt-3 text-sm text-ink/70">
-                Teams who come to work together on the land and beside the
-                fire.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-display text-xl text-ink">
-                Ekyoto Kya Ba Kyaala
-              </h3>
-              <p className="mt-3 text-sm text-ink/70">
-                An annual gathering of women for rest, womb care, and shared
-                talk.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-display text-xl text-ink">
-                Seekers of Healing &amp; Enrichment
-              </h3>
-              <p className="mt-3 text-sm text-ink/70">
-                People who feel tired, stuck, or are carrying a heavy burden, and are now ready to shed, let go,
-                and start fresh. If that is you, send the application.
-              </p>
-            </div>
-          </div>
+          <WelcomedSelector />
 
           <p className="mt-12 text-center text-sm text-ink/60">
             This is not a party island, a drop-in lodge, or a clinical facility.
+            Sessions are traditional, energetic, and artisanal; they complement
+            and do not replace medical or psychiatric care.
           </p>
         </div>
       </section>
 
       {/* ─── Section 5: Three Acts ─── */}
-      <section className="bg-dusk py-20 sm:py-28">
+      <section id="three-acts" className="bg-dusk py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-display text-3xl font-semibold text-cream">
             Three Acts of an Immersion
           </h2>
 
-          <div className="mt-12 grid gap-8 sm:grid-cols-3">
-            <div className="text-center">
-              <span className="text-5xl font-display text-bark-soft">I</span>
-              <h3 className="mt-4 font-display text-xl text-cream">Arrival</h3>
-              <p className="mt-3 text-sm leading-relaxed text-cream/70">
-                Step off the boat onto warm earth. Set down your bag. Let the
-                sound of the lake replace the sound of your phone. The first
-                evening is simply land.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <span className="text-5xl font-display text-bark-soft">II</span>
-              <h3 className="mt-4 font-display text-xl text-cream">Work</h3>
-              <p className="mt-3 text-sm leading-relaxed text-cream/70">
-                Enter the cave. Sit by the fire. Work with breath, voice, bark
-                cloth, and cowrie. The sessions are traditional, energetic, and
-                artisanal, guided by the host.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <span className="text-5xl font-display text-bark-soft">III</span>
-              <h3 className="mt-4 font-display text-xl text-cream">Return</h3>
-              <p className="mt-3 text-sm leading-relaxed text-cream/70">
-                Carry home a talisman you made, a garment you wove, and the
-                quiet knowledge that you sat with what needed sitting with.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-12 text-center">
-            <Link
-              href="/immersions"
-              className="text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
-            >
-              View immersions →
-            </Link>
-          </div>
+          <ThreeActsStepper />
         </div>
       </section>
 
       {/* ─── Section 6: Craft as Healing ─── */}
-      <section className="bg-cream py-20 sm:py-28">
+      <section id="craft-healing" className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-8 sm:grid-cols-2 lg:grid-cols-3">
             <div className="overflow-hidden rounded-md">
@@ -347,7 +253,7 @@ export default async function HomePage() {
       </section>
 
       {/* ─── Section 7: Host Block ─── */}
-      <section className="bg-mist py-20 sm:py-28">
+      <section id="the-host" className="bg-mist py-20 sm:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
           <Image
             src="/images/host-portrait-headwrap.jpg"
@@ -405,7 +311,7 @@ export default async function HomePage() {
       )}
 
       {/* ─── Section 8: Three Stay Cards ─── */}
-      <section className="bg-cream py-20 sm:py-28">
+      <section id="immersions" className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center font-display text-3xl font-semibold text-ink">
             Immersions
