@@ -182,7 +182,7 @@ local parity). Any `NEXT_PUBLIC_*` value requires a **redeploy** to take effect.
 | `NEXT_PUBLIC_SITE_URL` | Must be the real production origin (used in every email link) |
 | `SUPABASE_URL` | Hosted project API URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only; never exposed to the client |
-| `CRON_SECRET` | Authorises the email outbox processor (`/api/cron/email-outbox`); without it the route refuses with 503 and queued payment mail never drains on a schedule |
+| `CRON_SECRET` | Authorises the email outbox processor (`/api/cron/email-outbox`) and the payment reconciliation sweep (`/api/cron/payment-reconcile`); without it both routes refuse with 503, queued payment mail never drains on a schedule, and a payment whose IPN was lost is never recovered |
 | `PESAPAL_ENV` | `sandbox` until go-live is signed off |
 | `PESAPAL_CONSUMER_KEY` / `PESAPAL_CONSUMER_SECRET` | From the Pesapal dashboard |
 | `PESAPAL_IPN_URL` | Must equal the IPN URL registered in Pesapal (see §3) |
@@ -265,6 +265,12 @@ local parity). Any `NEXT_PUBLIC_*` value requires a **redeploy** to take effect.
 - [ ] **Idempotency** — replay the same IPN delivery (Pesapal dashboard → IPN
       history → resend) and paste evidence that nothing double-applied: one
       `webhook_events` claim, one payment completion, no second email.
+- [ ] **Lost-IPN recovery** (payment reconciliation) - complete a sandbox payment
+      with the IPN URL deliberately wrong, then open `/admin/payments`: the
+      payment is listed as stuck (after 30 min), **Re-check** settles it, and
+      `webhook_events` shows exactly one claim with type `RECONCILE:admin`. Also
+      `curl -H "Authorization: Bearer $CRON_SECRET" https://<production-domain>/api/cron/payment-reconcile`
+      returns `ok: true`, and the same call without the header returns 401.
 - [ ] **Overlap guard** (payment-integrity work) — approve a booking whose dates
       overlap an existing one and paste the **409 `overlapping_booking`** response.
 - [ ] Vercel function logs for the IPN show no errors during the tests.

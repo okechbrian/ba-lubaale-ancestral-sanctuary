@@ -7,19 +7,44 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Payment reconciliation.** A guest who pays but whose IPN never reaches us
+  (provider outage, a deploy, a dropped webhook) used to leave a payment
+  `initiated` forever with nobody told. Now `GET|POST /api/cron/payment-reconcile`
+  (Vercel Cron daily 07:30 UTC, `Authorization: Bearer $CRON_SECRET`, 503 when the
+  secret is unset) finds payments `initiated` for more than 30 minutes, asks
+  Pesapal `GetTransactionStatus`, and settles them through the **same function the
+  IPN uses**.
+  - **One settlement path.** `lib/payments/settle.ts#verifyAndSettle` now holds
+    everything the IPN route used to do after looking the payment up: provider
+    re-query, currency/amount cross-check, the atomic completion RPC (claim +
+    payment + booking + queued emails) and the voucher issue path. The IPN route,
+    the cron sweep and the admin Re-check all call it, and it is the only caller of
+    the completion RPCs - a payment cannot be marked paid without Pesapal's own
+    authenticated answer matching our currency and amount.
+  - **Conservative on ambiguity.** In the sweep, INVALID (status 0) only means
+    "nothing has landed yet", so it never writes a terminal state; the payment
+    stays `initiated` and is rotated to the back of the queue. Only FAILED/REVERSED
+    marks failed. Rows older than 14 days are left to the manual button.
+  - **`/admin/payments`** lists stuck (initiated > 30 min) and failed payments, each
+    with a **Re-check** button (`POST /api/admin/payments/[id]/recheck`, session
+    guarded). The admin cannot mark anything paid - the button only lets the
+    provider's answer take effect.
+  - Integration tests run the real database with only the provider stubbed
+    (`tests/payment-reconcile-integrity.test.ts`): exactly-once while the IPN and
+    the sweep race, no completion on any non-COMPLETED answer, voucher parity.
 - **Interactive homepage sections.** Three previously-unreferenced components
   under `components/home/` are now wired into the homepage:
 
-  - `HomeQuickJump` — a sticky in-page jump nav, so a visitor deep in a long
+  - `HomeQuickJump` - a sticky in-page jump nav, so a visitor deep in a long
     landing page can move between sections without scrolling back up.
-  - `WelcomedSelector` — replaces the flat "Who Is Welcomed" grid with filterable
+  - `WelcomedSelector` - replaces the flat "Who Is Welcomed" grid with filterable
     cards (solo / household / group), each linking to its route.
-  - `ThreeActsStepper` — replaces the static three-column Act summary with a
+  - `ThreeActsStepper` - replaces the static three-column Act summary with a
     tabbed stepper showing narrative, the ritual list per act, and prev/next.
 
   Sections keep their locked ids and heading order, and the locked non-medical
   disclaimer ("sessions complement and do not replace medical or psychiatric
-  care") is now rendered directly under the section — the interactive rewrite had
+  care") is now rendered directly under the section - the interactive rewrite had
   dropped it.
 
   **Owner sign-off pending.** The ritual descriptions in `ThreeActsStepper`
@@ -32,6 +57,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `tests/homepage-sections.test.ts`.
 
 ### Fixed
+
+- **A FAILED verdict could permanently swallow a later successful payment.** The
+  IPN recorded a failure under the same webhook claim key (the tracking id) that
+  the atomic completion claims, so if Pesapal reported FAILED and the guest then
+  paid the same order, the COMPLETED event looked like a duplicate and was
+  acknowledged without settling. Failures are now claimed as `failed:<tracking id>`.
+  A completion refused while the payment is not completed is reported as
+  `blocked` and logged instead of being treated as a harmless duplicate.
 
 - **Story cover uploads could never succeed.** `StoryEditor` posted the raw
   file with `Content-Type: image/jpeg` instead of `multipart/form-data`, so

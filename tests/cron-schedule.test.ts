@@ -78,18 +78,23 @@ describe("schedule decision", () => {
 });
 
 describe("shipped vercel.json", () => {
-  it("registers the email-outbox path", () => {
-    expect(vercelJson.crons).toEqual([{ path: CRON_PATH, schedule: DEFAULT_SCHEDULE }]);
+  const byPath = (p: string) => vercelJson.crons?.find((c) => c.path === p);
+
+  it("registers the email-outbox path on the daily default", () => {
+    expect(byPath(CRON_PATH)?.schedule).toBe(DEFAULT_SCHEDULE);
   });
 
-  it("ships the Hobby-safe daily schedule", () => {
-    // This is the regression that matters: a sub-daily value here would break
+  it("registers the payment-reconcile sweep, also daily on Hobby", () => {
+    expect(byPath("/api/cron/payment-reconcile")?.schedule).toBe("30 7 * * *");
+  });
+
+  it("ships only daily-safe schedules for every cron", () => {
+    // This is the regression that matters: any sub-daily value would break
     // every push on a Hobby account, silently.
-    expect(isDailySafe(vercelJson.crons?.[0]?.schedule ?? "")).toBe(true);
-  });
-
-  it("agrees with the script's default, so --check passes on a clean tree", () => {
-    expect(vercelJson.crons?.[0]?.schedule).toBe(DEFAULT_SCHEDULE);
+    expect(vercelJson.crons?.length).toBeGreaterThan(0);
+    for (const cron of vercelJson.crons ?? []) {
+      expect(isDailySafe(cron.schedule), cron.path).toBe(true);
+    }
   });
 
   it("agrees with what the script would read from a bare environment", () => {
@@ -104,13 +109,9 @@ describe("shipped vercel.json", () => {
     }
   });
 
-  it("is the only cron, so there is nothing else a plan limit could break", () => {
-    expect(vercelJson.crons).toHaveLength(1);
-  });
-
-  it("points at a route that actually exists", () => {
-    expect(CRON_PATH).toBe("/api/cron/email-outbox");
-    // server-only route dirs are route handlers; assert the file is present.
-    expect(raw).toContain("email-outbox");
+  it("points at cron routes", () => {
+    for (const cron of vercelJson.crons ?? []) {
+      expect(cron.path).toMatch(/^\/api\/cron\//);
+    }
   });
 });

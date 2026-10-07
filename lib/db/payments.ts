@@ -216,3 +216,74 @@ export async function initiatePayment(
     .eq("id", id);
   if (error) throw new Error(`initiatePayment failed: ${error.message}`);
 }
+
+/**
+ * Payments a reconciliation sweep should ask the provider about: `initiated`
+ * (the guest was sent to Pesapal) and not touched for `idleMs`.
+ *
+ * `updated_at` doubles as "last looked at": `markPaymentChecked` bumps it when
+ * the provider has nothing for us yet, so a payment that is perpetually
+ * unresolved rotates to the back of the queue instead of starving everything
+ * behind it, and is not re-queried on every tick. Rows older than `maxAgeMs`
+ * (by creation) are left to the admin Re-check button — the hosted order has
+ * long expired and polling it forever is only noise.
+ */
+export async function listStuckPayments(args: {
+  now: Date;
+  idleMs: number;
+  maxAgeMs: number;
+  limit: number;
+}): Promise<PaymentRow[]> {
+  const db = getDb();
+  const idleCutoff = new Date(args.now.getTime() - args.idleMs).toISOString();
+  const ageCutoff = new Date(args.now.getTime() - args.maxAgeMs).toISOString();
+  const { data, error } = await db
+    .from("payments")
+    .select("*")
+    .eq("status", "initiated")
+    .lt("updated_at", idleCutoff)
+    .gt("created_at", ageCutoff)
+    .order("updated_at", { ascending: true })
+    .limit(args.limit);
+  if (error) throw new Error(`listStuckPayments failed: ${error.message}`);
+  return (data ?? []) as PaymentRow[];
+}
+
+/**
+ * Records "we asked, the provider has nothing yet" by bumping `updated_at` —
+ * only while the payment is still `initiated`, so it can never race a
+ * completion into overwriting a newer state.
+ */
+export async function markPaymentChecked(id: string, now: Date): Promise<void> {
+  const db = getDb();
+  const { error } = await db
+    .from("payments")
+    .update({ updated_at: now.toISOString() })
+    .eq("id", id)
+    .eq("status", "initiated");
+  if (error) throw new Error(`markPaymentChecked failed: ${error.message}`);
+}
+
+/**
+ * What /admin/payments shows: payments that need a human's eyes — every
+ * `failed` one, and every `initiated` one that has been open longer than
+ * `stuckAfterMs` since it was created. Newest first.
+ */
+export async function listPaymentsNeedingAttention(args: {
+  now: Date;
+  stuckAfterMs: number;
+  limit?: number;
+}): Promise<PaymentRow[]> {
+  const db = getDb();
+  const cutoff = new Date(args.now.getTime() - args.stuckAfterMs).toISOString();
+  const { data, error } = await db
+    .from("payments")
+    .select("*")
+    .or(`status.eq.failed,and(status.eq.initiated,created_at.lt.${cutoff})`)
+    .order("created_at", { ascending: false })
+    .limit(args.limit ?? 200);
+  if (error) {
+    throw new Error(`listPaymentsNeedingAttention failed: ${error.message}`);
+  }
+  return (data ?? []) as PaymentRow[];
+}

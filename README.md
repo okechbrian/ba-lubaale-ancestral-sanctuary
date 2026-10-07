@@ -229,6 +229,25 @@ pre-deploy hook can catch the drift.
 Losing a tick is a latency problem, not a correctness one: rows stay queued and
 the next tick — or **Resend** in `/admin/emails` — delivers them.
 
+### Payment reconciliation
+
+The second safety net, for a **lost IPN**: if a guest paid but the webhook
+never reached us (provider outage, a deploy, a dropped notification) the
+payment sat `initiated` forever.
+
+- **Sweep** — `GET|POST /api/cron/payment-reconcile`, Vercel Cron daily at
+  07:30 UTC. Same `CRON_SECRET` bearer rule as the mail route. It finds
+  payments `initiated` for more than 30 minutes (and younger than 14 days),
+  re-queries `GetTransactionStatus` for each, and settles through the *same*
+  verified, atomic path as the IPN (`lib/payments/settle.ts#verifyAndSettle`).
+  A provider unreachable means the sweep stops and reports 503 rather than
+  a silent success.
+- **Admin** — `/admin/payments` lists stuck and failed payments with a
+  **Re-check** button for an immediate answer instead of waiting for the tick
+  (`POST /api/admin/payments/[id]/recheck`, session guarded). Nothing here is
+  ever marked paid except on Pesapal's confirmation of the exact amount and
+  currency.
+
 ### Payments (Pesapal, hosted checkout)
 
 1. Create a Pesapal merchant/developer account (sandbox first:

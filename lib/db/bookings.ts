@@ -109,3 +109,21 @@ export async function getActiveRanges(): Promise<DateRange[]> {
   if (error) throw new Error(`getActiveRanges failed: ${error.message}`);
   return (data ?? []) as DateRange[];
 }
+
+/** Name + email for a set of bookings, keyed by id (admin payment listing). */
+export async function getBookingContacts(
+  ids: string[],
+): Promise<Map<string, { name: string; email: string }>> {
+  const out = new Map<string, { name: string; email: string }>();
+  if (ids.length === 0) return out;
+  const db = getDb();
+  const { data, error } = await db
+    .from("bookings")
+    .select("id, name, email")
+    .in("id", ids);
+  if (error) throw new Error(`getBookingContacts failed: ${error.message}`);
+  for (const row of (data ?? []) as { id: string; name: string; email: string }[]) {
+    out.set(row.id, { name: row.name, email: row.email });
+  }
+  return out;
+}
