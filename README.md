@@ -176,6 +176,18 @@ A processor delivers the queue:
   08:00 UTC (`vercel.json`). Requires `Authorization: Bearer $CRON_SECRET`; with
   `CRON_SECRET` unset it refuses (503 `cron_secret_missing`) instead of being an
   open mail trigger.
+
+Payment reconciliation (safety net for a lost IPN):
+
+- **Route** - `GET|POST /api/cron/payment-reconcile`, Vercel Cron daily at 07:30
+  UTC (an hour before the mail drain, so what it settles is delivered the same
+  morning). Same `CRON_SECRET` bearer rule as above. It re-queries Pesapal for
+  every payment still `initiated` after 30 minutes and settles through the same
+  verified, atomic path as the IPN (`lib/payments/settle.ts`).
+- **Admin** - `/admin/payments` lists stuck and failed payments with a
+  **Re-check** button for an immediate answer instead of waiting for the tick.
+  Nothing is ever marked paid except on Pesapal's confirmation of the exact
+  amount.
 - **Retries** — a failed send requeues with exponential backoff (2, 4, 8, 16, 32
   minutes, capped at 60). After 5 attempts the row is parked as `failed`, or
   immediately when SMTP is not configured at all.

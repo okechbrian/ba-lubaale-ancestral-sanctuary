@@ -8,6 +8,7 @@
  *   - tests/vouchers-integrity.test.ts    (voucher issue, double-issue, redeem)
  *   - tests/growth-integrity.test.ts       (stories drafts/publish, enquiries)
  *   - tests/voucher-hardening-integrity.test.ts (code redaction, atomic purchase)
+ *   - tests/payment-reconcile-integrity.test.ts (cron + admin re-check, stubbed provider)
  *
  * It discovers:
  *   - TEST_SUPABASE_URL            (REST API, from `supabase status -o json`)
@@ -117,6 +118,7 @@ const vitestArgs = args.length
       "tests/vouchers-integrity.test.ts",
       "tests/growth-integrity.test.ts",
       "tests/voucher-hardening-integrity.test.ts",
+      "tests/payment-reconcile-integrity.test.ts",
     ];
 const res = spawnSync("npx", ["vitest", ...vitestArgs], {
   cwd: root,

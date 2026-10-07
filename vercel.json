@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
+      "path": "/api/cron/payment-reconcile",
+      "schedule": "30 7 * * *"
+    },
+    {
       "path": "/api/cron/email-outbox",
       "schedule": "0 8 * * *"
     }
