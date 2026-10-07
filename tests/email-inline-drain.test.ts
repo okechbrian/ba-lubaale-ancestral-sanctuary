@@ -35,7 +35,9 @@ interface OutboxStorage {
 }
 
 const storage = {
-  listDueOutbox: vi.fn<OutboxStorage["listDueOutbox"]>(async () => dueRows),
+  listDueOutbox: vi
+    .fn<OutboxStorage["listDueOutbox"]>()
+    .mockImplementation(async (limit) => dueRows.slice(0, limit)),
   claimOutboxRow: vi.fn<OutboxStorage["claimOutboxRow"]>(async (id) => {
     const found = dueRows.find((r) => r.id === id);
     return found ? { ...found, attempts: found.attempts + 1 } : null;
@@ -93,7 +95,11 @@ beforeEach(() => {
     savedEnv[k] = process.env[k];
     delete process.env[k];
   }
-  storage.listDueOutbox.mockReset().mockImplementation(async () => dueRows);
+  // The real query applies LIMIT in SQL, so the double has to honour the limit
+  // too — otherwise a test would silently pass while ignoring it.
+  storage.listDueOutbox
+    .mockReset()
+    .mockImplementation(async (limit) => dueRows.slice(0, limit));
   storage.claimOutboxRow.mockReset().mockImplementation(async (id: string) => {
     const found = dueRows.find((r) => r.id === id);
     return found ? { ...found, attempts: found.attempts + 1 } : null;

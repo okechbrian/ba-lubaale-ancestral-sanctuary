@@ -36,6 +36,26 @@ export const dynamic = "force-dynamic";
 
 const CLAIM_PROVIDER = "pesapal";
 
+/**
+ * Deliver a few queued emails inline, and never let that decision escape.
+ *
+ * `drainOutboxBestEffort` already swallows its own errors, but this wrapper is
+ * the actual guarantee: it means no mail-related throw can reach the payment
+ * paths' catch blocks and turn a settled payment into a 503, which would
+ * instruct the provider to retry an already-settled payment. Cheap insurance
+ * against a future change to the drain's error handling.
+ */
+async function drainSafely(reason: string): Promise<void> {
+  try {
+    await drainOutboxBestEffort({ reason });
+  } catch (err) {
+    console.error(
+      `inline email drain failed (${reason}; payment stays settled):`,
+      err instanceof Error ? err.message : "unknown",
+    );
+  }
+}
+
 function ackBody(trackingId: string, merchantRef: string, type: string): Response {
   return Response.json({
     orderNotificationType: type || "IPNCHANGE",
@@ -173,7 +193,7 @@ async function completeVoucherPayment(args: {
   // NOWHERE but this request's email bodies, so a buyer who does not hear
   // today holds an unusable code. Deliver inline, best-effort, and let the
   // cron cover whatever does not go out.
-  await drainOutboxBestEffort({ reason: "voucher" });
+  await drainSafely("voucher");
   if (!applied.issued && applied.first_completion) {
     // Should be impossible (unique payment_id) — but if it happens, the
     // payment is settled with no code, so shout rather than pretend.
@@ -292,10 +312,10 @@ async function handle(params: {
       // The emails are already durable (they were written inside the same
       // transaction as the payment). Delivering a few right here means the
       // guest hears about it within the webhook instead of at the next cron
-      // tick. Best-effort by design: a mail failure must never turn a settled
-      // payment into a 503, because the provider would retry an
-      // already-settled payment. Anything not delivered stays queued.
-      await drainOutboxBestEffort({ reason: `payment:${type}` });
+      // tick. Wrapped so a mail failure can NEVER reach the catch below: a 503
+      // here would tell the provider to retry an already-settled payment.
+      // Anything not delivered stays queued for the cron.
+      await drainSafely(`payment:${type}`);
       return ackBody(trackingId, merchantRef, type);
     }
 
