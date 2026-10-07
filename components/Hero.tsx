@@ -13,13 +13,13 @@ import { useReducedMotion } from "@/components/useReducedMotion";
 const HERO_CYCLE = "36s linear infinite";
 
 const FIRST_FRAME = {
-  src: "/images/hero-host-main-v1.jpg",
-  alt: "Queen Nalubaale welcoming visitors to the sanctuary",
+  src: "/images/hero-nature-wide-v1.jpg",
+  alt: "A wide vista of the sanctuary land and lake",
 };
 
 const LATER_FRAMES = [
-  { src: "/images/hero-nature-wide-v1.jpg", frame: 2 },
-  { src: "/images/hero-nature-forest-v1.jpg", frame: 3 },
+  { src: "/images/hero-nature-path.jpg", frame: 2 },
+  { src: "/images/hero-nature-roots.jpg", frame: 3 },
   { src: "/images/fire-night.jpg", frame: 4 },
 ] as const;
 
