@@ -15,6 +15,7 @@ import {
   voucherCodeHint,
 } from "@/lib/vouchers/code";
 import { prepareVoucherEmails } from "@/lib/vouchers/emails";
+import { drainOutboxBestEffort } from "@/lib/email/outbox";
 import type { PaymentRow } from "@/lib/db/types";
 import { verifyRemotePayment } from "@/lib/payments/state";
 import {
@@ -168,6 +169,11 @@ async function completeVoucherPayment(args: {
     // Duplicate delivery: the first attempt already issued the code.
     return;
   }
+  // A voucher is the case where waiting matters most: the raw code exists
+  // NOWHERE but this request's email bodies, so a buyer who does not hear
+  // today holds an unusable code. Deliver inline, best-effort, and let the
+  // cron cover whatever does not go out.
+  await drainOutboxBestEffort({ reason: "voucher" });
   if (!applied.issued && applied.first_completion) {
     // Should be impossible (unique payment_id) — but if it happens, the
     // payment is settled with no code, so shout rather than pretend.
@@ -185,10 +191,16 @@ async function completeVoucherPayment(args: {
  *
  * Completion happens in ONE database transaction that also queues the emails in
  * `email_outbox` — any failure rolls all of it back and returns 503 so the
- * provider retries. Nothing is sent from this request: a separate processor
- * delivers the queued mail, which is what makes "payment settled, guest never
- * told" impossible. A voucher purchase (no booking) takes its own path, where
- * the transaction issues the redeemable code.
+ * provider retries. The queue is durable before this request returns, so a
+ * crash here loses nothing.
+ *
+ * After a successful completion the request makes one **best-effort** attempt to
+ * deliver a few queued emails inline, so a guest hears about a settled payment
+ * (or a bought voucher code) within the webhook rather than at the next cron
+ * tick. It is best-effort in both directions: a mail failure never turns a
+ * settled payment into a 503, and nothing delivered inline is lost — the cron
+ * stays the safety net for whatever is left. A voucher purchase (no booking)
+ * takes its own path, where the transaction issues the redeemable code.
  * Always acks 200 when it understood the event.
  */
 async function handle(params: {
@@ -277,6 +289,13 @@ async function handle(params: {
       if (!applied.claimed) {
         return ackBody(trackingId, merchantRef, type); // duplicate delivery
       }
+      // The emails are already durable (they were written inside the same
+      // transaction as the payment). Delivering a few right here means the
+      // guest hears about it within the webhook instead of at the next cron
+      // tick. Best-effort by design: a mail failure must never turn a settled
+      // payment into a 503, because the provider would retry an
+      // already-settled payment. Anything not delivered stays queued.
+      await drainOutboxBestEffort({ reason: `payment:${type}` });
       return ackBody(trackingId, merchantRef, type);
     }
 

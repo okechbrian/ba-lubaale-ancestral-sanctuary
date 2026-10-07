@@ -53,12 +53,21 @@ class GmailSmtpSender implements EmailSender {
 
 let cached: EmailSender | null = null;
 
+/**
+ * Whether a real mail transport exists. Reads env directly rather than going
+ * through `getEmailSender`, whose sender is cached — callers that need to
+ * re-evaluate after changing env (tests, the inline outbox drain) must not be
+ * served a stale answer.
+ */
+export function isEmailTransportConfigured(): boolean {
+  return Boolean(process.env.SMTP_USER?.trim() && process.env.SMTP_PASS?.trim());
+}
+
 export function getEmailSender(): EmailSender {
   if (cached) return cached;
-  cached =
-    process.env.SMTP_USER && process.env.SMTP_PASS
-      ? new GmailSmtpSender()
-      : new UnavailableEmailSender();
+  cached = isEmailTransportConfigured()
+    ? new GmailSmtpSender()
+    : new UnavailableEmailSender();
   return cached;
 }
 
