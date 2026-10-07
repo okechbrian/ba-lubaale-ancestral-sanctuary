@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { prepareImageUpload } from "@/lib/cms/resize";
+import { uploadCmsImage, uploadErrorMessage } from "@/lib/cms/upload";
 
 type Obj = Record<string, unknown>;
 
@@ -114,30 +114,13 @@ function ImageField({
     setBusy(true);
     setUploadErr(null);
     try {
-      const prepared = await prepareImageUpload(f);
-      const fd = new FormData();
-      fd.append("file", prepared);
-      const res = await fetch("/api/admin/content/images", {
-        method: "POST",
-        body: fd,
-      });
-      const body = (await res.json().catch(() => ({}))) as { src?: string; error?: string };
-      if (res.ok && body.src) {
-        onUploaded(body.src);
-        onChange({ ...value, src: body.src });
+      const result = await uploadCmsImage(f);
+      if (result.ok) {
+        onUploaded(result.publicUrl);
+        onChange({ ...value, src: result.publicUrl });
       } else {
-        setUploadErr(
-          body.error === "file_too_large"
-            ? "That photo is too large (max 8 MB)."
-            : body.error === "unsupported_type"
-              ? "Unsupported format — use JPEG, PNG, WebP or AVIF."
-              : body.error === "database_not_configured"
-                ? "Database not configured — uploads are unavailable."
-                : `Upload failed (${body.error ?? res.status}).`,
-        );
+        setUploadErr(uploadErrorMessage(result.reason));
       }
-    } catch {
-      setUploadErr("Upload failed — check the photo and try again.");
     } finally {
       setBusy(false);
     }

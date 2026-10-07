@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { slugify } from "@/lib/growth/slug";
+import { uploadCmsImage, uploadErrorMessage } from "@/lib/cms/upload";
 
 export interface StoryDraft {
   id?: string;
@@ -53,23 +54,16 @@ export default function StoryEditor({ initial }: { initial?: StoryDraft }) {
     setUploading(true);
     setMsg(null);
     try {
-      const res = await fetch("/api/admin/content/images", {
-        method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-      const body = (await res.json().catch(() => ({}))) as {
-        url?: string;
-        error?: string;
-      };
-      if (!res.ok || !body.url) {
-        setMsg({ ok: false, text: `Upload failed (${body.error ?? res.status}).` });
+      const result = await uploadCmsImage(file);
+      if (!result.ok) {
+        setMsg({
+          ok: false,
+          text: uploadErrorMessage(result.reason),
+        });
         return;
       }
-      set("cover_image", body.url);
+      set("cover_image", result.publicUrl);
       setMsg({ ok: true, text: "Cover uploaded." });
-    } catch {
-      setMsg({ ok: false, text: "Upload failed — network error." });
     } finally {
       setUploading(false);
     }
