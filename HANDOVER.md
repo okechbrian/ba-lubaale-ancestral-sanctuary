@@ -319,6 +319,35 @@ deliberate, temporary decision, not for convenience.
 - **Turnstile** on `/apply`, `/api/vouchers`, `/api/group-inquiries`, verified
   **after** zod so a bad request never burns a single-use token; the honeypot is
   checked **before** zod so a bot never learns a field name.
+- **Raw HTML sinks — audited 2026-10-07, both safe.** There are exactly two
+  `dangerouslySetInnerHTML` in the source tree and neither is an injection
+  sink:
+  - `components/MomentsStrip.tsx:47` — a hardcoded `@keyframes` string injected
+    into a `<style>` tag. No user input reaches it.
+  - `app/stories/[slug]/page.tsx:77` — a `<script type="application/ld+json">`
+    carrying `JSON.stringify(jsonLd).replace(/</g, "\\u003c")`, the standard
+    defence against a `</script>` breakout.
+
+  The surfaces that *could* be injection vectors are all guarded. A story body
+  is never rendered as HTML: `app/stories/[slug]/page.tsx:110` splits on blank
+  lines into `<p>` text children, which React escapes, so a `<script>` typed
+  into a story renders as visible text. `components/InlineText.tsx:7`
+  allowlists `href` to `/` or `https://`, so `javascript:` degrades to literal
+  text. Emails are **plain text** — there is no HTML email builder at all. The
+  one `text/html` response (`lib/subscribe/link-page.ts:6`) escapes every
+  interpolation. There is no `innerHTML`, `eval` or `document.write` anywhere.
+
+  **No sanitiser dependency is installed, deliberately.** Do not add DOMPurify
+  or `sanitize-html` to "harden" these two sites: it would imply a
+  vulnerability that does not exist, add a server-side DOM requirement
+  (DOMPurify needs jsdom in Node), and obscure the real access model — RLS plus
+  a server-only service-role key. If a third raw-HTML sink is ever added,
+  sanitise *that* one and revisit this note.
+
+  **A previous audit reported both sites as "unsanitised owner HTML". That was
+  wrong.** It came from grepping for `dangerouslySetInnerHTML` and labelling
+  the matches without reading what was actually being injected. Recorded here
+  so nobody re-derives the same false positive.
 - **Voucher codes**: 128 bits CSPRNG, stored only as a SHA-256 digest; the body
   is redacted **in the database** by `mark_email_outbox_sent` once delivery is
   confirmed; `vouchers.payment_id` is unique, closing double-issue three ways.
