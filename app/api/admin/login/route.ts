@@ -8,6 +8,7 @@ import {
   adminLoginRequiresLimiter,
   checkRateLimit,
   rateLimitHeaders,
+  refundRateLimit,
 } from "@/lib/rate-limit";
 
 /** Constant-time-ish string compare (never logs or echoes credentials). */
@@ -84,6 +85,14 @@ export async function POST(request: Request): Promise<Response> {
       { status: 401, headers: rlHeaders },
     );
   }
+
+  // The attempt counter is charged before the password can be checked, so a
+  // successful login would otherwise spend one of the owner's five. Give that
+  // hit back: a success proves the password was known, which is exactly what
+  // the limit is not trying to stop. Nobody who is guessing can reach here.
+if (rl.consumed) {
+      await refundRateLimit({ name: "admin-login", ip: clientIp(request) });
+    }
 
   const token = await createSessionToken(secret);
   return Response.json(
