@@ -13,14 +13,14 @@ import { useReducedMotion } from "@/components/useReducedMotion";
 const HERO_CYCLE = "36s linear infinite";
 
 const FIRST_FRAME = {
-  src: "/images/hero-shore-gathering.jpg",
-  alt: "Women in rust bark-cloth dresses standing on the Lake Victoria shore",
+  src: "/images/hero-host-main.jpg",
+  alt: "Queen Nalubaale welcoming visitors to the sanctuary",
 };
 
 const LATER_FRAMES = [
-  { src: "/images/forest-lake-view.jpg", frame: 2 },
-  { src: "/images/fire-night.jpg", frame: 3 },
-  { src: "/images/closing-shore.jpg", frame: 4 },
+  { src: "/images/hero-nature-wide.jpg", frame: 2 },
+  { src: "/images/hero-nature-forest.jpg", frame: 3 },
+  { src: "/images/fire-night.jpg", frame: 4 },
 ] as const;
 
 export function Hero() {
@@ -76,7 +76,7 @@ export function Hero() {
             className="absolute inset-0 h-full w-full object-cover"
             style={{ animation: `heroFrame5 ${HERO_CYCLE}` }}
           >
-            <source src="/video/tortoise.mp4" type="video/mp4" />
+            <source src="/images/hero-herd-video.mp4" type="video/mp4" />
           </video>
         </>
       )}
