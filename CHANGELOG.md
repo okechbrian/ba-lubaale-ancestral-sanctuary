@@ -78,6 +78,38 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The admin login page told the owner their correct password was wrong.** The
+  limiter had locked them out — a correct-credential login returned
+  `429 {"error":"rate_limited","retry_after":716}` — and the page collapsed
+  every error that was not `admin_not_configured` into "Wrong username or
+  password.", discarding both the `Retry-After` header and the `retry_after`
+  field. So a *temporary* refusal was reported as a *permanent* one, and every
+  retry burned another of the five attempts, making the lockout worse. The
+  public intake forms (`VoucherBuyForm`, `GroupInquiryForm`) already
+  distinguished this case; the admin console was the odd one out.
+
+  `/admin/login` now says "Too many attempts from this device. Your credentials
+  are not the problem — try again in about N minutes", reads the real TTL from
+  Redis so the countdown tracks the actual window, locks the form for that
+  window instead of accepting clicks that each burn an attempt, unlocks itself
+  when the window closes, and warns at two remaining attempts. `429` is also
+  distinguished from the deliberate fail-closed `503`, which is now explained
+  rather than mistaken for bad typing.
+
+- **A successful login no longer spends the owner's rate-limit budget.** The
+  counter has to be charged before the password can be checked — you cannot
+  verify a guess without spending the attempt — so an owner who mistyped twice
+  and then typed it correctly had still used three of five, and one more stray
+  keystroke locked them out of their own console for fifteen minutes. The
+  counter was conflating *failures* with *attempts*, and only failures are what
+  the limit exists to stop. `refundRateLimit` now hands the hit back once the
+  correct credentials have been supplied; nobody who is guessing can reach that
+  path, so six wrong passwords in a row still lock the device out. `RateLimitDecision`
+  gained `consumed` so a caller can only ever refund a window its own request
+  actually charged, and the refund is best-effort by design — if Redis is
+  unreachable the hit simply stands, which is the fail-closed direction for a
+  security control.
+
 - **The merge gate told you to verify the wrong things.** `RELEASE_CHECKLIST.md`
   had drifted well behind the schema it was supposed to gate: it listed **five**
   migrations when there are nine, and told you to expect **7 rows** from a

@@ -186,10 +186,15 @@ fail-closed by design), and five fail-open intake limits were inert while
 reporting themselves as merely unconfigured.
 
 It survived a green suite because `tests/helpers/upstash-stub.ts` split the body
-on newlines — the stub encoded the **same wrong wire format as the code under
+on newlines - the stub encoded the **same wrong wire format as the code under
 test**, so nothing ever disagreed with anything. The stub now rejects non-JSON
 exactly as Upstash does, and `tests/rate-limit.test.ts` pins the endpoint,
 content type and body shape. Reverting the fix turns six tests red.
+
+The same trap bit again on 2026-10-07: the refund primitive needed `DECR`, the
+stub did not implement it, and three tests failed in a way that looked like a
+code bug and was actually a stub gap. Whenever new Redis commands are used,
+extend the stub in the same commit.
 
 Lesson worth keeping: a stub that reimplements a remote API from memory is a
 test that can only ever confirm the code matches the stub.
@@ -231,7 +236,45 @@ Upstash rather than hardcoded.
 
 ---
 
-## 8. Gotchas learned the hard way
+## 8. Locked out of /admin? Read this first
+
+If the login form says **"Too many attempts from this device"** with a
+countdown, nothing is wrong with your password — the brute-force limiter is
+doing its job (5 attempts / 15 minutes, keyed on client IP). Wait for the
+countdown; the form disables itself and re-enables when the window closes.
+
+**A successful login no longer counts against the budget** (fixed 2026-10-07),
+so ordinary typos can no longer lock you out. If you *are* locked out with the
+correct password, something is genuinely wrong and worth checking:
+
+```
+# What the server actually says (one attempt, headers included)
+curl -s -i -X POST https://ba-lubaale-ancestral-sanctuary.vercel.app/api/admin/login `
+  -H "Content-Type: application/json" -d '{"username":"...","password":"..."}'
+```
+
+| Status | Meaning |
+|---|---|
+| `200 {"ok":true}` | Credentials are fine. Anything else you saw was a UI problem. |
+| `401 invalid_credentials` | Username or password genuinely wrong. `x-ratelimit-remaining` shows how many attempts are left. |
+| `429 rate_limited` | Temporary lockout. `retry_after` is the seconds remaining, read from Redis. |
+| `503 rate_limiter_unavailable` | Upstash is unreachable. Deliberate: the console refuses to open unprotected. Check `UPSTASH_REDIS_REST_*`. |
+| `503 admin_not_configured` | `ADMIN_USERNAME` / `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` missing in that environment. |
+
+To clear a lockout immediately without waiting, delete the counter key for
+your IP (the key is `rl:admin-login:<your-ip>`), e.g. via the Upstash console:
+
+```
+DEL rl:admin-login:<your-public-ip>
+```
+
+Never raise `ALLOW_UNTHROTTLED_ADMIN` to get unstuck — it disables brute-force
+protection for the whole console, and the escape hatch exists for a
+deliberate, temporary decision, not for convenience.
+
+---
+
+## 9. Gotchas learned the hard way
 
 - **`vercel env pull` writes a live `VERCEL_OIDC_TOKEN` into the target file.**
   Delete it immediately after reading. Same for anything else it dumps.
@@ -262,7 +305,7 @@ Upstash rather than hardcoded.
 
 ---
 
-## 9. Security decisions worth preserving
+## 10. Security decisions worth preserving
 
 - **Client IP** (`lib/client-ip.ts`): `cf-connecting-ip` trusted **only** under
   `TRUST_CLOUDFLARE_IP=1`; else `x-vercel-forwarded-for`, then the **rightmost**

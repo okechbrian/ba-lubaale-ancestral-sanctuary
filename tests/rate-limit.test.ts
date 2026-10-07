@@ -95,6 +95,8 @@ describe("checkRateLimit — missing config disables loudly", () => {
       limit: 3,
       remaining: null,
       retryAfterSec: null,
+      // Nothing was charged, so a caller must not refund this decision.
+      consumed: false,
     });
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining("REFUSING traffic"),
@@ -317,6 +319,7 @@ describe("rateLimitHeaders", () => {
       limit: 5,
       remaining: null,
       retryAfterSec: null,
+      consumed: false,
     });
     expect(disabled).toEqual({
       "x-ratelimit-mode": "disabled-missing-config",

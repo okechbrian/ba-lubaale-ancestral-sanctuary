@@ -51,6 +51,19 @@ export async function startUpstashStub(
         e.n += 1;
         return { result: e.n };
       }
+      case "DECR": {
+        // Real Redis semantics, including the one that matters for a refund:
+        // DECR on a missing key CREATES it at -1 rather than erroring. Callers
+        // must cope with that, which is why refundRateLimit cleans up after a
+        // refund that goes negative.
+        let e = entry(parts[1]);
+        if (!e) {
+          e = { n: 0, expiresAt: null };
+          counters.set(parts[1], e);
+        }
+        e.n -= 1;
+        return { result: e.n };
+      }
       case "EXPIRE": {
         if (failExpire) return { error: "ERR unsupported option" };
         const e = entry(parts[1]);

@@ -29,12 +29,19 @@ export type RateLimitMode =
   | "fail-closed";
 
 export interface RateLimitDecision {
-  allowed: boolean;
-  mode: RateLimitMode;
-  limit: number;
-  remaining: number | null;
-  retryAfterSec: number | null;
-}
+allowed: boolean;
+    mode: RateLimitMode;
+    limit: number;
+    remaining: number | null;
+    retryAfterSec: number | null;
+    /**
+     * True when this call actually incremented the counter against Redis, so a
+     * caller that goes on to *succeed* can hand the hit back with
+     * `refundRateLimit`. False in every mode that short-circuits before the
+     * INCR (no config, backend error), where there is nothing to refund.
+     */
+    consumed: boolean;
+  }
 
 export interface RateLimitOptions {
   /** Bucket namespace, unique per endpoint (part of the Redis key). */
@@ -184,6 +191,7 @@ export async function checkRateLimit(
         limit: opts.limit,
         remaining: null,
         retryAfterSec: null,
+        consumed: false,
       };
     }
     warnOnce(
@@ -194,11 +202,12 @@ export async function checkRateLimit(
     );
     return {
       allowed: true,
-      mode: "disabled-missing-config",
-      limit: opts.limit,
-      remaining: null,
-      retryAfterSec: null,
-    };
+mode: "disabled-missing-config",
+        limit: opts.limit,
+        remaining: null,
+        retryAfterSec: null,
+        consumed: false,
+      };
   }
 
   const key = `rl:${opts.name}:${sanitizeIp(opts.ip)}`;
@@ -234,16 +243,19 @@ export async function checkRateLimit(
         limit: opts.limit,
         remaining: 0,
         retryAfterSec,
+        // The INCR ran before the denial, so this hit is on the counter.
+        consumed: true,
       };
     }
 
     return {
       allowed: true,
-      mode: "enabled",
-      limit: opts.limit,
-      remaining: Math.max(0, opts.limit - n),
-      retryAfterSec: null,
-    };
+mode: "enabled",
+        limit: opts.limit,
+        remaining: Math.max(0, opts.limit - n),
+        retryAfterSec: null,
+        consumed: true,
+      };
   } catch (err) {
     console.error(
       `[rate-limit] ${opts.name} backend error ` +
@@ -257,15 +269,73 @@ export async function checkRateLimit(
         limit: opts.limit,
         remaining: null,
         retryAfterSec: null,
+        consumed: false,
       };
     }
     return {
       allowed: false,
-      mode: "fail-closed",
-      limit: opts.limit,
-      remaining: null,
-      retryAfterSec: null,
-    };
+        mode: "fail-closed",
+        limit: opts.limit,
+        remaining: null,
+        retryAfterSec: null,
+        consumed: false,
+      };
+  }
+}
+
+/**
+ * Hand one hit back after a request *succeeded*.
+ *
+ * The limiter has to count an attempt before it knows whether the request will
+ * be allowed through — you cannot check a password without spending a check.
+ * On a login form that means a real owner who mistypes twice and then types it
+ * correctly has still spent three of five attempts, and a fifth stray keystroke
+ * locks the owner out of their own console for a quarter of an hour. The page
+ * then has to explain that lockout, which it did not, so the owner was told
+ * their correct password was wrong.
+ *
+ * Refunding on success separates the two things the counter was conflating:
+ * **failures** are what the limit exists to stop, and a success proves the
+ * password was known. An attacker gets no refund, because a refund only happens
+ * once the correct credentials have already been supplied.
+ *
+ * Best effort by design: if Redis is unreachable the hit simply stands, which
+ * is the fail-closed direction for a security control.
+ *
+ * Only call this when the matching `checkRateLimit` reported
+ * `consumed: true`, so it can never decrement a window this request did not
+ * touch.
+ */
+export async function refundRateLimit(opts: {
+  name: string;
+  ip: string;
+}): Promise<void> {
+  const cfg = redisConfig();
+  if (!cfg) return;
+  const key = `rl:${opts.name}:${sanitizeIp(opts.ip)}`;
+  try {
+    const json = await upstash(cfg, [["DECR", key]]);
+    const entry = entriesOf(json)[0];
+    if (entry?.error) {
+      // A command-level rejection is not an HTTP failure, so it does not throw
+      // above. Surfacing it keeps a silent no-op from looking like a working
+      // refund — the failure mode that made this whole incident hard to read.
+      throw new Error(`decr: ${entry.error}`);
+    }
+    const after = asNumber(entry?.result);
+    // The window can expire between the charge and the refund. DECR would then
+    // create the key at -1, so drop it rather than leave a bucket that reads
+    // one attempt *under* zero — the failure mode here is a slightly lenient
+    // counter, never a lockout.
+    if (after !== null && after < 0) {
+      await upstash(cfg, [["DEL", key]]);
+    }
+  } catch (err) {
+    console.error(
+      `[rate-limit] ${opts.name} refund failed (${
+        err instanceof Error ? err.message : "unknown"
+      }) — the hit stands, which is the safe direction.`,
+    );
   }
 }
 
