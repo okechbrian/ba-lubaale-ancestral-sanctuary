@@ -43,6 +43,14 @@ const booking: BookingRow = {
   status: "approved",
   amount_usd: "4500",
   approved_at: "2027-01-02T00:00:00Z",
+  cancelled_at: null,
+  refund_note: null,
+  payment_due_at: null,
+  balance_due_date: null,
+  balance_reminder_7d_sent: false,
+  balance_reminder_1d_sent: false,
+  redeemed_voucher_id: null,
+  voucher_credit_usd: null,
 };
 
 describe("howToPrepareGuest — built from the SAME content as /prepare", () => {

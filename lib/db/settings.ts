@@ -30,6 +30,8 @@ export const settingsValueSchema = z.object({
     )
     .max(12, "At most 12 voucher amounts")
     .optional(),
+  // Days an "approved" booking is held while awaiting the deposit.
+  hold_days: z.number().int().min(1).max(60).optional(),
 });
 
 type SettingsRows = { key: string; value: unknown }[];
@@ -49,6 +51,7 @@ function fromRows(rows: SettingsRows): Settings {
     depositPercent: v.deposit_percent ?? DEFAULT_SETTINGS.depositPercent,
     ugxRate: v.ugx_rate ?? DEFAULT_SETTINGS.ugxRate,
     voucherAmountsUsd: v.voucher_amounts_usd ?? DEFAULT_SETTINGS.voucherAmountsUsd,
+    holdDays: v.hold_days ?? DEFAULT_SETTINGS.holdDays,
   };
 }
 
@@ -85,6 +88,8 @@ export async function saveSettings(
     const cleaned = [...new Set(parsed.voucher_amounts_usd)].sort((a, b) => a - b);
     rows.push({ key: "voucher_amounts_usd", value: cleaned });
   }
+  if (parsed.hold_days !== undefined)
+    rows.push({ key: "hold_days", value: parsed.hold_days });
   if (rows.length === 0) return;
   const { error } = await db.from("settings").upsert(rows, { onConflict: "key" });
   if (error) throw new Error(`saveSettings failed: ${error.message}`);

@@ -1,6 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import {
   CRON_PATH,
   DEFAULT_SCHEDULE,
@@ -26,7 +24,6 @@ import vercelConfig from "../vercel.json";
  * verified rather than asserted in prose.
  */
 const vercelJson = vercelConfig as { crons?: { path: string; schedule: string }[] };
-const raw = readFileSync(join(process.cwd(), "vercel.json"), "utf8");
 
 describe("schedule decision", () => {
   it("defaults to the daily schedule, which is valid on every plan", () => {

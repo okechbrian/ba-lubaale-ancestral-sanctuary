@@ -1,11 +1,18 @@
-export type BookingStatus = "pending" | "approved" | "declined" | "paid";
+export type BookingStatus =
+  | "pending"
+  | "approved"
+  | "declined"
+  | "paid"
+  | "cancelled"
+  | "completed";
 export type PaymentKind = "deposit" | "balance";
 export type PaymentStatus =
   | "pending"
   | "initiated"
   | "completed"
   | "failed"
-  | "cancelled";
+  | "cancelled"
+  | "refunded";
 export type PartyType = "solo" | "couple" | "family" | "buyout";
 export type StaySlug = "essential" | "master" | "buyout";
 
@@ -33,6 +40,17 @@ export interface BookingRow {
   status: BookingStatus;
   amount_usd: string | null; // numeric comes back as string
   approved_at: string | null;
+  cancelled_at: string | null;
+  refund_note: string | null;
+  /** (b) When the guest must pay the deposit by before the hold is released. */
+  payment_due_at: string | null;
+  /** (c) Date the balance is due — defaults to the arrival date. */
+  balance_due_date: string | null;
+  balance_reminder_7d_sent: boolean;
+  balance_reminder_1d_sent: boolean;
+  /** (d) Voucher redeemed against this booking, if any. */
+  redeemed_voucher_id: string | null;
+  voucher_credit_usd: string | null;
 }
 
 export interface PaymentRow {
@@ -174,4 +192,6 @@ export interface Settings {
    * site never invents a price.
    */
   voucherAmountsUsd: number[];
+  /** (b) Days an "approved" booking is held while awaiting the deposit. */
+  holdDays: number;
 }

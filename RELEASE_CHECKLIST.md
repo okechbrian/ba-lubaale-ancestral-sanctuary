@@ -56,7 +56,7 @@ Rules that mattered, for the next stack:
 
 - [ ] Hosted Supabase project exists; region and project ref recorded here:
       `ref: ______  region: ______`
-- [ ] **All nine migrations applied, in order.** Order is load-bearing, not
+- [ ] **All ten migrations applied, in order.** Order is load-bearing, not
       cosmetic: `…00003` creates a **4-argument** `apply_payment_completion`
       and `…00005` drops exactly that signature for a 5-argument one. Out of
       order, Postgres keeps both and every `.rpc()` call becomes an ambiguous
@@ -73,6 +73,7 @@ Rules that mattered, for the next stack:
   | 7 | `20261002000006_vouchers.sql` | `voucher_requests`, `vouchers`, `payments.subject_kind`, `apply_voucher_completion`, `redeem_voucher` |
   | 8 | `20261002000007_growth_pages.sql` | `stories`, `group_inquiries` |
   | 9 | `20261002000008_voucher_hardening.sql` | `mark_email_outbox_sent` (redacts delivered voucher bodies in the DB), `create_voucher_purchase`, `voucher_request_for_payment` |
+  | 10 | `20261008000000_booking_lifecycle.sql` | `bookings.cancelled_at`/`refund_note`/`payment_due_at`/`balance_due_date`/reminder flags`, `bookings.redeemed_voucher_id`/`voucher_credit_usd`, `'cancelled'`/`'completed'` booking statuses, `'refunded'` payment status, `redeem_voucher_and_credit` |
 
 - [ ] Verified by running the checks below against the hosted project and
       pasting the output into the PR. Each `-- expect` line is the assertion.
@@ -98,14 +99,15 @@ select c.relname as table_name,
  where n.nspname = 'public' and c.relkind = 'r'
  order by c.relname;
 
--- 3. The eight app RPCs. expect exactly 8 rows.
+-- 3. The nine app RPCs. expect exactly 9 rows.
 select proname from pg_proc
   join pg_namespace n on n.oid = pronamespace
  where n.nspname = 'public'
    and proname in ('apply_payment_completion','apply_voucher_completion',
                    'claim_email_outbox','create_voucher_purchase',
                    'mark_email_outbox_sent','redeem_voucher',
-                   'requeue_email_outbox','voucher_request_for_payment')
+                   'redeem_voucher_and_credit','requeue_email_outbox',
+                   'voucher_request_for_payment')
  order by proname;
 
 -- 4. THE TRAP: apply_payment_completion must exist exactly once, in its
@@ -158,7 +160,7 @@ select
   `apply_migration` *does* write `supabase_migrations.schema_migrations`, but it
   stamps each row with its **own wall-clock version** (e.g. `20261005152716`),
   not the migration filename. A ledger full of those matches none of the repo
-  filenames, so check #8 above reports nine pending migrations and a later
+  filenames, so check #8 above reports ten pending migrations and a later
   `supabase db push` tries to re-apply all of them, failing on
   `type already exists` / `column already exists`. After applying via MCP,
   repoint the ledger rows at the filename versions, then re-run check #8 until

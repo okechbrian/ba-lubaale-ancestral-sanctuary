@@ -78,7 +78,14 @@ export function isOverlapViolation(error: {
 export async function updateBookingStatus(
   id: string,
   status: BookingStatus,
-  extra: { amount_usd?: number; approved_at?: string } = {},
+  extra: {
+    amount_usd?: number;
+    approved_at?: string;
+    cancelled_at?: string;
+    refund_note?: string | null;
+    payment_due_at?: string;
+    balance_due_date?: string;
+  } = {},
 ): Promise<BookingRow> {
   const db = getDb();
   const patch: Record<string, unknown> = {
@@ -108,6 +115,49 @@ export async function getActiveRanges(): Promise<DateRange[]> {
     .in("status", ["approved", "paid"]);
   if (error) throw new Error(`getActiveRanges failed: ${error.message}`);
   return (data ?? []) as DateRange[];
+}
+
+/** Approved stays whose deposit hold has expired without payment. */
+export async function listExpiredHoldApprovals(
+  now: Date = new Date(),
+): Promise<BookingRow[]> {
+  const db = getDb();
+  const { data, error } = await db
+    .from("bookings")
+    .select("*")
+    .eq("status", "approved")
+    .lt("payment_due_at", now.toISOString())
+    .order("payment_due_at", { ascending: true });
+  if (error) throw new Error(`listExpiredHoldApprovals failed: ${error.message}`);
+  return (data ?? []) as BookingRow[];
+}
+
+/** Cancel a booking and record why (a refund note when the deposit changes hands). */
+export async function cancelBooking(
+  id: string,
+  refundNote: string | null,
+): Promise<BookingRow> {
+  return updateBookingStatus(id, "cancelled", {
+    cancelled_at: new Date().toISOString(),
+    refund_note: refundNote,
+  });
+}
+
+/** Flip the reminder flag once a reminder email is queued, so it never repeats. */
+export async function markBalanceReminderSent(
+  id: string,
+  daysLeft: 7 | 1,
+): Promise<void> {
+  const patch =
+    daysLeft === 7
+      ? { balance_reminder_7d_sent: true }
+      : { balance_reminder_1d_sent: true };
+  const db = getDb();
+  const { error } = await db
+    .from("bookings")
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw new Error(`markBalanceReminderSent failed: ${error.message}`);
 }
 
 /** Name + email for a set of bookings, keyed by id (admin payment listing). */

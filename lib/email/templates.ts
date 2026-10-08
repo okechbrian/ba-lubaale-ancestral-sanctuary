@@ -451,3 +451,52 @@ export function voucherSoldOwner(v: {
     ].join("\n"),
   };
 }
+
+/** (b) Deposit hold expired: the stay is released; the guest gets a fair, honest note. */
+export function holdReleasedGuest(
+  booking: BookingRow,
+): { subject: string; text: string } {
+  return {
+    subject: `Your dates have been released (${booking.check_in} to ${booking.check_out})`,
+    text: [
+      `Hello ${booking.name},`,
+      "",
+      "We approved your request but had not heard about the deposit by the hold",
+      "deadline, so we have released those dates for another family.",
+      "",
+      `The dates you asked for (${booking.check_in} to ${booking.check_out}) are`,
+      "no longer reserved. Nothing has been charged.",
+      "",
+      "If you still want to come, please re-apply and we will try to make it",
+      `work: ${SITE()}/apply.`,
+      "",
+      "With care,",
+      "Queen Nalubaale",
+      "Ba Lubaale Ancestral Sanctuary",
+    ].join("\n"),
+  };
+}
+
+/** (c) Balance reminder before arrival. `daysLeft` is 7 or 1. */
+export function balanceReminderGuest(
+  booking: BookingRow,
+  daysLeft: number,
+): { subject: string; text: string } {
+  return {
+    subject: `Your balance is coming due (${booking.check_in} to ${booking.check_out})`,
+    text: [
+      `Hello ${booking.name},`,
+      "",
+      `A gentle reminder: the remaining balance for your stay is due ${
+        daysLeft === 1 ? "tomorrow" : `in ${daysLeft} days`
+      }, before your arrival on ${booking.check_in}.`,
+      "",
+      `If you have already paid the balance, please ignore this note. If your`,
+      `arrival plans have changed, please reply or write to us at ${SITE()}.`,
+      "",
+      "With care,",
+      "Queen Nalubaale",
+      "Ba Lubaale Ancestral Sanctuary",
+    ].join("\n"),
+  };
+}
