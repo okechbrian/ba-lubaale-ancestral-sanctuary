@@ -22,6 +22,7 @@ function fieldsFrom(settings: Settings): NumField[] {
     { name: "buyout.maxGuests", label: "Buyout max guests", value: p.buyout.maxGuests },
     { name: "depositPercent", label: "Deposit percent (%)", value: settings.depositPercent },
     { name: "ugxRate", label: "UGX per 1 USD", value: settings.ugxRate },
+    { name: "holdDays", label: "Hold days (approved, awaiting deposit)", value: settings.holdDays },
   ];
 }
 
@@ -60,6 +61,7 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
         },
         deposit_percent: num("depositPercent"),
         ugx_rate: num("ugxRate"),
+        hold_days: num("holdDays"),
       },
     };
     if (Object.values(values).some((v) => !Number.isFinite(Number(v)) || Number(v) <= 0)) {

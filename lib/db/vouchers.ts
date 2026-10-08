@@ -203,7 +203,10 @@ export async function redeemVoucherByCode(
   }
 
   const db = getDb();
-  const { data, error } = await db.rpc("redeem_voucher", {
+  // (d) Redeem AND credit the booking in ONE transaction — see the
+  // redeem_voucher_and_credit function. The admin cannot separate "mark it
+  // used" from "record the credit".
+  const { data, error } = await db.rpc("redeem_voucher_and_credit", {
     p_id: voucher.id,
     p_booking_id: bookingId,
   });

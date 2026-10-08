@@ -13,17 +13,17 @@ export default function BookingActions({
   paymentsConfigured: boolean;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = useState<"approve" | "decline" | null>(null);
+  const [busy, setBusy] = useState<"approve" | "decline" | "cancel" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function act(action: "approve" | "decline") {
+  async function act(action: "approve" | "decline" | "cancel", note?: string) {
     setBusy(action);
     setError(null);
     try {
       const res = await fetch(`/api/admin/bookings/${id}/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, ...(note ? { note } : {}) }),
       });
       if (res.ok) {
         router.refresh();
@@ -53,10 +53,35 @@ export default function BookingActions({
     }
   }
 
+  if (status === "approved" || status === "paid") {
+    return (
+      <div className="space-y-2">
+        <button
+          onClick={() => {
+            const note = window.prompt(
+              "Cancel this booking. Refunds stay manual in Pesapal — what note should be recorded for the guest?",
+            );
+            if (!note) return;
+            void act("cancel", note);
+          }}
+          disabled={busy !== null}
+          className="rounded-md border border-ember/50 px-6 py-2.5 text-sm font-semibold text-ember hover:bg-ember/5 disabled:opacity-60"
+        >
+          {busy === "cancel" ? "Cancelling..." : "Cancel this booking"}
+        </button>
+        <p className="text-xs text-ink/50">
+          Cancelling frees the dates. Any refund is handled manually in
+          Pesapal; the note you enter is recorded on the booking.
+        </p>
+        {error && <p className="text-sm text-ember">{error}</p>}
+      </div>
+    );
+  }
+
   if (status !== "pending") {
     return (
       <p className="text-sm text-ink/60">
-        This request is <strong className="text-ink">{status}</strong> — no
+        This request is <strong className="text-ink">{status}</strong> - no
         further action.
       </p>
     );

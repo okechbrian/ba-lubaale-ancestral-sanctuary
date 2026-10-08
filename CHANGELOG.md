@@ -7,6 +7,35 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Booking lifecycle.** Bookings now age through the same kinds of states you
+  would write on a paper ledger, and a cron keeps them honest:
+  - **(a) Cancelled / completed stays + refund note.** Admin can cancel an
+    `approved` or `paid` booking; cancelling moves it to `cancelled` (which
+    *frees the window*, because `cancelled` is not in the
+    `bookings_no_overlap` guard) and records a required refund note. Pesapal
+    refunds stay manual - the note says what was promised. Past stays settle
+    to `completed`.
+  - **(b) Deposit hold that expires.** Approval stamps `payment_due_at = now +
+    hold_days` (owner-tunable in `/admin/settings`, default 3 days). The
+    `/api/cron/booking-lifecycle` cron emails the guest first, then cancels
+    any booking whose hold expired unpaid; the window opens again immediately.
+    A booking with a *completed* deposit is never released, it is reconciled
+    to `paid`.
+  - **(c) Balance reminders before arrival.** Approved-then-funded bookings
+    get `balance_due_date` (defaults to arrival) and two reminders via the
+    email outbox: a 7-day and a 1-day nudge for the balance, each behind its
+    own flag so a missed cron run never spams the guest.
+  - **(d) Voucher redemption debits the booking.** `redeem_voucher_and_credit`
+    marks the voucher used and credits its value to `bookings.voucher_credit_usd`
+    in one transaction; the booking's `amount_usd` is reduced accordingly, and
+    re-running redemption is a no-op.
+  - `payment_status` accepts `refunded`; admin-facing `/admin/bookings/[id]`
+    shows the hold deadline, balance due date, refund note and voucher credit.
+  - `tests/booking-lifecycle-integrity.test.ts` (7 tests) exercises the cron,
+    the admin cancel route, the voucher debit RPC and the settings default
+    against real local Supabase.
+  - One new migration: `20261008000000_booking_lifecycle.sql`.
+
 - **Payment reconciliation.** A guest who pays but whose IPN never reaches us
   (provider outage, a deploy, a dropped webhook) used to leave a payment
   `initiated` forever with nobody told. Now `GET|POST /api/cron/payment-reconcile`

@@ -12,6 +12,8 @@ export const DEFAULT_SETTINGS: Settings = {
   // Vouchers are off until the owner lists the amounts they want to sell. The
   // site must never invent a voucher price.
   voucherAmountsUsd: [],
+  /** (b) Days an "approved" booking is held while awaiting the deposit. */
+  holdDays: 3,
 };
 
 /** Voucher price lookup: only amounts the owner actually configured. */

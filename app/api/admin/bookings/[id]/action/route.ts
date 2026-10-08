@@ -2,6 +2,7 @@ import { isAdminRequest } from "@/lib/admin/session";
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
 import {
   OverlappingBookingError,
+  cancelBooking,
   getBooking,
   updateBookingStatus,
 } from "@/lib/db/bookings";
@@ -36,13 +37,13 @@ export async function POST(request: Request, ctx: Ctx): Promise<Response> {
   }
 
   const { id } = await ctx.params;
-  let body: { action?: string };
+  let body: { action?: string; note?: string };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "invalid_json" }, { status: 400 });
   }
-  if (body.action !== "approve" && body.action !== "decline") {
+  if (!["approve", "decline", "cancel"].includes(body.action ?? "")) {
     return Response.json({ error: "invalid_action" }, { status: 400 });
   }
   if (body.action === "approve" && !isPesapalConfigured()) {
@@ -54,6 +55,28 @@ export async function POST(request: Request, ctx: Ctx): Promise<Response> {
   try {
     const booking = await getBooking(id);
     if (!booking) return Response.json({ error: "not_found" }, { status: 404 });
+    if (body.action === "cancel") {
+      // (a) Cancelling a confirmed stay frees the window: 'cancelled' is not in
+      // the bookings_no_overlap whitelist, so the constraint drops the range.
+      if (booking.status !== "approved" && booking.status !== "paid") {
+        return Response.json(
+          { error: "invalid_transition", status: booking.status },
+          { status: 409 },
+        );
+      }
+      const note =
+        typeof body.note === "string" && body.note.trim().length > 0
+          ? body.note.trim()
+          : "Cancelled by the sanctuary.";
+      const cancelled = await cancelBooking(id, note);
+      return Response.json({
+        ok: true,
+        status: "cancelled",
+        refund_note: note,
+        booking_id: id,
+        cancelled_at: cancelled.cancelled_at,
+      });
+    }
     if (booking.status !== "pending") {
       return Response.json(
         { error: "invalid_transition", status: booking.status },
@@ -91,6 +114,14 @@ export async function POST(request: Request, ctx: Ctx): Promise<Response> {
       const updated = await updateBookingStatus(id, "approved", {
         amount_usd: totalUsd,
         approved_at: new Date().toISOString(),
+        // (b) Hold the dates for the owner-configured window, then the lifecycle
+        // cron releases them if no deposit arrives. Only fixed on this write;
+        // the hold clock starts when the guest is told their request passed.
+        payment_due_at: new Date(
+          Date.now() + settings.holdDays * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        // (c) Balance is due on arrival unless the booking says otherwise.
+        balance_due_date: booking.check_in,
       });
       const email = bookingApprovedGuest(
         updated,

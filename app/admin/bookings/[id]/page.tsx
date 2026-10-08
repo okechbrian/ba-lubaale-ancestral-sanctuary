@@ -95,6 +95,30 @@ export default async function AdminBookingDetailPage({
             value={booking.approved_at.replace("T", " ").slice(0, 16)}
           />
         )}
+        {booking.payment_due_at && (
+          <Row
+            label="Deposit due by"
+            value={booking.payment_due_at.replace("T", " ").slice(0, 16)}
+          />
+        )}
+        {booking.balance_due_date && (
+          <Row label="Balance due date" value={booking.balance_due_date} />
+        )}
+        {booking.redeemed_voucher_id && (
+          <Row
+            label="Voucher credit"
+            value={`$${Number(booking.voucher_credit_usd ?? 0).toLocaleString("en-US")} USD`}
+          />
+        )}
+        {booking.cancelled_at && (
+          <>
+            <Row
+              label="Cancelled"
+              value={booking.cancelled_at.replace("T", " ").slice(0, 16)}
+            />
+            <Row label="Refund note" value={booking.refund_note} />
+          </>
+        )}
       </dl>
 
       <PaymentAdmin
