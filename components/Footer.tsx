@@ -8,10 +8,8 @@ export function Footer() {
 
   return (
     <footer className="border-t border-mist/40 bg-dusk text-cream">
-      {/* Top blessing & navigation section */}
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-12">
-          {/* Brand + blessing (4 cols) */}
           <div className="lg:col-span-4 space-y-4">
             <Link
               href="/"
@@ -44,153 +42,47 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Links grid (8 cols) */}
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8">
-            {/* The Sanctuary */}
             <div>
               <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
                 The Sanctuary
               </p>
               <ul className="mt-4 space-y-2.5">
-                <li>
-                  <Link
-                    href="/the-land"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    The Land
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/the-cave"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    The Cave
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/the-host"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    Queen Nalubaale
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/atelier"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    The Atelier
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/stories"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    Stories from the House
-                  </Link>
-                </li>
+                <li><Link href="/the-land" className="text-sm text-cream/70 transition-colors hover:text-leaf">The Land</Link></li>
+                <li><Link href="/the-cave" className="text-sm text-cream/70 transition-colors hover:text-leaf">The Cave</Link></li>
+                <li><Link href="/the-host" className="text-sm text-cream/70 transition-colors hover:text-leaf">Queen Nalubaale</Link></li>
+                <li><Link href="/atelier" className="text-sm text-cream/70 transition-colors hover:text-leaf">The Atelier</Link></li>
+                <li><Link href="/stories" className="text-sm text-cream/70 transition-colors hover:text-leaf">Stories from the House</Link></li>
               </ul>
             </div>
-
-            {/* Experiences & Offerings */}
             <div>
               <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
                 Experiences
               </p>
               <ul className="mt-4 space-y-2.5">
-                <li>
-                  <Link
-                    href="/immersions"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    Immersions (Retreats)
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/practices"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    Day Practices
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/for-groups"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    For Groups & Delegations
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/vouchers"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    Gift Vouchers
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/apply"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    Apply for a Stay
-                  </Link>
-                </li>
+                <li><Link href="/immersions" className="text-sm text-cream/70 transition-colors hover:text-leaf">Immersions (Retreats)</Link></li>
+                <li><Link href="/practices" className="text-sm text-cream/70 transition-colors hover:text-leaf">Day Practices</Link></li>
+                <li><Link href="/for-groups" className="text-sm text-cream/70 transition-colors hover:text-leaf">For Groups & Delegations</Link></li>
+                <li><Link href="/vouchers" className="text-sm text-cream/70 transition-colors hover:text-leaf">Gift Vouchers</Link></li>
+                <li><Link href="/apply" className="text-sm text-cream/70 transition-colors hover:text-leaf">Apply for a Stay</Link></li>
               </ul>
             </div>
-
-            {/* Journey & Care */}
             <div>
               <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
                 Plan Your Visit
               </p>
               <ul className="mt-4 space-y-2.5">
-                <li>
-                  <Link
-                    href="/arrive"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    How to Arrive
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/prepare"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    How to Prepare
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/faq"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    Questions & FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/policies"
-                    className="text-sm text-cream/70 transition-colors hover:text-leaf"
-                  >
-                    Sanctuary Policies
-                  </Link>
-                </li>
+                <li><Link href="/arrive" className="text-sm text-cream/70 transition-colors hover:text-leaf">How to Arrive</Link></li>
+                <li><Link href="/prepare" className="text-sm text-cream/70 transition-colors hover:text-leaf">How to Prepare</Link></li>
+                <li><Link href="/faq" className="text-sm text-cream/70 transition-colors hover:text-leaf">Questions & FAQ</Link></li>
+                <li><Link href="/policies" className="text-sm text-cream/70 transition-colors hover:text-leaf">Sanctuary Policies</Link></li>
               </ul>
             </div>
           </div>
         </div>
 
-        {/* Teachings & Direct Contact Banner */}
         <div className="mt-14 border-t border-cream/15 pt-10">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 items-start">
-            {/* Teachings */}
             <div className="lg:col-span-2">
               <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
                 Hear Her Teachings
@@ -218,8 +110,6 @@ export function Footer() {
                 </a>
               </div>
             </div>
-
-            {/* Direct Contact */}
             <div>
               <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
                 Direct Contact
@@ -227,22 +117,14 @@ export function Footer() {
               <ul className="mt-3 space-y-2 text-sm text-cream/75">
                 <li>
                   <span className="text-bark-soft">Email:</span>{" "}
-                  <a
-                    href={`mailto:${site.contact.email}`}
-                    className="transition-colors hover:text-leaf underline decoration-cream/30"
-                  >
+                  <a href={`mailto:${site.contact.email}`} className="transition-colors hover:text-leaf underline decoration-cream/30">
                     {site.contact.email}
                   </a>
                 </li>
                 <li>
                   <span className="text-bark-soft">WhatsApp:</span>{" "}
                   {site.contact.whatsapp ? (
-                    <a
-                      href={`https://wa.me/${site.contact.whatsapp}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition-colors hover:text-leaf"
-                    >
+                    <a href={`https://wa.me/${site.contact.whatsapp}`} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-leaf">
                       {site.contact.whatsapp}
                     </a>
                   ) : (
@@ -254,15 +136,13 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Mailing list signup (double opt-in) */}
         <div className="mt-12 border-t border-cream/15 pt-8">
           <SubscribeBox />
         </div>
 
-        {/* Legal & Cultural lines */}
         <div className="mt-12 border-t border-cream/15 pt-8 text-xs leading-relaxed text-cream/50 space-y-2">
           <p>
-            Sessions here are traditional, energetic, and artisanal. They
+            Sessions here are traditional, energetic, spiritual, and artisanal. They
             complement and do not replace medical or psychiatric care. The
             sanctuary does not provide emergency or clinical services.
           </p>
@@ -283,4 +163,3 @@ export function Footer() {
     </footer>
   );
 }
-
