@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 export default function ImmersionsPage() {
   return (
     <>
-      {/* Hero */}
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
         <div className="absolute inset-0 bg-dusk" />
         <Image
@@ -33,7 +32,6 @@ export default function ImmersionsPage() {
         </div>
       </section>
 
-      {/* International table */}
       <section className="bg-cream py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-display text-3xl font-semibold text-ink">
@@ -42,11 +40,11 @@ export default function ImmersionsPage() {
           <p className="mt-3 text-ink/70">
             Prices in USD. All immersions include organic meals and guided
             sessions with the host. Accommodation is listed under each
-            immersion.
+            immersion. Sessions are traditional, energetic, spiritual, and
+            artisanal.
           </p>
 
           <div className="mt-10 space-y-8">
-            {/* Essential */}
             <div className="rounded-md border border-mist p-6 sm:p-8">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                 <div>
@@ -75,12 +73,11 @@ export default function ImmersionsPage() {
               </ul>
             </div>
 
-            {/* Master */}
             <div className="rounded-md border border-mist p-6 sm:p-8">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                 <div>
                   <h3 className="font-display text-2xl text-ink">
-                    Master Transformation &amp; Craft Immersion
+                    Master Transformation & Craft Immersion
                   </h3>
                   <p className="mt-1 text-sm text-bark">5 days / 4 nights</p>
                 </div>
@@ -95,6 +92,7 @@ export default function ImmersionsPage() {
                 </div>
               </div>
               <ul className="mt-6 space-y-2 text-sm text-ink/70">
+                <li>A cottage</li>
                 <li>Full sanctuary access</li>
                 <li>Three Lake House sessions</li>
                 <li>Two cave sessions (diagnostic and trauma-release)</li>
@@ -105,7 +103,6 @@ export default function ImmersionsPage() {
               </ul>
             </div>
 
-            {/* Buyout */}
             <div className="rounded-md border border-mist p-6 sm:p-8">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                 <div>
@@ -125,18 +122,19 @@ export default function ImmersionsPage() {
                 </div>
               </div>
               <ul className="mt-6 space-y-2 text-sm text-ink/70">
+                <li>The island as a closed household. Sleeping is in the cottages, not the Lake House.</li>
                 <li>Unlimited Lake House access</li>
                 <li>Cave diagnostic and trauma-release</li>
                 <li>Forest and spring</li>
                 <li>Livestock and fireplace</li>
                 <li>
                   Unlimited one-on-one sessions and workshops of the
-                  group&apos;s choice
+                  group's choice
                 </li>
                 <li>Private cook using farm milk, lake fish, herbs, fruit</li>
               </ul>
               <p className="mt-4 text-xs text-ink/60">
-                House food protocol still applies.
+                House food protocol still applies. No default eggs.
               </p>
             </div>
           </div>
@@ -152,7 +150,6 @@ export default function ImmersionsPage() {
         </div>
       </section>
 
-      {/* Supporting stills */}
       <section className="bg-mist py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-4 sm:grid-cols-3">
@@ -187,7 +184,6 @@ export default function ImmersionsPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="bg-dusk py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
           <h2 className="font-display text-3xl font-semibold text-cream">
