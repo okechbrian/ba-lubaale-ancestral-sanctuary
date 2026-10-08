@@ -2,10 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
+import { HearHer } from "@/components/HearHer";
 import { MomentsStrip } from "@/components/MomentsStrip";
 import { HomeQuickJump } from "@/components/home/HomeQuickJump";
 import { WelcomedSelector } from "@/components/home/WelcomedSelector";
 import { ThreeActsStepper } from "@/components/home/ThreeActsStepper";
+import { formatFireDate, nextFireSaturday } from "@/lib/fire-circle/date";
 import { resolveContent } from "@/lib/cms";
 import { momentsBlockSchema, testimonialsBlockSchema } from "@/lib/cms/blocks";
 import { momentsDefault } from "@/content/moments";
@@ -29,6 +31,9 @@ export default async function HomePage() {
     ),
   ]);
   const voices = [one, two, three].filter((v) => v.quote.trim() !== "");
+  // Same helpers the /fire-circle page uses, so the homepage can never quote a
+  // different night than the page it sends the guest to.
+  const nextFire = formatFireDate(nextFireSaturday());
 
   return (
     <>
@@ -282,6 +287,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ─── Section 7a: Her voice — the same component /the-host renders ─── */}
+      <HearHer />
+
       {/* ─── Section 7b: Guest voices (hidden while every slot is empty) ─── */}
       {voices.length > 0 && (
         <section className="bg-dusk py-20 sm:py-28">
@@ -398,6 +406,35 @@ export default async function HomePage() {
             </Link>
             .
           </p>
+        </div>
+      </section>
+
+      {/* ─── Section 8b: The fire circle ─── */}
+      <section id="fire-circle" className="bg-dusk py-20 sm:py-28">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-bark-soft">
+            One evening a month
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-semibold text-cream">
+            The fire circle
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-cream/80">
+            Online. Queen Nalubaale speaks, then there are questions. No class,
+            no recording, no chat.
+          </p>
+          <p className="mt-4 text-cream/80">
+            The next one is {nextFire}.
+          </p>
+          <p className="mt-2 text-cream/80">
+            The amount is not on this page. She confirms it if she approves a
+            seat.
+          </p>
+          <Link
+            href="/fire-circle#request"
+            className="mt-8 inline-block rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
+          >
+            Request a seat →
+          </Link>
         </div>
       </section>
 
