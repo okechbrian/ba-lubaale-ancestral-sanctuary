@@ -35,11 +35,17 @@ function PaymentList({
                 <span className="font-medium text-ink">
                   {p.subject_kind === "voucher"
                     ? "Gift voucher"
-                    : (who?.name ?? "Unknown booking")}
+                    : p.subject_kind === "fire_circle"
+                      ? "Fire circle"
+                      : (who?.name ?? "Unknown booking")}
                 </span>
                 {who && <span className="ml-2 text-ink/50">{who.email}</span>}
                 <div className="mt-1 text-xs text-ink/50">
-                  {p.subject_kind === "voucher" ? "voucher purchase" : p.kind}
+                  {p.subject_kind === "voucher"
+                    ? "voucher purchase"
+                    : p.subject_kind === "fire_circle"
+                      ? "fire circle seat"
+                      : p.kind}
                   {" - USD "}
                   {Number(p.amount_usd).toLocaleString("en-US")}
                   {" ("}

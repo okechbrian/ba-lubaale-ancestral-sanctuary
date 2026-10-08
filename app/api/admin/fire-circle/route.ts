@@ -133,7 +133,10 @@ async function queue(row: {
   payment_id: null;
 }): Promise<void> {
   const { getDb } = await import("@/lib/db/client");
-  const { error } = await getDb().from("email_outbox").insert(row);
+  const { to, ...rest } = row;
+  const { error } = await getDb()
+    .from("email_outbox")
+    .insert({ ...rest, recipient: to });
   if (error) {
     console.error("fire circle mail could not be queued:", error.message);
   }

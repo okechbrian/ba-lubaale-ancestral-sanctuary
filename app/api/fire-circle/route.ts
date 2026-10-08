@@ -88,7 +88,16 @@ export async function POST(request: Request): Promise<Response> {
     const emails = prepareFireCircleReceivedEmails(parsed.data);
     const { error } = await getDb()
       .from("email_outbox")
-      .insert(emails.map((e) => ({ ...e, booking_id: null, payment_id: null })));
+      .insert(
+        emails.map((e) => ({
+          category: e.category,
+          recipient: e.to,
+          subject: e.subject,
+          body: e.body,
+          booking_id: null,
+          payment_id: null,
+        })),
+      );
     if (error) throw new Error(error.message);
   } catch (err) {
     console.error(

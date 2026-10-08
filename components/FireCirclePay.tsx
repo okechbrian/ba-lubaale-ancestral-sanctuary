@@ -27,7 +27,9 @@ export default function FireCirclePay({ token, feeUsd }: { token: string; feeUsd
       setMessage(
         body.error === "payment_unavailable"
           ? "Card and mobile-money payment is not open yet. Your seat is held. Nothing has been taken."
-          : "Payment could not be started. Nothing has been taken.",
+          : body.error === "payment_in_progress"
+            ? "A payment for this seat is already open. Nothing new has been taken."
+            : "Payment could not be started. Nothing has been taken.",
       );
     } catch {
       setBusy(false);

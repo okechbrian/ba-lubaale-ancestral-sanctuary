@@ -39,7 +39,10 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: true, checkoutUrl: result.checkoutUrl }, { headers });
   } catch (err) {
     if (err instanceof FireCircleCheckoutError) {
-      const status = err.message === "already_paid" ? 409 : 404;
+      const status =
+        err.message === "already_paid" || err.message === "payment_in_progress"
+          ? 409
+          : 404;
       return Response.json({ error: err.message }, { status, headers });
     }
     if (err instanceof DatabaseNotConfiguredError) {

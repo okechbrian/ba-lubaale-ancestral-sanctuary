@@ -6,6 +6,7 @@ import {
   getFireCircleRequestByHash,
   type FireCircleRequestRow,
 } from "@/lib/db/fire-circle";
+import { releaseFailedFirePayment } from "@/lib/db/fire-circle-release";
 import { getPaymentById, initiatePayment, setPaymentStatus } from "@/lib/db/payments";
 import { submitOrder } from "@/lib/payments/pesapal";
 import { hashSeatToken } from "@/lib/fire-circle/token";
@@ -36,7 +37,7 @@ export async function startFireCircleCheckout(token: string): Promise<{
     throw new FireCircleCheckoutError("fee_missing");
   }
 
-  const reused = await reusableUrl(row);
+  const reused = await openOrRelease(row);
   if (reused) return { checkoutUrl: reused, amountUsd };
 
   const settings = await getSettings();
@@ -62,20 +63,41 @@ export async function startFireCircleCheckout(token: string): Promise<{
     await initiatePayment(paymentId, order.trackingId, order.redirectUrl);
     return { checkoutUrl: order.redirectUrl, amountUsd };
   } catch (err) {
-    await setPaymentStatus(paymentId, "failed").catch(() => undefined);
+    try {
+      await setPaymentStatus(paymentId, "failed");
+      await releaseFailedFirePayment(row.id, paymentId);
+    } catch {
+      // Leave the link. The next attempt releases a failed row.
+    }
     throw err;
   }
 }
 
-async function reusableUrl(row: FireCircleRequestRow): Promise<string | null> {
+/**
+ * A live checkout URL is reused. A failed or unfinished attempt is released
+ * so a new payment can be created. A completed payment is never replaced.
+ */
+async function openOrRelease(row: FireCircleRequestRow): Promise<string | null> {
   if (!row.payment_id) return null;
   const payment = await getPaymentById(row.payment_id);
+  if (!payment) return null;
+  if (payment.status === "completed") {
+    throw new FireCircleCheckoutError("already_paid");
+  }
   if (
-    payment &&
     (payment.status === "initiated" || payment.status === "pending") &&
     payment.redirect_url
   ) {
     return payment.redirect_url;
   }
-  return null;
+  if (
+    payment.status === "failed" ||
+    payment.status === "cancelled" ||
+    payment.status === "initiated" ||
+    payment.status === "pending"
+  ) {
+    await releaseFailedFirePayment(row.id, payment.id);
+    return null;
+  }
+  throw new FireCircleCheckoutError("payment_in_progress");
 }
