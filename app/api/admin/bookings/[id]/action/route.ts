@@ -11,6 +11,7 @@ import { AvailabilityConflictError } from "@/lib/booking/availability";
 import { getSettings } from "@/lib/db/settings";
 import { depositAmountUsd, stayAmountUsd } from "@/lib/booking/pricing";
 import { sendAndLog } from "@/lib/email/sender";
+import { recordAudit } from "@/lib/db/audit";
 import { bookingApprovedGuest, bookingDeclinedGuest } from "@/lib/email/templates";
 import { CheckoutNotAllowedError, createOrReuseCheckout } from "@/lib/payments/checkout";
 import {
@@ -69,6 +70,11 @@ export async function POST(request: Request, ctx: Ctx): Promise<Response> {
           ? body.note.trim()
           : "Cancelled by the sanctuary.";
       const cancelled = await cancelBooking(id, note);
+      await recordAudit({
+        action: "booking_cancelled",
+        subject: id,
+        details: { refund_note: note, cancelled_at: cancelled.cancelled_at },
+      });
       return Response.json({
         ok: true,
         status: "cancelled",
@@ -129,6 +135,11 @@ export async function POST(request: Request, ctx: Ctx): Promise<Response> {
         checkout.checkoutUrl,
       );
       await sendAndLog("booking_approved_guest", updated.email, email.subject, email.text);
+      await recordAudit({
+        action: "booking_approved",
+        subject: id,
+        details: { totalUsd, depositUsd },
+      });
       return Response.json({
         ok: true,
         status: "approved",
@@ -146,6 +157,7 @@ export async function POST(request: Request, ctx: Ctx): Promise<Response> {
       email.subject,
       email.text,
     );
+    await recordAudit({ action: "booking_declined", subject: id });
     return Response.json({ ok: true, status: "declined" });
   } catch (err) {
     if (err instanceof DatabaseNotConfiguredError) {

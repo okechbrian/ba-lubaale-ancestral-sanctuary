@@ -304,4 +304,74 @@ resize to ≤2400px WebP; the API enforces type + 8 MB limits server-side).
 
 Prices stay in `/admin/settings`; policies and legal copy stay in the repo.
 
+### Backups, retention and data deletion on request
+
+**What we hold.** The site's personal data is small and lives in one Supabase
+(Postgres) project: `bookings` (name, email, WhatsApp, country, stay details,
+burden notes), `payments` (amounts, provider reference), `subscribers` (email
+address and confirmation state), `email_outbox` / `email_log` (recipient
+address, subject, body), `group_inquiries`, `stories`, `vouchers`, and
+`blocked_dates`. `admin_audit` records who changed what, with no guest data.
+The owner's personal phone number is deliberately **never** published.
+
+**Backups.** Take a logical dump before any risky change and keep it off the
+host:
+
+```bash
+supabase link --project-ref "$SUPABASE_PROJECT_REF"
+supabase db dump --db-url "$SUPABASE_DB_URL" --file "backup-$(date +%F).sql"
+```
+
+The dump contains everything above, including guest email addresses and email
+bodies — treat the file as sensitive and store it encrypted. Platform-managed
+daily backups/PITR are not enabled on the free plan; a recurring logical dump
+(weekly plus before deploys) is the current policy.
+
+**Retention.** Financial records (bookings, payments, vouchers) are kept for
+**7 years** — Ugandan tax practice wants receipts to be producible. Everything
+non-financial is kept only as long as it earns its place:
+
+- `subscribers`: kept while the person stays on the list; unsubscribe marks the
+  row `unsubscribed` and it stops being mailed immediately.
+- `email_outbox` / `email_log`: delivered rows can be pruned after 90 days;
+  failed rows are kept until resolved so nothing is silently lost.
+- `admin_audit`: rolling 12 months is plenty; it is a debugging aid, not a
+  compliance log.
+
+**Deletion on request.** A guest can ask for their data to go. Do it by email
+reply (or whatever channel they used) and then run the delete in the Supabase
+SQL editor — the site intentionally ships no self-service delete button, because
+accidental erasure is worse than a slow reply:
+
+```sql
+-- 1. Find them first, and confirm the identity out of band.
+select id, name, email, created_at from public.bookings where email = 'guest@example.test';
+
+-- 2. Soft-delete the booking row (keeps the audit trail, drops the PII).
+update public.bookings
+   set name = '[deleted]',
+       email = '[deleted]@invalid.example',
+       whatsapp = null,
+       burden = '[deleted]',
+       limits = null,
+       updated_at = now()
+ where email = 'guest@example.test';
+
+-- 3. Remove them from the mailing list (confirm token rows go with it).
+delete from public.subscribers where email = 'guest@example.test';
+
+-- 4. Remove queued/archived copies of their mail.
+delete from public.email_outbox where recipient = 'guest@example.test';
+delete from public.email_log   where to_email   = 'guest@example.test';
+```
+
+Payments are **not** deleted — the money record has to stay for tax. Note that
+anonymised rows still occupy their dates if the booking is `approved`/`paid`;
+cancel it via `/admin` first if the stay is not going ahead.
+
+Supabase backups are region-scoped and deleted on project deletion; if a guest
+asks what a "deletion" covers, say honestly: the live rows and any backup
+within the retention window, after which a restore from an old dump could
+briefly reintroduce an anonymised-but-present record.
+
 Change history: [CHANGELOG.md](./CHANGELOG.md).

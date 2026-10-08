@@ -7,6 +7,7 @@ import {
   VoucherNotRedeemable,
 } from "@/lib/db/vouchers";
 import { z } from "zod";
+import { recordAudit } from "@/lib/db/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -77,6 +78,11 @@ export async function POST(request: Request): Promise<Response> {
 
       const outcome = await redeemVoucherByCode(code, booking_id);
       if (outcome.status === "redeemed") {
+        await recordAudit({
+          action: "voucher_redeemed",
+          subject: booking_id,
+          details: { code_hint: outcome.voucher?.code_hint },
+        });
         return Response.json({
           ok: true,
           status: "redeemed",

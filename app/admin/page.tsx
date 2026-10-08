@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
 import { listBookings } from "@/lib/db/bookings";
+import { listAudits } from "@/lib/db/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,13 @@ export default async function AdminBookingsPage({
   } catch (err) {
     if (err instanceof DatabaseNotConfiguredError) dbMissing = true;
     else throw err;
+  }
+
+  let audits: Awaited<ReturnType<typeof listAudits>> = [];
+  try {
+    audits = await listAudits(25);
+  } catch (err) {
+    if (!(err instanceof DatabaseNotConfiguredError)) throw err;
   }
 
   return (
@@ -109,6 +117,28 @@ export default async function AdminBookingsPage({
             </tbody>
           </table>
         </div>
+      )}
+
+      <h2 className="mt-10 font-display text-lg font-semibold text-ink">
+        Recent admin audit
+      </h2>
+      {audits.length === 0 ? (
+        <p className="mt-3 text-sm text-ink/60">No admin actions yet.</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-mist rounded-md border border-mist bg-white text-sm">
+          {audits.map((a) => (
+            <li key={a.id} className="flex items-start justify-between gap-3 px-4 py-2">
+              <span className="font-mono text-xs text-ink/70">
+                {a.created_at.replace("T", " ").slice(0, 16)}
+              </span>
+              <span className="font-medium text-ink">{a.action}</span>
+              <span className="text-ink/60">
+                {a.subject ?? ""}
+                {a.details ? ` · ${JSON.stringify(a.details)}` : ""}
+              </span>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

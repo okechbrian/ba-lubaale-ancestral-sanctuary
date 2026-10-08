@@ -196,3 +196,22 @@ export async function unsubscribeSubscriber(
   if (updErr) throw new Error(`unsubscribeSubscriber failed: ${updErr.message}`);
   return "unsubscribed";
 }
+
+/**
+ * Subscriber listing for /admin/subscribers. `status` undefined means every
+ * status, newest first. Used by the admin page and the CSV export route.
+ */
+export async function listSubscribers(
+  status?: "pending" | "confirmed" | "unsubscribed",
+): Promise<SubscriberRow[]> {
+  const db = getDb();
+  let query = db
+    .from("subscribers")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (status) query = query.eq("status", status);
+  // Bounded on purpose: the export must never page an unbounded table.
+  const { data, error } = await query.limit(1000);
+  if (error) throw new Error(`listSubscribers failed: ${error.message}`);
+  return (data ?? []) as SubscriberRow[];
+}

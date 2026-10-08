@@ -5,6 +5,7 @@ import {
   markOutboxFailed,
   markOutboxSent,
 } from "@/lib/db/email-outbox";
+import { alertOwner } from "@/lib/monitoring/alerts";
 import type { EmailOutboxRow } from "@/lib/db/types";
 import { getEmailSender, isEmailTransportConfigured } from "@/lib/email/sender";
 
@@ -152,6 +153,19 @@ export async function processEmailOutbox(
           `(attempt ${row.attempts}/${OUTBOX_MAX_ATTEMPTS}): ${error}` +
           (terminal ? " — parked, needs a manual resend" : " — retrying"),
       );
+      if (terminal) {
+        // Owner gets one durable row per terminally-failed email — never
+        // silently parked without a signal.
+        alertOwner({
+          category: "owner_alert_email_failed",
+          subject: `Email parked as failed: ${row.category}`,
+          lines: [
+            `Message ${row.id} never delivered after ${row.attempts} attempt(s).`,
+            `Reason: ${error}`,
+            "Fix the transport and hit the Resend button in /admin/emails.",
+          ],
+        }).catch(() => undefined);
+      }
     } catch (err) {
       summary.retrying += 1;
       console.error(

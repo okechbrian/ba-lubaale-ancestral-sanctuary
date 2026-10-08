@@ -71,6 +71,40 @@ export async function getSettings(): Promise<Settings> {
   }
 }
 
+export async function getSettingUpdatedAt(key: string): Promise<Date | null> {
+  try {
+    const db = getDb();
+    const { data, error } = await db
+      .from("settings")
+      .select("updated_at")
+      .eq("key", key)
+      .maybeSingle();
+    if (error || !data || !data.updated_at) return null;
+    return new Date(data.updated_at);
+  } catch {
+    return null;
+  }
+}
+
+const UGX_REVIEW_DAYS = 30;
+
+/**
+ * How stale the UGX rate is. Lives here rather than in the page because
+ * `Date.now()` inside a component body is impure (the React compiler
+ * rejects it), and this is server-only work anyway.
+ */
+export async function getUgxRateStaleness(): Promise<{
+  stale: boolean;
+  days: number | null;
+}> {
+  const updated = await getSettingUpdatedAt("ugx_rate");
+  if (!updated) return { stale: true, days: null };
+  const days = Math.floor(
+    (Date.now() - updated.getTime()) / (24 * 60 * 60 * 1000),
+  );
+  return { stale: days > UGX_REVIEW_DAYS, days };
+}
+
 /** Owner-save from /admin/settings — partial upsert, validated first. */
 export async function saveSettings(
   input: z.infer<typeof settingsValueSchema>,

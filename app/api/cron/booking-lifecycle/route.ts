@@ -1,5 +1,6 @@
 import { DatabaseNotConfiguredError, getDb } from "@/lib/db/client";
 import { guardCron } from "@/lib/cron/auth";
+import { captureError } from "@/lib/monitoring";
 import {
   cancelBooking,
   listBookings,
@@ -167,6 +168,7 @@ async function handle(request: Request): Promise<Response> {
       return Response.json({ error: "database_not_configured" }, { status: 503 });
     }
     console.error("[booking-lifecycle] sweep failed:", err);
+    await captureError(err, { route: "booking-lifecycle" });
     return Response.json({ error: "booking_lifecycle_failed" }, { status: 500 });
   }
 }

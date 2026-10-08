@@ -1,5 +1,7 @@
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
 import { guardCron } from "@/lib/cron/auth";
+import { captureError } from "@/lib/monitoring";
+import { alertOwner } from "@/lib/monitoring/alerts";
 import {
   RECONCILE_DEFAULT_LIMIT,
   reconcileStuckPayments,
@@ -44,6 +46,20 @@ async function handle(request: Request): Promise<Response> {
         { status: 503 },
       );
     }
+    // The owner must know a payment that settled may still be telling the
+    // guest nothing – and that rejected verification rows need a human.
+    if (summary.unresolved > 0 || summary.blocked > 0 || summary.errors > 0) {
+      const bad = summary.items.filter((i) =>
+        ["unresolved", "blocked", "error"].includes(i.result),
+      );
+      await alertOwner({
+        category: "owner_alert_payments_stuck",
+        subject: `Payments still needing attention (${summary.unresolved} unresolved, ${summary.blocked} blocked, ${summary.errors} errors)`,
+        lines: bad
+          .slice(0, 10)
+          .map((i) => `- ${i.detail}: ${i.paymentId}`),
+      });
+    }
     return Response.json({ ok: true, ...summary });
   } catch (err) {
     if (err instanceof DatabaseNotConfiguredError) {
@@ -53,6 +69,7 @@ async function handle(request: Request): Promise<Response> {
       "[payment-reconcile] sweep failed:",
       err instanceof Error ? err.message : "unknown",
     );
+    await captureError(err, { route: "payment-reconcile" });
     return Response.json({ error: "reconcile_failed" }, { status: 500 });
   }
 }
