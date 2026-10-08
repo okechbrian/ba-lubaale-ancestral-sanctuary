@@ -36,16 +36,20 @@ Rules that mattered, for the next stack:
 
 ## 0. Per-PR pre-flight (every PR, before it leaves draft)
 
-- [ ] CI green on the PR head commit (`lint`, `typecheck`, `test`, `build`).
+- [ ] CI green on the PR head commit: both `verify` (`lint`, `typecheck`,
+      `test`, `build`) and `integrity`.
 - [ ] PR description matches what the branch actually does; no secret, key,
       password, or real customer detail in the diff or in a comment.
-- [ ] `npm run test:integrity` green against a **local** stack
-      (`supabase start` + `supabase db reset`) — these tests never fake a pass.
-      Note this is **not** part of CI, and it is why `npm test` reports a block
-      of *skipped* tests when Docker is not running. On the current `main` the
-      baseline is `259 passed | 49 skipped` across 30 files; if you see more
-      skips than that, the local stack was not up and the integrity gate did
-      not actually run.
+- [ ] `integrity` CI job green. It starts Postgres 15 (via `supabase start`),
+      applies every repo migration in order (`supabase db reset`), and runs
+      `npm run test:integrity`. The runner treats any **skipped** integrity
+      test as a build failure, so "green" means every integrity test genuinely
+      executed against the migrated schema. Locally, the same command
+      (`supabase start` + `supabase db reset` + `npm run test:integrity`)
+      reproduces it exactly; skipping the stack on your machine leaves
+      `npm test` reporting the usual block of *skipped* tests, which is
+      expected and is why the same tests stay visible but hidden
+      in the plain `npm test` output.
 - [ ] Evidence comments for sections 1–5 pasted below (sections 1–5 can be
       satisfied once, on PR #2, and referenced by the later PRs — but each PR
       must link the evidence).
