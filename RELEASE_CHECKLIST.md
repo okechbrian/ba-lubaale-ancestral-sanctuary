@@ -42,9 +42,11 @@ Rules that mattered, for the next stack:
       password, or real customer detail in the diff or in a comment.
 - [ ] `integrity` CI job green. It starts Postgres 15 (via `supabase start`),
       applies every repo migration in order (`supabase db reset`), and runs
-      `npm run test:integrity`. The runner treats any **skipped** integrity
-      test as a build failure, so "green" means every integrity test genuinely
-      executed against the migrated schema. Locally, the same command
+      `npm run test:integrity` — using Supabase CLI **2.101.0** (pinned in the
+      workflow) both locally and in CI so the environment does not float between
+      runs. The runner treats any **skipped** integrity test as a build failure,
+      so "green" means every integrity test genuinely executed against the
+      migrated schema. Locally, the same command
       (`supabase start` + `supabase db reset` + `npm run test:integrity`)
       reproduces it exactly; skipping the stack on your machine leaves
       `npm test` reporting the usual block of *skipped* tests, which is

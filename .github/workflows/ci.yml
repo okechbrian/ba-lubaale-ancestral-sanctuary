@@ -38,7 +38,9 @@ jobs:
       - run: npm ci
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned so CI matches the local CLI you used to produce the suite;
+          # `latest` floated, which caused today to become tomorrow in CI.
+          version: 2.101.0
       # Postgres 15 + PostgREST + friends, no edge runtime / studio / mailpit
       # needed for the SQL tests (faster, and they need no inbox server).
       - name: Start the local stack
