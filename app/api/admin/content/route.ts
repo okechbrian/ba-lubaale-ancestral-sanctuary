@@ -8,6 +8,7 @@ import {
   saveContent,
 } from "@/lib/cms";
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
+import { recordAudit } from "@/lib/db/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,10 @@ export async function PUT(request: Request): Promise<Response> {
   }
   try {
     await saveContent(parsed.data.key, parsed.data.value);
+    await recordAudit({
+      action: "content_saved",
+      subject: parsed.data.key,
+    });
     return Response.json({ ok: true });
   } catch (err) {
     return errorResponse(err);
@@ -68,6 +73,10 @@ export async function DELETE(request: Request): Promise<Response> {
   }
   try {
     await deleteContent(key);
+    await recordAudit({
+      action: "content_deleted",
+      subject: key,
+    });
     return Response.json({ ok: true });
   } catch (err) {
     return errorResponse(err);

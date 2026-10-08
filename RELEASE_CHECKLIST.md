@@ -62,7 +62,7 @@ Rules that mattered, for the next stack:
 
 - [ ] Hosted Supabase project exists; region and project ref recorded here:
       `ref: ______  region: ______`
-- [ ] **All ten migrations applied, in order.** Order is load-bearing, not
+- [ ] **All eleven migrations applied, in order.** Order is load-bearing, not
       cosmetic: `…00003` creates a **4-argument** `apply_payment_completion`
       and `…00005` drops exactly that signature for a 5-argument one. Out of
       order, Postgres keeps both and every `.rpc()` call becomes an ambiguous
@@ -80,22 +80,23 @@ Rules that mattered, for the next stack:
   | 8 | `20261002000007_growth_pages.sql` | `stories`, `group_inquiries` |
   | 9 | `20261002000008_voucher_hardening.sql` | `mark_email_outbox_sent` (redacts delivered voucher bodies in the DB), `create_voucher_purchase`, `voucher_request_for_payment` |
   | 10 | `20261008000000_booking_lifecycle.sql` | `bookings.cancelled_at`/`refund_note`/`payment_due_at`/`balance_due_date`/reminder flags`, `bookings.redeemed_voucher_id`/`voucher_credit_usd`, `'cancelled'`/`'completed'` booking statuses, `'refunded'` payment status, `redeem_voucher_and_credit` |
+  | 11 | `20261008000001_admin_audit.sql` | `admin_audit` (append-only admin action trail: approve/decline/cancel/redeem/settings/content) |
 
 - [ ] Verified by running the checks below against the hosted project and
       pasting the output into the PR. Each `-- expect` line is the assertion.
 
 ```sql
--- 1. Twelve tables. expect exactly 12 rows.
+-- 1. Thirteen tables. expect exactly 13 rows.
 select table_name from information_schema.tables
  where table_schema = 'public'
-   and table_name in ('blocked_dates','bookings','email_log','email_outbox',
-                      'group_inquiries','payments','settings','stories',
-                      'subscribers','voucher_requests','vouchers',
+   and table_name in ('admin_audit','blocked_dates','bookings','email_log',
+                      'email_outbox','group_inquiries','payments','settings',
+                      'stories','subscribers','voucher_requests','vouchers',
                       'webhook_events')
  order by table_name;
 
 -- 2. RLS on every one of them, no policies (service_role bypasses).
---    expect 12 rows, rls_enabled = true, policies = 0 for each.
+--    expect 13 rows, rls_enabled = true, policies = 0 for each.
 select c.relname as table_name,
        c.relrowsecurity as rls_enabled,
        (select count(*) from pg_policies p

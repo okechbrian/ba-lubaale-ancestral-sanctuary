@@ -135,6 +135,14 @@ export interface EmailOutboxRow {
 
 export type SubscriberStatus = "pending" | "confirmed" | "unsubscribed";
 
+export interface AuditEntry {
+  id: string;
+  created_at: string;
+  action: string;
+  subject: string | null;
+  details: Record<string, unknown> | null;
+}
+
 export interface SubscriberRow {
   id: string;
   created_at: string;

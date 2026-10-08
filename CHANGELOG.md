@@ -7,6 +7,35 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Operations surface for the owner console.**
+  - **`/admin/subscribers`** — list with `all / pending / confirmed /
+    unsubscribed` filters, plus a **CSV export** (`/api/admin/subscribers
+    ?format=csv&status=…`, session-guarded, attachment download, values
+    quote-escaped).
+  - **`admin_audit`** (new migration `20261008000001_admin_audit.sql`) — an
+    append-only trail written on booking **approve / decline / cancel**, voucher
+    **redeem**, **settings** saves and **content** saves/deletes. The newest 25
+    rows render at the bottom of `/admin`. Audit writes are best-effort by
+    design: if the insert fails the operation still completes and the failure is
+    logged, so bookkeeping can never block a guest-facing action.
+  - **Error monitoring with PII scrubbing** (`lib/monitoring`) — `captureError()`
+    always logs locally and, when `SENTRY_DSN` is set, forwards a minimal event
+    to the intake endpoint. Guest names, emails, WhatsApp numbers and any
+    phone-shaped string are redacted first; ids are kept so failures stay
+    diagnosable. Wired into the payment reconciliation and booking lifecycle
+    crons.
+  - **Owner alerts on silent failures** — a terminally-failed email queues one
+    `owner_alert_email_failed` row to `OWNER_NOTIFY_EMAIL`, and the payment
+    reconciliation sweep queues `owner_alert_payments_stuck` listing the
+    payments it could not settle (unresolved / blocked / errors).
+  - **`ugx_rate` staleness warning** — `/admin/settings` now shows a banner once
+    the rate has not been saved for 30 days (or has never been saved
+    explicitly), because the placeholder rate quietly mis-prices every deposit.
+  - **README: backups, retention and data deletion on request** — what we hold,
+    how to take a logical dump, the retention rules (7 years financial, 90 days
+    for delivered mail, 12 months for audit), and the exact SQL to anonymise a
+    guest's data on request while keeping the money record for tax.
+
 - **CI integrity gate.** A new `integrity` job
   (`.github/workflows/ci.yml`) starts Postgres 15 via the Supabase CLI,
   applies every migration in order with `supabase db reset`, and runs

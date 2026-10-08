@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { isAdminRequest } from "@/lib/admin/session";
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
+import { recordAudit } from "@/lib/db/audit";
 import { saveSettings, settingsValueSchema } from "@/lib/db/settings";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +32,10 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     await saveSettings(parsed.data.settings);
+    await recordAudit({
+      action: "settings_saved",
+      details: parsed.data.settings,
+    });
     return Response.json({ ok: true });
   } catch (err) {
     if (err instanceof DatabaseNotConfiguredError) {
