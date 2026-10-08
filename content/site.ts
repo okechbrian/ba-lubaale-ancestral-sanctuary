@@ -51,6 +51,11 @@ export const navigationGroups = {
         href: "/the-host",
         description: "Mama Nalubaale — seer, healer, and master artisan",
       },
+      {
+        label: "Hear her",
+        href: "/the-host#hear-her",
+        description: "Three films. Her voice, not a course.",
+      },
     ],
   },
   experiences: {

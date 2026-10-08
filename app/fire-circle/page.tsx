@@ -16,7 +16,7 @@ export default function FireCirclePage() {
       <section className="bg-dusk py-20 sm:py-28">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-bark-soft">
-            Members
+            Online
           </p>
           <h1 className="mt-3 font-display text-4xl font-semibold text-cream sm:text-5xl">
             The fire circle
