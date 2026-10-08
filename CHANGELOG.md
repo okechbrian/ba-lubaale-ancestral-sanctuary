@@ -7,6 +7,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **CI integrity gate.** A new `integrity` job
+  (`.github/workflows/ci.yml`) starts Postgres 15 via the Supabase CLI,
+  applies every migration in order with `supabase db reset`, and runs
+  `npm run test:integrity` on every PR. Skipped tests are now a build
+  failure (`run-integrity-tests.mjs` exits 2 on a non-zero skipped count),
+  because the suite reports *skipped* — not *failed* — whenever the DB
+  stack is missing, which reads as a fake green. The Supabase CLI is
+  pinned to **2.101.0** locally and in CI, with the deviation rationale for
+  "not a bare `postgres:15` service container" recorded in the workflow,
+  the runner header, the README and `RELEASE_CHECKLIST.md` §0.
+
 - **Booking lifecycle.** Bookings now age through the same kinds of states you
   would write on a paper ledger, and a cron keeps them honest:
   - **(a) Cancelled / completed stays + refund note.** Admin can cancel an

@@ -42,8 +42,14 @@ Repo: https://github.com/okechbrian/ba-lubaale-ancestral-sanctuary
    `test:integrity` (payment-integrity integration tests against a REAL local
    database — first run `supabase start` + `supabase db reset`; without the
    stack the suite skips with a notice, it never fakes a pass).
-   CI (`.github/workflows/ci.yml`) runs lint + test + build on every push/PR,
-   with no secrets required.
+   CI (`.github/workflows/ci.yml`) runs lint + test + build + the full
+   integrity gate on every push/PR, with no secrets required.
+
+   The integrity stack is *Supabase CLI*-managed on purpose: the test files
+   talk to REST + RLS semantics through the client's Supabase API, so a bare
+   `postgres:15` container is NOT sufficient. Match the CLI version when you
+   reproduce CI locally — CI pins `supabase/setup-cli` to `2.101.0`, which
+   ships the Postgres 15 engine the tests expect.
 
 | Missing credential | Honest behaviour (no fakes) |
 |---|---|
