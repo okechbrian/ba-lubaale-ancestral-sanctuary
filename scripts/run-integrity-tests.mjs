@@ -23,6 +23,9 @@
  *   npm run test:integrity
  *
  * Exits non-zero with an honest message when the stack is not running.
+ * ALSO exits non-zero if any test file reports skipped tests - skipping is a
+ * fake pass, and this gate is consumed by GitHub Actions (see
+ * .github/workflows/ci.yml#integrity), so skipped tests fail CI outright.
  */
 import { execFileSync, spawnSync } from "node:child_process";
 import crypto from "node:crypto";
@@ -124,8 +127,32 @@ const vitestArgs = args.length
     ];
 const res = spawnSync("npx", ["vitest", ...vitestArgs], {
   cwd: root,
-  stdio: "inherit",
+  stdio: ["ignore", "pipe", "pipe"],
   env,
   shell: process.platform === "win32",
+  encoding: "utf8",
 });
-process.exit(res.status ?? 1);
+const stdout = res.stdout ?? "";
+const stderr = res.stderr ?? "";
+if (stdout) process.stdout.write(stdout);
+if (stderr) process.stderr.write(stderr);
+
+if (res.status !== 0) {
+  process.exit(res.status ?? 1);
+}
+
+// Integrity tests SKIP (rather than fake-fail) when the local stack is not
+// healthy. That is a great local ergonomic, but it means a green run is only
+// meaningful if NOTHING was skipped. CI depends on that guarantee, so the
+// runner enforces it here: any skipped test fails the whole suite.
+const skipped = stdout.match(/(\d+)\s+skipped/);
+if (skipped && Number(skipped[1]) > 0) {
+  console.error(
+    `\n[integrity-gate] ${skipped[1]} test(s) were SKIPPED. ` +
+      "It gets converted to a failure here because the suite never fakes a pass: " +
+      "a green run with skips means the database stack was not up, i.e. the gate did not run.",
+  );
+  process.exit(2);
+}
+
+process.exit(0);

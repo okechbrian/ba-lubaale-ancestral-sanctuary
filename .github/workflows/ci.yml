@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, "feat/**"]
+    branches: [main, "feat/**", "ci/**"]
   pull_request:
 
 jobs:
@@ -19,3 +19,37 @@ jobs:
       - run: npm test
       # next build runs the TypeScript check too; no secrets required here
       - run: npm run build
+
+  integrity:
+    # Every PR: apply every repo migration against Postgres 15, then run the
+    # integrity suite against it. The suite talks Supabase REST semantics
+    # (supabase-js + RLS + RPCs), so a plain postgres:15 **service container**
+    # alone is not enough - it ships without the PostgREST layer the client
+    # expects. `supabase start` starts the same Postgres 15 engine inside
+    # Docker and adds that layer, so this is the smallest change that honours
+    # both "real Postgres 15" and the existing test contract.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      # Postgres 15 + PostgREST + friends, no edge runtime / studio / mailpit
+      # needed for the SQL tests (faster, and they need no inbox server).
+      - name: Start the local stack
+        run: >-
+          supabase start
+          -x edge-runtime,gotrue,imgproxy,logflare,mailpit,postgres-meta,realtime,studio,supavisor,vector --ignore-health-check
+      - name: Apply every migration, in order
+        run: supabase db reset
+      # `npm run test:integrity` fails the step if any integrity test is
+      # SKIPPED (skipped tests are a fake pass - the gate must not run green
+      # on a broken DB stack, which is exactly what the runner enforces).
+      - name: Run the integrity suite (fail on any skipped test)
+        run: npm run test:integrity
+        timeout-minutes: 15
