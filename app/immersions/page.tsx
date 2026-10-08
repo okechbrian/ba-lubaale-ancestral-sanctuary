@@ -127,14 +127,11 @@ export default function ImmersionsPage() {
                 <li>Cave diagnostic and trauma-release</li>
                 <li>Forest and spring</li>
                 <li>Livestock and fireplace</li>
-                <li>
-                  Unlimited one-on-one sessions and workshops of the
-                  group's choice
-                </li>
-                <li>Private cook using farm milk, lake fish, herbs, fruit</li>
+                <li>Unlimited one-on-one sessions and workshops of the group's choice</li>
+                <li>Private cook using farm milk, eggs, fish, and herbal teas</li>
               </ul>
               <p className="mt-4 text-xs text-ink/60">
-                House food protocol still applies. No default eggs.
+                The female-visitor house rule still applies: no chicken and no eggs for women guests.
               </p>
             </div>
           </div>
