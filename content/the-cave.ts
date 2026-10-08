@@ -1,18 +1,18 @@
 import type { CaveBlock } from "@/lib/cms/blocks";
 
-/** Default /the-cave copy — verbatim from the original page. */
+/** Default /the-cave copy from the owner's sanctuary document. */
 export const caveDefault: CaveBlock = {
   heroImage: {
     src: "/images/og-cave-shore.jpg",
     alt: "Mossed rock mouth of Nalubaale Cave seen from the water",
   },
   heroLead:
-    "Deep inside the quiet chambers, guests work with silence, breath, and voice to set down what is heavy and hear what has been waiting.",
+    "More than a hundred caves. Three are open. The rest are visited only after a holy calling from themselves.",
   intro: {
     heading: "More Than a Hundred Caves",
     paragraphs: [
-      "Ssese holds more than a hundred caves. Only three are open to guests. The rest are visited only after a calling from themselves, as they are never offered as an add-on to a booking and are not listed here.",
-      "Sessions are guided by the host. You do not enter alone. You do not enter on a schedule. The cave keeps its own time.",
+      "These are more than a hundred on the island, but only three are open to the public. The rest can be visited after a holy calling from themselves.",
+      "Sessions are guided by the host. You do not enter alone. The cave keeps its own time.",
     ],
     image: {
       src: "/images/cave-silhouette.jpg",
@@ -24,18 +24,18 @@ export const caveDefault: CaveBlock = {
     items: [
       {
         title: "Nalubaale Chamber",
-        tagline: "focusing on motherhood, marriage, and prosperity, and achieving closeness after cleansing",
-        body: "Belonging to Nalongo Nalubaale, the twin mother, who is a Queen and mother to creation. People appeal to her for childbearing, marriage, and prosperity. You may visit the cave; closeness to her requires deep spiritual and physical cleansing.",
+        tagline: "mother to all creation",
+        body: "This belongs to Nalongo Nalubaale, twin mother Nalubaale, who is a Queen and mother to all creation. This motherhood makes it easy for people from all walks of life to appeal to her for any kind of challenge, from childbearing and marriage to prosperity. You may visit the cave, but getting her close to you requires deep spiritual and physical cleansing.",
       },
       {
         title: "Lubaale Musisi Chamber",
-        tagline: "movement out of stagnation",
-        body: "Known for movement and for the earthquake, and for waking every person from sleep. When your life has gone stagnant, this is the chamber to visit. Work with him may include his traditional diet.",
+        tagline: "movement, waking, the earthquake",
+        body: "He is known as the god of the earthquake. In our culture, when we fall asleep, he is responsible for waking every person daily. If you feel stagnant in any way, he is the one to talk to. People affected by the earthquake can have a dialogue with him. He is very good at generating movement in every aspect of life, spiritual or physical. All this is done through his diet.",
       },
       {
         title: "Lubaale Wanema Chamber",
-        tagline: "order, when nothing lands right",
-        body: "Father of Lubaale Mukasa. Reserved, and responsible for putting things straight. Go to him in the seasons when nothing you do lands right and people find fault in everything.",
+        tagline: "putting things straight",
+        body: "He is a father to Lubaale Mukasa. So reserved, he is responsible for putting things straight and right. There are times when you cannot do things right, and people find fault in everything you do. He is the one to talk to in that spiritual stage.",
       },
     ],
   },
@@ -56,7 +56,7 @@ export const caveDefault: CaveBlock = {
       },
       {
         title: "Traditional Work",
-        body: "Sessions here are traditional, energetic, and artisanal. They complement and do not replace medical or psychiatric care. The sanctuary does not provide emergency or clinical services.",
+        body: "Sessions here are traditional, energetic, spiritual, and artisanal. They complement and do not replace medical or psychiatric care. The sanctuary does not provide emergency or clinical services.",
       },
     ],
   },

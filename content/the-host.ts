@@ -1,6 +1,6 @@
 import type { HostBlock } from "@/lib/cms/blocks";
 
-/** Default /the-host copy — verbatim from the original page. */
+/** Default /the-host copy. CMS can override this if a block is published. */
 export const hostDefault: HostBlock = {
   heroImage: {
     src: "/images/host-portrait-headwrap.jpg",
@@ -9,10 +9,10 @@ export const hostDefault: HostBlock = {
   bio: {
     heading: "Seer, Healer, Master Artisan",
     paragraphs: [
-      "I work with voice, hands, breath, water, fire, wind, and earth, as well as with bark, cowrie, and root water beside the fire that has burned on this shore longer than any of us can remember. Being of Ssese origin, I am close to my ancestors.",
-      "This sanctuary is not a place I started. It is a place I was given, and I knowingly inherited this responsibility in August 1998. The work I carry came from the women who kept this place long before me. It is old, it is living, and it is not mine to sell, but only to hold and share.",
+      "I work with my ba Lubaale ancestors to offer spiritual healing, motherly love, homely comfort, and a home feeling for a heart that has been homeless. The healing voice was given to me. I work with that voice, and with hands, breath, water, fire, wind, and earth, as well as with bark, cowrie, and root water beside the fire that has burned on this shore longer than any of us can remember.",
+      "Being of Ssese origin, I am close to my ancestors. This sanctuary is not a place I started. It is a place I was given, and I knowingly inherited this responsibility in August 1998. The work I carry came from the women who kept this place long before me. It is old, it is living, and it is not mine to sell, but only to hold and share. I have made a few modifications. The place is still not mine.",
       "My Munyoro mother taught me the techniques I work with here. Her mother, my grandmother and a princess of Tooro, raised me in my early years.",
-      "I do not offer guarantees. I offer time, silence, and those techniques. What happens in the cave is between you and the space. I am the one who holds the door.",
+      "I do not offer guarantees. I offer time, silence, peace, and those techniques. What happens in the cave is between you and the space. I am the one who holds the door. Sessions here are traditional, energetic, spiritual, and artisanal.",
     ],
     image: {
       src: "/images/host-measuring-bark.jpg",
@@ -37,7 +37,7 @@ export const hostDefault: HostBlock = {
     ],
   },
   quote: {
-    text: "“I listen to the wave upon the shore, the breath within your chest, and the stories carried in the roots of this land. Welcome home to yourself.”",
-    cite: "— Queen Nalubaale",
+    text: "\u201cI listen to the wave upon the shore, the breath within your chest, and the stories carried in the roots of this land. Welcome home to yourself.\u201d",
+    cite: "\u2014 Queen Nalubaale",
   },
 };

@@ -21,16 +21,16 @@ const items: WelcomedItem[] = [
     category: "individual",
     title: "Solitude Lovers",
     tagline: "Silence, fire, stone, & lake",
-    body: "People ready to sit with themselves in deep silence, beside the ancient hearth and mossed stones, where they can be grounded directly back to their roots without distraction.",
+    body: "People ready to sit with themselves in deep silence, beside the fire and the stones, where they can be lifted off a weight and grounded back to their roots.",
     pathLabel: "Essential Solo Immersion",
     pathHref: "/immersions",
   },
   {
     id: "seekers",
     category: "individual",
-    title: "Seekers of Healing & Shedding",
-    tagline: "Unburdening & fresh beginnings",
-    body: "Those who feel tired, stuck, or are carrying a heavy burden from work, grief, or transitions. You come here to shed, let the root waters wash what is heavy, and start fresh.",
+    title: "Seekers of Healing & Enrichment",
+    tagline: "Shed, let go, start fresh",
+    body: "People who are stressed, tired, lost, or hungry for self-knowing. There is a need to shed, let go, and make a major decision. If this is you, send the application.",
     pathLabel: "Apply for Immersion",
     pathHref: "/apply",
   },
@@ -39,7 +39,7 @@ const items: WelcomedItem[] = [
     category: "household",
     title: "Couples & Partnerships",
     tagline: "Arbitration, blessing, & shared craft",
-    body: "Partners seeking honest arbitration, ancestral blessing, and shared tactile craft beside the night fire. Quiet work done genuinely together, never performed for an audience.",
+    body: "Partners seeking a lasting relationship, arbitration, blessing, and a shared craft beside the fire. Work done together, to keep the two of you together.",
     pathLabel: "Couples Immersion",
     pathHref: "/immersions",
   },
@@ -47,8 +47,8 @@ const items: WelcomedItem[] = [
     id: "families",
     category: "household",
     title: "Families & Lineage",
-    tagline: "Living culture & generational peace",
-    body: "Households introducing children to living culture, the farm herd, ancient medicinal trees, and ancestral craft. Generational reunion, arbitration, and one household at a time.",
+    tagline: "Living culture, reunion, a fresh start",
+    body: "Households introducing children to living culture, the land, the herd, the fire, the forest, and ancestral craft. Families seeking reunion, arbitration, youth rehabilitation, and a fresh start.",
     pathLabel: "Family Stays",
     pathHref: "/immersions",
   },
@@ -56,17 +56,17 @@ const items: WelcomedItem[] = [
     id: "retreat-groups",
     category: "group",
     title: "Spiritual Circles & Retreats",
-    tagline: "Truth without performance",
-    body: "A spiritual family built on truth and humility. Such circles can request whole-island buyout windows or group sessions to sit with the land and sacred caves.",
+    tagline: "A family, not a performance",
+    body: "When people of the same frequency meet, they become more than friends. A spiritual family, with no lies and no hypocrisy. Such a family can visit this ground together.",
     pathLabel: "For Groups",
     pathHref: "/for-groups",
   },
   {
     id: "teams",
     category: "group",
-    title: "Purpose-Driven Teams",
+    title: "Team Building",
     tagline: "Shared labor, fire, & clarity",
-    body: "Leaders and colleagues who come to ground themselves, work with their hands on the land, and find strategic stillness around the evening hearth.",
+    body: "Teams who come to work with their hands on the land, sit by the fire, and leave with a clearer mind than they arrived with.",
     pathLabel: "Group Enquiries",
     pathHref: "/for-groups",
   },
@@ -74,8 +74,8 @@ const items: WelcomedItem[] = [
     id: "ba-kyaala",
     category: "group",
     title: "Ekyoto Kya Ba Kyaala",
-    tagline: "Annual sacred women's gathering",
-    body: "An annual coming-together of women for profound rest, womb care, traditional herbal baths, and honest elder-guided talk around the fire.",
+    tagline: "Annual gathering of women",
+    body: "Women carry the house, the work, and everyone else, and often forget themselves. This gathering is for rest, womb care, shared talk, and the girly deeds that no one else makes time for. Menopause is spoken of here. Someone is listening.",
     pathLabel: "Learn about the Circle",
     pathHref: "/for-groups",
   },
@@ -91,7 +91,6 @@ export function WelcomedSelector() {
 
   return (
     <div className="mt-10">
-      {/* Category Pills */}
       <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           type="button"
@@ -139,7 +138,6 @@ export function WelcomedSelector() {
         </button>
       </div>
 
-      {/* Grid of Cards */}
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredItems.map((item) => (
           <div
