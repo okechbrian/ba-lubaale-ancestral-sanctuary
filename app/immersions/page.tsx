@@ -127,7 +127,7 @@ export default function ImmersionsPage() {
                 <li>Cave diagnostic and trauma-release</li>
                 <li>Forest and spring</li>
                 <li>Livestock and fireplace</li>
-                <li>Unlimited one-on-one sessions and workshops of the group's choice</li>
+                <li>Unlimited one-on-one sessions and workshops of the group&apos;s choice</li>
                 <li>Private cook using farm milk, eggs, fish, and herbal teas</li>
               </ul>
               <p className="mt-4 text-xs text-ink/60">
