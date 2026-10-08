@@ -12,6 +12,7 @@ const TABS = [
   { href: "/admin/subscribers", label: "Subscribers" },
   { href: "/admin/stories", label: "Stories" },
   { href: "/admin/inquiries", label: "Enquiries" },
+  { href: "/admin/fire-circle", label: "Fire circle" },
   { href: "/admin/settings", label: "Settings" },
   { href: "/admin/emails", label: "Emails" },
 ];

@@ -63,6 +63,7 @@ export function Footer() {
                 <li><Link href="/immersions" className="text-sm text-cream/70 transition-colors hover:text-leaf">Immersions (Retreats)</Link></li>
                 <li><Link href="/practices" className="text-sm text-cream/70 transition-colors hover:text-leaf">Day Practices</Link></li>
                 <li><Link href="/for-groups" className="text-sm text-cream/70 transition-colors hover:text-leaf">For Groups & Delegations</Link></li>
+                <li><Link href="/fire-circle" className="text-sm text-cream/70 transition-colors hover:text-leaf">The Fire Circle</Link></li>
                 <li><Link href="/vouchers" className="text-sm text-cream/70 transition-colors hover:text-leaf">Gift Vouchers</Link></li>
                 <li><Link href="/apply" className="text-sm text-cream/70 transition-colors hover:text-leaf">Apply for a Stay</Link></li>
               </ul>

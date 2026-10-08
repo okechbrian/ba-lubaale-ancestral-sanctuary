@@ -58,8 +58,8 @@ export interface PaymentRow {
   created_at: string;
   updated_at: string;
   booking_id: string | null; // null for a voucher purchase
-  /** "stay" = deposit/balance for a booking, "voucher" = gift voucher. */
-  subject_kind: "stay" | "voucher";
+  /** "stay" = deposit/balance for a booking, "voucher" = gift voucher, "fire_circle" = monthly seat. */
+  subject_kind: "stay" | "voucher" | "fire_circle";
   kind: PaymentKind;
   amount_usd: string;
   amount_ugx: string;
