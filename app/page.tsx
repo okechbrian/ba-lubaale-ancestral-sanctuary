@@ -5,7 +5,6 @@ import { Hero } from "@/components/Hero";
 import { HearHer } from "@/components/HearHer";
 import { MomentsStrip } from "@/components/MomentsStrip";
 import { HomeQuickJump } from "@/components/home/HomeQuickJump";
-import { ValueStrip } from "@/components/home/ValueStrip";
 import { WelcomedSelector } from "@/components/home/WelcomedSelector";
 import { ThreeActsStepper } from "@/components/home/ThreeActsStepper";
 import { WavyRule, CircleGo } from "@/components/editorial";
@@ -41,8 +40,6 @@ export default async function HomePage() {
     <>
       {/* ─── Section 1: Hero ─── */}
       <Hero />
-
-      <ValueStrip />
 
       {/* ─── Section 1a: In-page jump nav ─── */}
       <HomeQuickJump />
