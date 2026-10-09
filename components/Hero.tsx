@@ -80,13 +80,13 @@ function Frames({ reducedMotion }: { reducedMotion: boolean }) {
 
 function Seal() {
   return (
-    <div className="absolute bottom-3 right-3 z-20 h-20 w-20 sm:bottom-5 sm:right-5 sm:h-32 sm:w-32">
+    <div className="absolute bottom-3 right-3 z-20 h-24 w-24 sm:bottom-5 sm:right-5 sm:h-36 sm:w-36">
       <svg viewBox="0 0 120 120" className="h-full w-full drop-shadow-sm" aria-hidden="true">
         <circle cx="60" cy="60" r="58" fill="#E8A06A" />
         <circle
           cx="60"
           cy="60"
-          r="49"
+          r="50"
           fill="none"
           stroke="#1A1814"
           strokeWidth="0.7"
@@ -94,27 +94,33 @@ function Seal() {
         />
         <path
           id="hero-seal"
-          d="M60,60 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0"
+          d="M60,60 m-40,0 a40,40 0 1,1 80,0 a40,40 0 1,1 -80,0"
           fill="none"
         />
         <text
           fill="#1A1814"
-          fontSize="7"
-          letterSpacing="1.6"
+          fontSize="6.4"
+          letterSpacing="3.1"
           fontFamily="ui-sans-serif, system-ui, sans-serif"
         >
           <textPath href="#hero-seal">
-            PRIVATE · SCREENED · ONE HOUSEHOLD ·
+            LAKE VICTORIA · UGANDA ·
           </textPath>
         </text>
-        <path
-          d="M60 70c0-8 6-12 6-18a6 6 0 0 0-12 0c0 6 6 10 6 18z"
-          fill="none"
-          stroke="#8B2E14"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
+        <text
+          fill="#1A1814"
+          textAnchor="middle"
+          fontFamily="Georgia, 'Times New Roman', serif"
+        >
+          <tspan x="60" y="58" fontSize="13">
+            Ssese
+          </tspan>
+          <tspan x="60" y="72" fontSize="11">
+            Islands
+          </tspan>
+        </text>
       </svg>
+      <span className="sr-only">Ssese Islands, Lake Victoria, Uganda</span>
     </div>
   );
 }
