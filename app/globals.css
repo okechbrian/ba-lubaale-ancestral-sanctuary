@@ -33,6 +33,15 @@ body {
   color: var(--ink);
 }
 
+/* Sideways strips stay swipeable, without a painted scrollbar. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Hero crossfade — 36s round.
    One keyframe block per layer, with literal stops. Custom properties are
    NOT used as keyframe offsets: the CSS minifier collapses those rules
