@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { site } from "@/content/site";
 import { channel, films } from "@/content/teaching";
 import { SubscribeBox } from "@/components/SubscribeBox";
@@ -13,14 +14,16 @@ export function Footer() {
           <div className="lg:col-span-4 space-y-4">
             <Link
               href="/"
-              className="inline-flex flex-col leading-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-bark"
+              className="inline-block rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bark"
+              aria-label="Ba Lubaale Ancestral Sanctuary Kiwamirembe Home"
             >
-              <span className="font-display text-2xl font-semibold tracking-tight text-ink">
-                BA LUBAALE
-              </span>
-              <span className="text-[10px] font-medium tracking-[0.22em] text-bark uppercase">
-                {site.subtitle}
-              </span>
+              <Image
+                src="/images/logo-lockup.png"
+                alt=""
+                width={1461}
+                height={251}
+                className="h-12 w-auto sm:h-14"
+              />
             </Link>
 
             <p className="font-display text-lg leading-snug text-ink max-w-sm">
