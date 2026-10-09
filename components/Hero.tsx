@@ -257,6 +257,14 @@ export function Hero() {
           <p className="mt-4 max-w-md text-base leading-relaxed text-ink/75 sm:text-lg">
             {active.body}
           </p>
+          {/* Locked in DECISIONS.md #1 / MASTER_PROMPT: the poetic subtitle, which
+              must never appear as the header logo. The hero previously showed it
+              below this paragraph; the work-led slides had dropped it from the
+              whole site, so it is restored here at its original size and
+              placement. */}
+          <p className="mt-3 hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/50 sm:block">
+            The Weaver&apos;s Sanctuary &amp; Sacred Caves
+          </p>
           <Link
             href={active.href}
             className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember sm:w-auto"
