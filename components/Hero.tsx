@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { formatFireDate, nextFireSaturday } from "@/lib/fire-circle/date";
 import { useReducedMotion } from "@/components/useReducedMotion";
 import { WavyRule } from "@/components/editorial";
 
@@ -125,29 +127,154 @@ function Seal() {
   );
 }
 
+type Slide = {
+  id: string;
+  title: string;
+  body: string;
+  href: string;
+  cta: string;
+};
+
+function slides(nextFire: string): { now: Slide[]; ahead: Slide[] } {
+  return {
+    now: [
+      {
+        id: "cave",
+        title: "The cave",
+        body: "Three of the caves are open to guests: Nalubaale, Lubaale Musisi, and Lubaale Wanema. The rest are visited only after a calling.",
+        href: "/the-cave",
+        cta: "The three caves",
+      },
+      {
+        id: "springs",
+        title: "The springs",
+        body: "A full-time spring rises in the roots of the ancient tree, clean water used for cleansing before and after cave sessions.",
+        href: "/the-land",
+        cta: "The land",
+      },
+      {
+        id: "fire",
+        title: "The shore fire",
+        body: "Fire burns on the shore most evenings. Evening conversation here, with the host and her people. The day is laid down before sleep.",
+        href: "/the-land",
+        cta: "The land",
+      },
+      {
+        id: "craft",
+        title: "Craft",
+        body: "Guests learn to measure, cut, and sew bark cloth into garments, wall hangings, and talisman wraps. You weave it, sew it, and carry it home.",
+        href: "/atelier",
+        cta: "Visit the Atelier",
+      },
+      {
+        id: "herd",
+        title: "The herd",
+        body: "Free-roaming goats and cows. Naturally fed. Goat bell at dusk.",
+        href: "/the-land",
+        cta: "The land",
+      },
+    ],
+    ahead: [
+      {
+        id: "circle",
+        title: "The fire circle",
+        body: `Online. Queen Nalubaale speaks, then there are questions. No class, no recording, no chat. The next one is ${nextFire}.`,
+        href: "/fire-circle#request",
+        cta: "Request a seat",
+      },
+      {
+        id: "stays",
+        title: "Immersions",
+        body: "Essential Healing Immersion. Master Transformation & Craft. Whole-Island Buyout. One household at a time. Private. Screened.",
+        href: "/immersions",
+        cta: "View the stays",
+      },
+    ],
+  };
+}
+
 export function Hero() {
   const reducedMotion = useReducedMotion();
+  const nextFire = formatFireDate(nextFireSaturday());
+  const [mode, setMode] = useState<"now" | "ahead">("now");
+  const [index, setIndex] = useState(0);
+  const list = slides(nextFire)[mode];
+  const active = list[Math.min(index, list.length - 1)];
+
+  function chooseMode(next: "now" | "ahead") {
+    setMode(next);
+    setIndex(0);
+  }
 
   return (
     <section className="relative bg-cream">
-      <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:gap-6 lg:px-8 lg:py-16">
-        <div className="relative z-10 max-w-xl lg:col-start-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-bark sm:text-[11px] sm:tracking-[0.22em]">
-            Ssese Islands · Lake Victoria · Uganda
-          </p>
-          <h1 className="mt-3 font-display text-5xl font-semibold leading-[0.92] tracking-tight text-ink sm:text-7xl">
-            Ba Lubaale
-            <span className="mt-2 block text-[0.62em] font-medium leading-none">
-              Ancestral Sanctuary
-            </span>
+      <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:gap-6 lg:px-8 lg:py-16">
+        <div className="relative z-10 max-w-xl lg:row-start-1">
+          <div className="flex gap-2" role="tablist" aria-label="What is happening">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === "now"}
+              onClick={() => chooseMode("now")}
+              className={`min-h-11 rounded-full px-4 text-sm font-semibold ${
+                mode === "now" ? "bg-ink text-cream" : "bg-mist text-ink"
+              }`}
+            >
+              Now
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === "ahead"}
+              onClick={() => chooseMode("ahead")}
+              className={`min-h-11 rounded-full px-4 text-sm font-semibold ${
+                mode === "ahead" ? "bg-ink text-cream" : "bg-mist text-ink"
+              }`}
+            >
+              Ahead
+            </button>
+          </div>
+
+          <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto">
+            {list.map((item, i) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setIndex(i)}
+                className={`min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold ${
+                  i === index ? "bg-bark text-cream" : "text-ink/70"
+                }`}
+              >
+                {item.title}
+              </button>
+            ))}
+          </div>
+
+          <h1 className="mt-6 font-display text-4xl font-semibold leading-none text-ink sm:text-6xl">
+            {active.title}
           </h1>
-          <h2 className="mt-3 font-display text-2xl text-bark sm:text-3xl">
-            Kiwamirembe
-          </h2>
-          <WavyRule className="hidden sm:block" />
+          <WavyRule />
+          <p className="mt-4 max-w-md text-base leading-relaxed text-ink/75 sm:text-lg">
+            {active.body}
+          </p>
+          {/* Locked in DECISIONS.md #1 / MASTER_PROMPT: the poetic subtitle, which
+              must never appear as the header logo. The hero previously showed it
+              below this paragraph; the work-led slides had dropped it from the
+              whole site, so it is restored here at its original size and
+              placement. */}
+          <p className="mt-3 hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/50 sm:block">
+            The Weaver&apos;s Sanctuary &amp; Sacred Caves
+          </p>
+          <Link
+            href={active.href}
+            className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember sm:w-auto"
+          >
+            {active.cta}
+            <span aria-hidden="true">→</span>
+          </Link>
         </div>
 
-        <div className="relative lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <div className="relative lg:col-start-2 lg:row-start-1">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-16 top-8 hidden h-[88%] w-36 rounded-[100%] bg-cream lg:block"
@@ -158,33 +285,6 @@ export function Hero() {
             </div>
             <Seal />
           </div>
-        </div>
-
-        <div className="relative z-10 max-w-xl lg:col-start-1">
-          <p className="max-w-sm text-base leading-relaxed text-ink/75 sm:text-lg">
-            A living ancestral sanctuary of cave, craft, herd, and lake.
-          </p>
-          <p className="mt-3 hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/50 sm:block">
-            The Weaver&apos;s Sanctuary & Sacred Caves
-          </p>
-          <div className="mt-6 flex flex-col items-stretch gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
-            <Link
-              href="/apply"
-              className="inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember"
-            >
-              Request an Immersion
-              <span aria-hidden="true">→</span>
-            </Link>
-            <a
-              href="#land-gateways"
-              className="text-center text-sm font-semibold text-ink underline decoration-bark/50 underline-offset-4 transition-colors hover:text-bark sm:text-left"
-            >
-              Enter the Land
-            </a>
-          </div>
-          <p className="mt-4 text-xs tracking-wide text-ink/45">
-            Private. Screened. One household at a time.
-          </p>
         </div>
       </div>
     </section>

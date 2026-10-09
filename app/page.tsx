@@ -580,32 +580,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ─── Section 11: Closing Full-Bleed ─── */}
-      <section className="relative flex min-h-[60vh] items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-dusk" />
-        <Image
-          src="/images/closing-shore.jpg"
-          alt="Shore gathering on Lake Victoria at sunset"
-          fill
-          priority
-          quality={85}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-dusk/60" />
-
-        <div className="relative z-10 mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="font-display text-2xl text-cream sm:text-3xl">
-            Leave the noise. Sit by the fire. Breathe inside the stone.
-          </p>
-          <Link
-            href="/apply"
-            className="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember sm:w-auto"
-          >
-            Request an Immersion
-          </Link>
-        </div>
-      </section>
     </>
   );
 }
