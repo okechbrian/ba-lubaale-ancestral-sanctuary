@@ -80,7 +80,7 @@ export function HomeQuickJump() {
 
   return (
     <div
-      className="sticky z-30 hidden border-b border-ink/10 bg-cream/95 py-3 backdrop-blur-md md:block"
+      className="sticky z-30 border-b border-ink/10 bg-cream/95 py-3 backdrop-blur-md"
       style={{ top: `${headerHeight}px` }}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
