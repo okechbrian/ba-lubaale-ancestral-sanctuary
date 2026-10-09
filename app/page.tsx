@@ -5,8 +5,10 @@ import { Hero } from "@/components/Hero";
 import { HearHer } from "@/components/HearHer";
 import { MomentsStrip } from "@/components/MomentsStrip";
 import { HomeQuickJump } from "@/components/home/HomeQuickJump";
+import { ValueStrip } from "@/components/home/ValueStrip";
 import { WelcomedSelector } from "@/components/home/WelcomedSelector";
 import { ThreeActsStepper } from "@/components/home/ThreeActsStepper";
+import { WavyRule, CircleGo } from "@/components/editorial";
 import { formatFireDate, nextFireSaturday } from "@/lib/fire-circle/date";
 import { resolveContent } from "@/lib/cms";
 import { momentsBlockSchema, testimonialsBlockSchema } from "@/lib/cms/blocks";
@@ -40,43 +42,46 @@ export default async function HomePage() {
       {/* ─── Section 1: Hero ─── */}
       <Hero />
 
+      <ValueStrip />
+
       {/* ─── Section 1a: In-page jump nav ─── */}
       <HomeQuickJump />
 
       {/* ─── Section 1b: Teaching line ─── */}
-      <section className="bg-dusk py-8 sm:py-10">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 px-4 text-center sm:px-6 lg:px-8">
-          <p className="font-display text-lg leading-relaxed text-cream sm:text-xl">
+      <section className="bg-cream pb-4 pt-16 sm:pt-20">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 text-center sm:px-6 lg:px-8">
+          <p className="font-display text-3xl leading-snug text-ink sm:text-4xl">
             This ground is where the Lubaale of Ssese can be approached, and
             where the teaching is lived.
           </p>
+          <WavyRule />
           <Link
             href="/the-host#hear-her"
-            className="text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
+            className="text-sm font-semibold text-ink underline decoration-bark/50 underline-offset-4 transition-colors hover:text-bark"
           >
-            Hear her →
+            Hear her
           </Link>
         </div>
       </section>
 
       {/* ─── Section 2: Host Invitation ─── */}
-      <section className="bg-cream py-20 sm:py-28">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
+      <section className="bg-cream pb-20 pt-12 sm:pb-28">
+        <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 sm:grid-cols-[16rem_1fr] sm:px-6 lg:px-8">
           <Image
             src="/images/host-portrait-headwrap.jpg"
             alt="Queen Nalubaale outdoors in a brown headwrap and gold collar"
-            width={224}
-            height={224}
-            className="h-48 w-48 rounded-full object-cover sm:h-56 sm:w-56"
+            width={320}
+            height={400}
+            className="aspect-[4/5] w-full rounded-[2rem] object-cover"
           />
-          <blockquote className="text-center sm:text-left">
-            <p className="font-display text-2xl leading-relaxed text-ink sm:text-3xl">
+          <blockquote>
+            <p className="font-display text-3xl leading-snug text-ink sm:text-4xl">
               &ldquo;I listen to the wave upon the shore, the breath within your
               chest, and the stories carried in the roots of this land. Welcome
               home to yourself.&rdquo;
             </p>
-            <cite className="mt-4 block text-sm not-italic text-bark">
-              — Queen Nalubaale
+            <cite className="mt-5 block text-sm not-italic font-semibold uppercase tracking-[0.16em] text-bark">
+              Queen Nalubaale
             </cite>
           </blockquote>
         </div>
@@ -86,87 +91,95 @@ export default async function HomePage() {
       <MomentsStrip moments={moments} />
 
       {/* ─── Section 3: Four Land Gateways ─── */}
-      <section
-        id="land-gateways"
-        className="bg-mist py-20 sm:py-28"
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-display text-3xl font-semibold text-ink">
-            The Land
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-ink/70">
-            Tropical forest against grassland, fed by a spring in the roots of
-            an ancient tree. Free-roaming goats and cows. Naturally fed lake
-            fish. An ancient resident tortoise, Mutaka, who is seen most afternoons.
-            And more than a hundred caves, three of them open to guests.
-          </p>
-
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <section id="land-gateways" className="bg-cream pb-20 sm:pb-28">
+        <div className="mx-auto grid max-w-7xl items-end gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
+          <div className="lg:col-span-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bark">
+              The land
+            </p>
+            <h2 className="mt-3 font-display text-5xl font-semibold leading-[0.95] text-ink sm:text-6xl">
+              The Land.
+            </h2>
+            <WavyRule />
+            <p className="mt-6 max-w-sm text-ink/70">
+              Tropical forest against grassland, fed by a spring in the roots of
+              an ancient tree. Free-roaming goats and cows. Naturally fed lake
+              fish. An ancient resident tortoise, Mutaka, who is seen most afternoons.
+              And more than a hundred caves, three of them open to guests.
+            </p>
+            <Link
+              href="/the-land"
+              className="mt-6 inline-block text-sm font-semibold text-ink underline decoration-bark/50 underline-offset-4 hover:text-bark"
+            >
+              Enter the land
+            </Link>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:col-span-8">
             {/* Cave */}
-            <Link href="/the-cave#cave" className="group block">
-              <div className="relative overflow-hidden rounded-md">
+            <Link href="/the-cave#cave" className="group flex flex-col">
+              <div className="rounded-[1.6rem] bg-canopy p-3">
                 <Image
                   src="/images/og-cave-shore.jpg"
                   alt="Mossed rock mouth of Nalubaale Cave seen from the water"
-                  width={400}
-                  height={300}
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  width={480}
+                  height={600}
+                  className="aspect-[4/5] w-full rounded-[1.15rem] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-dusk/60 to-transparent" />
-                <h3 className="absolute bottom-4 left-4 font-display text-xl text-cream">
-                  Cave
-                </h3>
+              </div>
+              <div className="mt-3 flex items-center justify-between px-1">
+                <h3 className="font-display text-xl text-ink">Cave</h3>
+                <CircleGo />
               </div>
             </Link>
 
             {/* Lake House */}
-            <Link href="/the-land#lake-house" className="group block">
-              <div className="relative overflow-hidden rounded-md">
+            <Link href="/the-land#lake-house" className="group flex flex-col">
+              <div className="rounded-[1.6rem] bg-bark-soft p-3">
                 <Image
                   src="/images/lake-house.jpg"
                   alt="The Lake House on stilts over Lake Victoria, framed by mango trees"
-                  width={400}
-                  height={300}
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  width={480}
+                  height={600}
+                  className="aspect-[4/5] w-full rounded-[1.15rem] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-dusk/60 to-transparent" />
-                <h3 className="absolute bottom-4 left-4 font-display text-xl text-cream">
-                  Lake House
-                </h3>
+              </div>
+              <div className="mt-3 flex items-center justify-between px-1">
+                <h3 className="font-display text-xl text-ink">Lake House</h3>
+                <CircleGo />
               </div>
             </Link>
 
             {/* Forest Spring */}
-            <Link href="/the-land#spring" className="group block">
-              <div className="relative overflow-hidden rounded-md">
+            <Link href="/the-land#spring" className="group flex flex-col">
+              <div className="rounded-[1.6rem] bg-dusk p-3">
                 <Image
                   src="/images/forest-roots.jpg"
                   alt="Buttress roots of an ancient tree in the sanctuary forest"
-                  width={400}
-                  height={300}
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  width={480}
+                  height={600}
+                  className="aspect-[4/5] w-full rounded-[1.15rem] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-dusk/60 to-transparent" />
-                <h3 className="absolute bottom-4 left-4 font-display text-xl text-cream">
-                  Forest Spring
-                </h3>
+              </div>
+              <div className="mt-3 flex items-center justify-between px-1">
+                <h3 className="font-display text-xl text-ink">Forest Spring</h3>
+                <CircleGo />
               </div>
             </Link>
 
             {/* Herd & Fire */}
-            <Link href="/the-land#herd" className="group block">
-              <div className="relative overflow-hidden rounded-md">
+            <Link href="/the-land#herd" className="group flex flex-col">
+              <div className="rounded-[1.6rem] bg-ember p-3">
                 <Image
                   src="/images/herd-goats.jpg"
                   alt="Free-roaming goats in the sanctuary compound"
-                  width={400}
-                  height={300}
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  width={480}
+                  height={600}
+                  className="aspect-[4/5] w-full rounded-[1.15rem] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-dusk/60 to-transparent" />
-                <h3 className="absolute bottom-4 left-4 font-display text-xl text-cream">
-                  Herd &amp; Fire
-                </h3>
+              </div>
+              <div className="mt-3 flex items-center justify-between px-1">
+                <h3 className="font-display text-xl text-ink">Herd & Fire</h3>
+                <CircleGo />
               </div>
             </Link>
           </div>
@@ -176,9 +189,10 @@ export default async function HomePage() {
       {/* ─── Section 4: Who Is Welcomed ─── */}
       <section id="who-is-welcomed" className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-display text-3xl font-semibold text-ink">
+          <h2 className="text-center font-display text-4xl font-semibold text-ink sm:text-5xl">
             Who Is Welcomed
           </h2>
+          <WavyRule className="mx-auto" />
 
           <WelcomedSelector />
 
@@ -193,95 +207,123 @@ export default async function HomePage() {
       {/* ─── Section 5: Three Acts ─── */}
       <section id="three-acts" className="bg-dusk py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-display text-3xl font-semibold text-cream">
+          <h2 className="text-center font-display text-4xl font-semibold text-cream sm:text-5xl">
             Three Acts of an Immersion
           </h2>
+          <WavyRule className="mx-auto text-bark-soft!" />
 
           <ThreeActsStepper />
         </div>
       </section>
 
       {/* ─── Section 6: Craft as Healing ─── */}
-      <section id="craft-healing" className="bg-cream py-20 sm:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid items-center gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="overflow-hidden rounded-md">
-              <Image
-                src="/images/host-measuring-bark.jpg"
-                alt="Mama Nalubaale measuring bark cloth with tape in the banana grove"
-                width={400}
-                height={300}
-                className="aspect-[4/3] w-full object-cover"
-              />
-            </div>
-            <div className="overflow-hidden rounded-md">
+      <section id="craft-healing" className="overflow-hidden">
+        <div className="grid lg:grid-cols-12">
+          <div className="flex flex-col justify-center bg-bark px-6 py-14 text-cream sm:px-10 lg:col-span-4 lg:py-20">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cream/80">
+              The atelier
+            </p>
+            <h2 className="mt-3 font-display text-5xl font-semibold leading-[0.95]">
+              Craft as Healing.
+            </h2>
+            <WavyRule className="text-cream!" />
+            <p className="mt-6 text-cream/90">
+              As the fingers work banana fibre, palm leaf, and bark cloth beside
+              the fire, intention leaves the mouth and enters the object that
+              goes home.
+            </p>
+            <Link
+              href="/atelier"
+              className="mt-8 text-sm font-semibold underline decoration-cream/50 underline-offset-4"
+            >
+              Visit the Atelier
+            </Link>
+          </div>
+          <div className="grid gap-3 bg-mist p-4 sm:grid-cols-3 lg:col-span-5 lg:grid-cols-1 lg:p-8">
+            <Image
+              src="/images/host-measuring-bark.jpg"
+              alt="Mama Nalubaale measuring bark cloth with tape in the banana grove"
+              width={800}
+              height={520}
+              className="aspect-[4/3] w-full rounded-[1.4rem] object-cover sm:col-span-2 lg:col-span-1 lg:aspect-[16/10]"
+            />
+            <div className="grid grid-cols-2 gap-3 sm:col-span-1 sm:grid-cols-1 lg:grid-cols-2">
               <Image
                 src="/images/bark-dresses-stand.jpg"
                 alt="Finished bark-cloth dresses hanging on a stand among banana trees"
                 width={400}
                 height={300}
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-square w-full rounded-[1.2rem] object-cover"
               />
-            </div>
-            <div className="overflow-hidden rounded-md sm:col-span-2 lg:col-span-1">
               <Image
                 src="/images/cowrie-four.jpg"
                 alt="Four women wearing cowrie strand necklaces"
                 width={400}
                 height={300}
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-square w-full rounded-[1.2rem] object-cover"
               />
             </div>
           </div>
-
-          <div className="mt-10 max-w-2xl">
-            <h2 className="font-display text-3xl font-semibold text-ink">
-              Craft as Healing
-            </h2>
-            <p className="mt-4 text-lg text-ink/70">
-              As the fingers work banana fibre, palm leaf, and bark cloth beside
-              the fire, intention leaves the mouth and enters the object that
-              goes home.
-            </p>
-            <p className="mt-2 text-lg text-ink/70">
+          <div className="flex flex-col items-center justify-center bg-canopy px-8 py-14 text-center text-cream lg:col-span-3">
+            <svg viewBox="0 0 160 160" className="h-40 w-40" aria-hidden="true">
+              <circle cx="80" cy="80" r="74" fill="none" stroke="currentColor" strokeWidth="1" />
+              <path
+                id="craft-seal"
+                d="M80,80 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"
+                fill="none"
+              />
+              <text fill="currentColor" fontSize="9" letterSpacing="2.4">
+                <textPath href="#craft-seal">
+                  WEAVE IT · SEW IT · CARRY IT HOME ·
+                </textPath>
+              </text>
+              <text
+                x="80"
+                y="84"
+                textAnchor="middle"
+                fill="currentColor"
+                fontSize="13"
+                fontFamily="Georgia, serif"
+              >
+                Home
+              </text>
+            </svg>
+            <p className="mt-6 max-w-xs text-sm leading-relaxed text-cream/85">
               You do not only speak the intention. You weave it, sew it, and
               carry it home.
             </p>
-            <Link
-              href="/atelier"
-              className="mt-6 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
-            >
-              Visit the Atelier →
-            </Link>
           </div>
         </div>
       </section>
 
       {/* ─── Section 7: Host Block ─── */}
-      <section id="the-host" className="bg-mist py-20 sm:py-28">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 sm:flex-row sm:px-6 lg:px-8">
+      <section id="the-host" className="bg-cream py-20 sm:py-28">
+        <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 sm:grid-cols-[18rem_1fr] sm:px-6 lg:px-8">
           <Image
             src="/images/host-portrait-headwrap.jpg"
             alt="Queen Nalubaale, a seer, healer, and master artisan"
-            width={288}
-            height={288}
-            className="h-56 w-56 rounded-full object-cover sm:h-72 sm:w-72"
+            width={360}
+            height={440}
+            className="aspect-[4/5] w-full rounded-[2rem] object-cover"
           />
           <div className="max-w-md">
-            <h2 className="font-display text-3xl font-semibold text-ink">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bark">
+              Mama Nalubaale
+            </p>
+            <h2 className="mt-3 font-display text-5xl font-semibold leading-none text-ink">
               Queen Nalubaale
             </h2>
-            <p className="mt-1 text-bark">Mama Nalubaale</p>
-            <p className="mt-4 text-lg text-ink/70">
+            <WavyRule />
+            <p className="mt-6 text-lg text-ink/70">
               I work with breath, bark, cowrie, root water, and the fire that
               has burned on this shore longer than any of us can remember. This
               sanctuary is not a business I started — it is a place I was given.
             </p>
             <Link
               href="/the-host"
-              className="mt-5 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
+              className="mt-6 inline-block text-sm font-semibold text-ink underline decoration-bark/50 underline-offset-4 hover:text-bark"
             >
-              Meet the host →
+              Meet the host
             </Link>
           </div>
         </div>
@@ -321,87 +363,114 @@ export default async function HomePage() {
       {/* ─── Section 8: Three Stay Cards ─── */}
       <section id="immersions" className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center font-display text-3xl font-semibold text-ink">
-            Immersions
+          <div className="text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bark">
+            Stays
+          </p>
+          <h2 className="mt-3 text-center font-display text-5xl font-semibold text-ink">
+            Immersions.
           </h2>
+          <WavyRule className="mx-auto" />
           <p className="mx-auto mt-3 max-w-2xl text-center text-ink/70">
             One household at a time. Private. Screened. Application-gated.
           </p>
+          </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {/* Essential Healing */}
-            <div className="rounded-md border border-mist bg-cream p-6">
-              <h3 className="font-display text-xl text-ink">
-                Essential Healing Immersion
-              </h3>
-              <p className="mt-1 text-sm text-bark">3 days / 2 nights</p>
-              <p className="mt-2 text-sm font-semibold text-ink">
-                Essential from USD 2,200
-              </p>
-              <p className="mt-4 text-sm leading-relaxed text-ink/70">
-                A cottage, two Lake House readings — diagnostic and fish
-                feeding — one cave healing session, daily root-water cleansing,
-                fireplace release, and a cowrie talisman workshop.
-              </p>
-              <Link
-                href="/immersions"
-                className="mt-6 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
-              >
-                View details →
-              </Link>
+            <div className="flex h-full flex-col overflow-hidden rounded-[1.6rem]">
+              <div className="bg-canopy px-6 py-7 text-cream">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-cream/75">
+                  3 days / 2 nights
+                </p>
+                <h3 className="mt-2 font-display text-2xl leading-tight">
+                  Essential Healing Immersion
+                </h3>
+              </div>
+              <div className="flex flex-1 flex-col bg-mist p-6">
+                <p className="text-sm font-semibold text-ink">
+                  Essential from USD 2,200
+                </p>
+                <p className="mt-4 text-sm leading-relaxed text-ink/70">
+                  A cottage, two Lake House readings — diagnostic and fish
+                  feeding — one cave healing session, daily root-water cleansing,
+                  fireplace release, and a cowrie talisman workshop.
+                </p>
+                <Link
+                  href="/immersions"
+                  className="group mt-auto flex items-center justify-between pt-6 text-sm font-semibold text-ink"
+                >
+                  View details
+                  <CircleGo />
+                </Link>
+              </div>
             </div>
 
             {/* Master Transformation */}
-            <div className="rounded-md border border-mist bg-cream p-6">
-              <h3 className="font-display text-xl text-ink">
-                Master Transformation &amp; Craft
-              </h3>
-              <p className="mt-1 text-sm text-bark">5 days / 4 nights</p>
-              <p className="mt-2 text-sm font-semibold text-ink">
-                Master from USD 4,500
-              </p>
-              <p className="mt-4 text-sm leading-relaxed text-ink/70">
-                Full sanctuary access, three Lake House sessions, two cave
-                sessions, daily spring cleansing, fireplace release and
-                arbitration, a bark-cloth garment or wall hanging, and custom
-                herbal teas.
-              </p>
-              <Link
-                href="/immersions"
-                className="mt-6 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
-              >
-                View details →
-              </Link>
+            <div className="flex h-full flex-col overflow-hidden rounded-[1.6rem]">
+              <div className="bg-ember px-6 py-7 text-cream">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-cream/75">
+                  5 days / 4 nights
+                </p>
+                <h3 className="mt-2 font-display text-2xl leading-tight">
+                  Master Transformation & Craft
+                </h3>
+              </div>
+              <div className="flex flex-1 flex-col bg-mist p-6">
+                <p className="text-sm font-semibold text-ink">
+                  Master from USD 4,500
+                </p>
+                <p className="mt-4 text-sm leading-relaxed text-ink/70">
+                  Full sanctuary access, three Lake House sessions, two cave
+                  sessions, daily spring cleansing, fireplace release and
+                  arbitration, a bark-cloth garment or wall hanging, and custom
+                  herbal teas.
+                </p>
+                <Link
+                  href="/immersions"
+                  className="group mt-auto flex items-center justify-between pt-6 text-sm font-semibold text-ink"
+                >
+                  View details
+                  <CircleGo />
+                </Link>
+              </div>
             </div>
 
             {/* Whole-island buyout */}
-            <div className="rounded-md border border-mist bg-cream p-6">
-              <h3 className="font-display text-xl text-ink">
-                Whole-Island Buyout
-              </h3>
-              <p className="mt-1 text-sm text-bark">3 days</p>
-              <p className="mt-2 text-sm font-semibold text-ink">
-                Buyout from USD 10,000
-              </p>
-              <p className="mt-4 text-sm leading-relaxed text-ink/70">
-                Exclusive use of the whole land — cave, Lake House, spring,
-                livestock and fireplace, unlimited one-on-one sessions and
-                workshops of the group&apos;s choice, and a private cook using
-                farm milk, lake fish, herbs, and fruit. House food protocol
-                still applies.
-              </p>
-              <Link
-                href="/immersions"
-                className="mt-6 inline-block text-sm font-semibold text-leaf transition-colors hover:text-leaf/80"
-              >
-                View details →
-              </Link>
+            <div className="flex h-full flex-col overflow-hidden rounded-[1.6rem]">
+              <div className="bg-dusk px-6 py-7 text-cream">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-cream/75">
+                  3 days
+                </p>
+                <h3 className="mt-2 font-display text-2xl leading-tight">
+                  Whole-Island Buyout
+                </h3>
+              </div>
+              <div className="flex flex-1 flex-col bg-mist p-6">
+                <p className="text-sm font-semibold text-ink">
+                  Buyout from USD 10,000
+                </p>
+                <p className="mt-4 text-sm leading-relaxed text-ink/70">
+                  Exclusive use of the whole land — cave, Lake House, spring,
+                  livestock and fireplace, unlimited one-on-one sessions and
+                  workshops of the group&apos;s choice, and a private cook using
+                  farm milk, lake fish, herbs, and fruit. House food protocol
+                  still applies.
+                </p>
+                <Link
+                  href="/immersions"
+                  className="group mt-auto flex items-center justify-between pt-6 text-sm font-semibold text-ink"
+                >
+                  View details
+                  <CircleGo />
+                </Link>
+              </div>
             </div>
           </div>
 
           <p className="mt-8 text-center text-sm text-ink/60">
             East Africa resident rates are on{" "}
-            <Link href="/practices" className="text-leaf hover:underline">
+            <Link href="/practices" className="text-bark underline underline-offset-2">
               /practices
             </Link>
             .
@@ -410,30 +479,32 @@ export default async function HomePage() {
       </section>
 
       {/* ─── Section 8b: The fire circle ─── */}
-      <section id="fire-circle" className="bg-dusk py-20 sm:py-28">
+      <section id="fire-circle" className="bg-bark py-20 text-cream sm:py-24">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-bark-soft">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cream/80">
             One evening a month
           </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold text-cream">
+          <h2 className="mt-3 font-display text-5xl font-semibold">
             The fire circle
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-cream/80">
+          <WavyRule className="mx-auto text-cream!" />
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-cream/90">
             Online. Queen Nalubaale speaks, then there are questions. No class,
             no recording, no chat.
           </p>
-          <p className="mt-4 text-cream/80">
+          <p className="mt-4 text-cream/90">
             The next one is {nextFire}.
           </p>
-          <p className="mt-2 text-cream/80">
+          <p className="mt-2 text-cream/90">
             The amount is not on this page. She confirms it if she approves a
             seat.
           </p>
           <Link
             href="/fire-circle#request"
-            className="mt-8 inline-block rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
+            className="mt-8 inline-flex items-center gap-3 rounded-full bg-cream px-6 py-3 text-sm font-semibold text-bark transition-colors hover:bg-mist"
           >
-            Request a seat →
+            Request a seat
+            <span aria-hidden="true">→</span>
           </Link>
         </div>
       </section>
@@ -447,13 +518,13 @@ export default async function HomePage() {
           <div className="flex gap-4">
             <Link
               href="/apply"
-              className="rounded-md bg-lake px-6 py-2 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
+              className="rounded-full bg-cream px-6 py-2.5 text-sm font-semibold text-canopy transition-colors hover:bg-mist"
             >
               Request Immersion
             </Link>
             <Link
               href="/prepare"
-              className="rounded-md border border-cream/30 px-6 py-2 text-sm font-semibold text-cream transition-colors hover:border-cream/60"
+              className="rounded-full border border-cream/40 px-6 py-2.5 text-sm font-semibold text-cream transition-colors hover:border-cream"
             >
               How to Prepare
             </Link>
@@ -528,7 +599,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/apply"
-            className="mt-8 inline-block rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
+            className="mt-8 inline-flex items-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember"
           >
             Request an Immersion
           </Link>

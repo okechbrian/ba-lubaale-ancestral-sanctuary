@@ -61,10 +61,10 @@ export function SubscribeBox() {
 
   return (
     <div>
-      <p className="text-xs font-semibold tracking-widest text-bark-soft uppercase">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-bark">
         Stay in Touch
       </p>
-      <p className="mt-2 max-w-md text-sm leading-relaxed text-cream/70">
+      <p className="mt-2 max-w-md text-sm leading-relaxed text-ink/70">
         Occasional notes from the sanctuary, featuring stories from the land and the
         household, and the dates we open. Confirm through your email;
         unsubscribe any time.
@@ -72,12 +72,12 @@ export function SubscribeBox() {
 
       {state.kind === "done" ? (
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <p className="text-sm font-semibold text-leaf">
+          <p className="text-sm font-semibold text-canopy">
             Almost there! Please check your inbox and confirm your subscription.
           </p>
           <button
             type="button"
-            className="text-xs text-cream/50 underline transition-colors hover:text-cream/80"
+            className="text-xs text-ink/50 underline transition-colors hover:text-ink"
             onClick={() => setState({ kind: "idle" })}
           >
             Use another address
@@ -94,18 +94,18 @@ export function SubscribeBox() {
               type="email"
               required
               autoComplete="email"
-              placeholder="Your email address"
+              placeholder="Email address"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
                 if (state.kind === "error") setState({ kind: "idle" });
               }}
-              className="w-full rounded-md border border-cream/20 bg-cream/10 px-3 py-2.5 text-sm text-cream placeholder:text-cream/40 focus:border-leaf focus:outline-none"
+              className="w-full rounded-full border border-ink/15 bg-cream px-4 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-bark focus:outline-none"
             />
             <button
               type="submit"
               disabled={state.kind === "busy"}
-              className="rounded-md bg-leaf px-5 py-2.5 text-sm font-semibold text-dusk transition-colors hover:bg-leaf/90 disabled:opacity-50"
+              className="rounded-full bg-bark px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-ember disabled:opacity-50"
             >
               {state.kind === "busy" ? "Sending…" : "Subscribe"}
             </button>
@@ -124,7 +124,7 @@ export function SubscribeBox() {
           />
 
           {state.kind === "error" && (
-            <p className="mt-3 text-sm text-bark-soft">{state.message}</p>
+            <p className="mt-3 text-sm text-ember">{state.message}</p>
           )}
         </form>
       )}

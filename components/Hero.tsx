@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useReducedMotion } from "@/components/useReducedMotion";
+import { WavyRule } from "@/components/editorial";
 
 /**
  * Hero crossfade: four stills then the tortoise clip, 36s round.
  * The first frame paints at once; the rest ramp in and out on the
  * per-layer keyframes declared in globals.css. Costs no JavaScript and
  * no extra bytes. Reduced-motion visitors get one still and no cycle.
+ * The cycle now plays inside the curved panel, not as a full-bleed screen.
  */
 const HERO_CYCLE = "36s linear infinite";
 
@@ -23,103 +25,151 @@ const LATER_FRAMES = [
   { src: "/images/fire-night.jpg", frame: 4 },
 ] as const;
 
+function Frames({ reducedMotion }: { reducedMotion: boolean }) {
+  if (reducedMotion) {
+    return (
+      <Image
+        src={FIRST_FRAME.src}
+        alt={FIRST_FRAME.alt}
+        fill
+        priority
+        quality={85}
+        className="object-cover"
+      />
+    );
+  }
+
+  return (
+    <>
+      <Image
+        src={FIRST_FRAME.src}
+        alt={FIRST_FRAME.alt}
+        fill
+        priority
+        quality={85}
+        className="object-cover"
+        style={{ animation: `heroFrame1 ${HERO_CYCLE}` }}
+      />
+      {LATER_FRAMES.map(({ src, frame }) => (
+        <Image
+          key={src}
+          src={src}
+          alt=""
+          fill
+          quality={85}
+          aria-hidden="true"
+          className="object-cover"
+          style={{ animation: `heroFrame${frame} ${HERO_CYCLE}` }}
+        />
+      ))}
+      <video
+        muted
+        playsInline
+        loop
+        autoPlay
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ animation: `heroFrame5 ${HERO_CYCLE}` }}
+      >
+        <source src="/images/hero-herd-video-v1.mp4" type="video/mp4" />
+      </video>
+    </>
+  );
+}
+
 export function Hero() {
   const reducedMotion = useReducedMotion();
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      {reducedMotion ? (
-        /* Reduced motion: one still, no cycle, no video */
-        <Image
-          src={FIRST_FRAME.src}
-          alt={FIRST_FRAME.alt}
-          fill
-          priority
-          quality={85}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      ) : (
-        <>
-          {/* Frame 1 — already on screen at load, so it never fades in */}
-          <Image
-            src={FIRST_FRAME.src}
-            alt={FIRST_FRAME.alt}
-            fill
-            priority
-            quality={85}
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ animation: `heroFrame1 ${HERO_CYCLE}` }}
-          />
-
-          {/* Frames 2–4: stills */}
-          {LATER_FRAMES.map(({ src, frame }) => (
-            <Image
-              key={src}
-              src={src}
-              alt=""
-              fill
-              quality={85}
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full object-cover"
-              style={{ animation: `heroFrame${frame} ${HERO_CYCLE}` }}
-            />
-          ))}
-
-          {/* Frame 5: the tortoise clip closes the cycle */}
-          <video
-            muted
-            playsInline
-            loop
-            autoPlay
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ animation: `heroFrame5 ${HERO_CYCLE}` }}
-          >
-            <source src="/images/hero-herd-video-v1.mp4" type="video/mp4" />
-          </video>
-        </>
-      )}
-
-      {/* Dusk overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-dusk/60 via-dusk/50 to-dusk/70" />
-
-      {/* Content */}
-      <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <p className="text-xs font-semibold tracking-[0.3em] text-bark-soft uppercase">
-          Ssese Islands · Lake Victoria · Uganda
-        </p>
-        <h1 className="mt-6 font-display text-5xl font-semibold text-cream sm:text-7xl">
-          Ba Lubaale Ancestral Sanctuary
-        </h1>
-        <h2 className="mt-2 font-display text-3xl text-bark-soft sm:text-4xl">
-          Kiwamirembe
-        </h2>
-        <p className="mt-6 text-lg text-cream/80 sm:text-xl">
-          A living ancestral sanctuary of cave, craft, herd, and lake.
-        </p>
-        <p className="mt-2 text-sm tracking-widest text-bark-soft/70 uppercase">
-          The Weaver&apos;s Sanctuary &amp; Sacred Caves
-        </p>
-
-        <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Link
-            href="/apply"
-            className="rounded-md bg-lake px-8 py-3 text-sm font-semibold text-cream transition-colors hover:bg-lake/80"
-          >
-            Request an Immersion
-          </Link>
-          <a
-            href="#land-gateways"
-            className="rounded-md border border-cream/30 px-8 py-3 text-sm font-semibold text-cream transition-colors hover:border-cream/60"
-          >
-            Enter the Land
-          </a>
+    <section className="relative overflow-hidden bg-cream">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-6 lg:px-8 lg:py-16">
+        <div className="relative z-10 max-w-xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-bark">
+            Ssese Islands · Lake Victoria · Uganda
+          </p>
+          <h1 className="mt-4 font-display text-5xl font-semibold leading-[0.92] tracking-tight text-ink sm:text-7xl">
+            Ba Lubaale
+            <span className="mt-2 block text-[0.62em] font-medium leading-none">
+              Ancestral Sanctuary
+            </span>
+          </h1>
+          <h2 className="mt-4 font-display text-2xl text-bark sm:text-3xl">
+            Kiwamirembe
+          </h2>
+          <WavyRule />
+          <p className="mt-6 max-w-sm text-lg leading-relaxed text-ink/75">
+            A living ancestral sanctuary of cave, craft, herd, and lake.
+          </p>
+          <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/50">
+            The Weaver&apos;s Sanctuary & Sacred Caves
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-6">
+            <Link
+              href="/apply"
+              className="inline-flex items-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember"
+            >
+              Request an Immersion
+              <span aria-hidden="true">→</span>
+            </Link>
+            <a
+              href="#land-gateways"
+              className="text-sm font-semibold text-ink underline decoration-bark/50 underline-offset-4 transition-colors hover:text-bark"
+            >
+              Enter the Land
+            </a>
+          </div>
+          <p className="mt-6 text-xs tracking-wide text-ink/45">
+            Private. Screened. One household at a time.
+          </p>
         </div>
 
-        <p className="mt-8 text-xs text-cream/50">
-          Private. Screened. One household at a time.
-        </p>
+        <div className="relative">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-16 top-8 hidden h-[88%] w-36 rounded-[100%] bg-cream lg:block"
+          />
+          <div className="relative min-h-[26rem] overflow-hidden rounded-[2.25rem] bg-bark sm:min-h-[32rem] lg:rounded-bl-[7.5rem] lg:rounded-tr-[2.25rem]">
+            <div className="absolute inset-3 overflow-hidden rounded-[1.7rem] bg-dusk sm:inset-4 lg:rounded-bl-[6.5rem]">
+              <Frames reducedMotion={reducedMotion} />
+            </div>
+          </div>
+          <div className="absolute -bottom-3 right-3 z-20 h-28 w-28 sm:right-6 sm:h-32 sm:w-32">
+            <svg viewBox="0 0 120 120" className="h-full w-full drop-shadow-sm" aria-hidden="true">
+              <circle cx="60" cy="60" r="58" fill="#E8A06A" />
+              <circle
+                cx="60"
+                cy="60"
+                r="49"
+                fill="none"
+                stroke="#1A1814"
+                strokeWidth="0.7"
+                strokeDasharray="1.5 2.2"
+              />
+              <path
+                id="hero-seal"
+                d="M60,60 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0"
+                fill="none"
+              />
+              <text
+                fill="#1A1814"
+                fontSize="7"
+                letterSpacing="1.6"
+                fontFamily="ui-sans-serif, system-ui, sans-serif"
+              >
+                <textPath href="#hero-seal">
+                  PRIVATE · SCREENED · ONE HOUSEHOLD ·
+                </textPath>
+              </text>
+              <path
+                d="M60 70c0-8 6-12 6-18a6 6 0 0 0-12 0c0 6 6 10 6 18z"
+                fill="none"
+                stroke="#8B2E14"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
       </div>
     </section>
   );

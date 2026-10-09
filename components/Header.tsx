@@ -90,31 +90,15 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-cream/95 backdrop-blur-md shadow-sm border-b border-mist/70 py-2.5"
-          : "bg-cream/90 backdrop-blur-sm border-b border-transparent py-3.5"
+      className={`sticky top-0 z-50 border-b border-mist bg-cream transition-shadow duration-300 ${
+        scrolled ? "shadow-sm" : ""
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Wordmark */}
-        <Link
-          href="/"
-          className="group flex flex-col leading-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm"
-          aria-label="Ba Lubaale Ancestral Sanctuary Kiwamirembe Home"
-        >
-          <span className="font-display text-lg font-semibold tracking-wide text-ink transition-colors group-hover:text-canopy sm:text-xl">
-            BA LUBAALE
-          </span>
-          <span className="text-[10px] font-medium tracking-[0.2em] text-bark uppercase transition-colors group-hover:text-ember">
-            {site.subtitle}
-          </span>
-        </Link>
-
-        {/* Desktop nav */}
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        {/* Desktop nav, left */}
         <nav
           ref={navRef}
-          className="hidden items-center gap-7 lg:flex"
+          className="hidden items-center gap-4 xl:gap-6 lg:flex"
           aria-label="Main"
         >
           {/* Group 1: The Sanctuary */}
@@ -125,10 +109,10 @@ export function Header() {
           >
             <button
               type="button"
-              className={`flex items-center gap-1.5 text-sm font-medium transition-colors py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm ${
+              className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm xl:text-[11px] xl:tracking-[0.16em] ${
                 isGroupActive(navigationGroups.sanctuary.items) ||
                 activeDropdown === "sanctuary"
-                  ? "text-leaf font-semibold"
+                  ? "text-bark"
                   : "text-ink/80 hover:text-ink"
               }`}
               onClick={() =>
@@ -142,7 +126,7 @@ export function Header() {
               <span>{navigationGroups.sanctuary.label}</span>
               <svg
                 className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                  activeDropdown === "sanctuary" ? "rotate-180 text-leaf" : "text-ink/50"
+                  activeDropdown === "sanctuary" ? "rotate-180 text-bark" : "text-ink/50"
                 }`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -171,7 +155,7 @@ export function Header() {
                         role="menuitem"
                         className={`group flex flex-col rounded-md p-2.5 transition-colors ${
                           active
-                            ? "bg-mist/80 text-leaf"
+                            ? "bg-mist/80 text-bark"
                             : "hover:bg-mist/50 text-ink"
                         }`}
                         onClick={() => setActiveDropdown(null)}
@@ -179,7 +163,7 @@ export function Header() {
                         <span className="font-display text-sm font-semibold flex items-center justify-between">
                           <span>{item.label}</span>
                           {active && (
-                            <span className="h-1.5 w-1.5 rounded-full bg-leaf" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-bark" />
                           )}
                         </span>
                         <span className="mt-0.5 text-xs text-ink/70 leading-relaxed font-normal">
@@ -201,10 +185,10 @@ export function Header() {
           >
             <button
               type="button"
-              className={`flex items-center gap-1.5 text-sm font-medium transition-colors py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm ${
+              className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm xl:text-[11px] xl:tracking-[0.16em] ${
                 isGroupActive(navigationGroups.experiences.items) ||
                 activeDropdown === "experiences"
-                  ? "text-leaf font-semibold"
+                  ? "text-bark"
                   : "text-ink/80 hover:text-ink"
               }`}
               onClick={() =>
@@ -219,7 +203,7 @@ export function Header() {
               <svg
                 className={`h-3.5 w-3.5 transition-transform duration-200 ${
                   activeDropdown === "experiences"
-                    ? "rotate-180 text-leaf"
+                    ? "rotate-180 text-bark"
                     : "text-ink/50"
                 }`}
                 viewBox="0 0 20 20"
@@ -249,7 +233,7 @@ export function Header() {
                         role="menuitem"
                         className={`group flex flex-col rounded-md p-2.5 transition-colors ${
                           active
-                            ? "bg-mist/80 text-leaf"
+                            ? "bg-mist/80 text-bark"
                             : "hover:bg-mist/50 text-ink"
                         }`}
                         onClick={() => setActiveDropdown(null)}
@@ -257,7 +241,7 @@ export function Header() {
                         <span className="font-display text-sm font-semibold flex items-center justify-between">
                           <span>{item.label}</span>
                           {active && (
-                            <span className="h-1.5 w-1.5 rounded-full bg-leaf" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-bark" />
                           )}
                         </span>
                         <span className="mt-0.5 text-xs text-ink/70 leading-relaxed font-normal">
@@ -271,18 +255,6 @@ export function Header() {
             )}
           </div>
 
-          {/* Direct Link: Stories */}
-          <Link
-            href="/stories"
-            className={`text-sm font-medium transition-colors py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm ${
-              pathname === "/stories" || pathname.startsWith("/stories/")
-                ? "text-leaf font-semibold"
-                : "text-ink/80 hover:text-ink"
-            }`}
-          >
-            Stories
-          </Link>
-
           {/* Group 3: Visit & Plan */}
           <div
             className="relative"
@@ -291,10 +263,10 @@ export function Header() {
           >
             <button
               type="button"
-              className={`flex items-center gap-1.5 text-sm font-medium transition-colors py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm ${
+              className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm xl:text-[11px] xl:tracking-[0.16em] ${
                 isGroupActive(navigationGroups.visit.items) ||
                 activeDropdown === "visit"
-                  ? "text-leaf font-semibold"
+                  ? "text-bark"
                   : "text-ink/80 hover:text-ink"
               }`}
               onClick={() =>
@@ -306,7 +278,7 @@ export function Header() {
               <span>{navigationGroups.visit.label}</span>
               <svg
                 className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                  activeDropdown === "visit" ? "rotate-180 text-leaf" : "text-ink/50"
+                  activeDropdown === "visit" ? "rotate-180 text-bark" : "text-ink/50"
                 }`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -335,7 +307,7 @@ export function Header() {
                         role="menuitem"
                         className={`group flex flex-col rounded-md p-2.5 transition-colors ${
                           active
-                            ? "bg-mist/80 text-leaf"
+                            ? "bg-mist/80 text-bark"
                             : "hover:bg-mist/50 text-ink"
                         }`}
                         onClick={() => setActiveDropdown(null)}
@@ -343,7 +315,7 @@ export function Header() {
                         <span className="font-display text-sm font-semibold flex items-center justify-between">
                           <span>{item.label}</span>
                           {active && (
-                            <span className="h-1.5 w-1.5 rounded-full bg-leaf" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-bark" />
                           )}
                         </span>
                         <span className="mt-0.5 text-xs text-ink/70 leading-relaxed font-normal">
@@ -356,31 +328,45 @@ export function Header() {
               </div>
             )}
           </div>
-
-          {/* CTA: Request Immersion */}
-          <Link
-            href="/apply"
-            className="rounded-md bg-lake px-4 py-2 text-sm font-semibold text-cream shadow-sm transition-all duration-200 hover:bg-lake/85 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-lake focus-visible:ring-offset-2 focus-visible:ring-offset-cream active:scale-95"
-          >
-            Request Immersion
-          </Link>
-
-          {/* Language Stub */}
-          <LanguageStub />
         </nav>
 
-        {/* Mobile menu trigger */}
-        <div className="flex items-center gap-3 lg:hidden">
-          <Link
-            href="/apply"
-            className="rounded-md bg-lake px-3 py-1.5 text-xs font-semibold text-cream transition-colors hover:bg-lake/85"
-          >
-            Request
-          </Link>
+        <Link
+          href="/"
+          className="group justify-self-center text-center leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm"
+          aria-label="Ba Lubaale Ancestral Sanctuary Kiwamirembe Home"
+        >
+          <span className="block font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+            BA LUBAALE
+          </span>
+          <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.22em] text-bark">
+            {site.subtitle}
+          </span>
+        </Link>
+
+        <div className="flex items-center justify-end gap-4">
+          <div className="hidden items-center gap-5 lg:flex">
+            <Link
+              href="/stories"
+              className={`text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm ${
+                pathname === "/stories" || pathname.startsWith("/stories/")
+                  ? "text-bark"
+                  : "text-ink/80 hover:text-ink"
+              }`}
+            >
+              Stories
+            </Link>
+            <Link
+              href="/apply"
+              className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:text-bark"
+            >
+              Request
+            </Link>
+            <LanguageStub />
+          </div>
 
           <button
             type="button"
-            className="relative flex h-10 w-10 items-center justify-center rounded-md text-ink hover:bg-mist/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-bark"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-mist focus:outline-none focus-visible:ring-2 focus-visible:ring-bark lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
@@ -460,7 +446,7 @@ export function Header() {
                     onClick={() => setMobileOpen(false)}
                     className={`block rounded-md py-2 px-3 font-display text-lg font-medium transition-colors ${
                       pathname === item.href
-                        ? "bg-mist text-leaf"
+                        ? "bg-mist text-bark"
                         : "text-ink hover:bg-mist/50"
                     }`}
                   >
@@ -486,7 +472,7 @@ export function Header() {
                     onClick={() => setMobileOpen(false)}
                     className={`block rounded-md py-2 px-3 font-display text-lg font-medium transition-colors ${
                       pathname === item.href
-                        ? "bg-mist text-leaf"
+                        ? "bg-mist text-bark"
                         : "text-ink hover:bg-mist/50"
                     }`}
                   >
@@ -501,7 +487,7 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                   className={`block rounded-md py-2 px-3 font-display text-lg font-medium transition-colors ${
                     pathname === "/stories"
-                      ? "bg-mist text-leaf"
+                      ? "bg-mist text-bark"
                       : "text-ink hover:bg-mist/50"
                   }`}
                 >
@@ -526,7 +512,7 @@ export function Header() {
                     onClick={() => setMobileOpen(false)}
                     className={`block rounded-md py-2 px-3 font-display text-lg font-medium transition-colors ${
                       pathname === item.href
-                        ? "bg-mist text-leaf"
+                        ? "bg-mist text-bark"
                         : "text-ink hover:bg-mist/50"
                     }`}
                   >
@@ -544,7 +530,7 @@ export function Header() {
           <div className="border-t border-mist/70 bg-cream p-6 space-y-4">
             <Link
               href="/apply"
-              className="block w-full rounded-md bg-lake py-3.5 text-center font-display text-base font-semibold text-cream shadow transition-colors hover:bg-lake/85"
+              className="block w-full rounded-full bg-bark py-3.5 text-center text-sm font-semibold text-cream transition-colors hover:bg-ember"
               onClick={() => setMobileOpen(false)}
             >
               Request an Immersion
@@ -554,7 +540,7 @@ export function Header() {
               <LanguageStub />
               <a
                 href={`mailto:${site.contact.email}`}
-                className="hover:text-leaf transition-colors"
+                className="hover:text-bark transition-colors"
               >
                 {site.contact.email}
               </a>
