@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatFireDate, nextFireSaturday } from "@/lib/fire-circle/date";
+import { nextIndex, readMsFor, shouldAutoAdvance } from "@/lib/hero-slides";
 import { useReducedMotion } from "@/components/useReducedMotion";
 import { WavyRule } from "@/components/editorial";
 
@@ -198,41 +199,132 @@ export function Hero() {
   const nextFire = formatFireDate(nextFireSaturday());
   const [mode, setMode] = useState<"now" | "ahead">("now");
   const [index, setIndex] = useState(0);
-  const list = slides(nextFire)[mode];
+  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focusWithin, setFocusWithin] = useState(false);
+  const [hidden, setHidden] = useState(false);
+const [manualStep, setManualStep] = useState(0);
+  const heroRef = useRef<HTMLElement>(null);
+
+  // Memoised so the timer effect can depend on `list` without restarting on
+  // every render: slides(nextFire)[mode] hands back a fresh array each time,
+  // which would reset the clock forever and nothing would ever advance.
+  const list = useMemo(() => slides(nextFire)[mode], [mode, nextFire]);
   const active = list[Math.min(index, list.length - 1)];
+
+  const autoAdvance = shouldAutoAdvance({
+    length: list.length,
+    reducedMotion,
+    paused,
+    hovered,
+    focusWithin,
+    hidden,
+  });
+
+  // A backgrounded tab must not run the clock down unseen, or the visitor
+  // comes back to a slide they never saw.
+  useEffect(() => {
+    const sync = () => setHidden(document.visibilityState === "hidden");
+    sync();
+    document.addEventListener("visibilitychange", sync);
+    return () => document.removeEventListener("visibilitychange", sync);
+  }, []);
+
+  // Keyboard focus inside the hero holds the copy still, so the link under a
+  // visitor's focus is not swapped out from under them.
+  useEffect(() => {
+    const element = heroRef.current;
+    if (!element) return;
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target as HTMLElement | null;
+      // Only keyboard focus counts. Clicking a slide with a mouse also focuses
+      // that button, and quietly freezing the hero because someone picked a
+      // slide would be baffling; :focus-visible marks keyboard intent.
+      if (target?.matches?.(":focus-visible")) setFocusWithin(true);
+    };
+    const onFocusOut = (event: FocusEvent) => {
+      if (!element.contains(event.relatedTarget as Node | null)) setFocusWithin(false);
+    };
+    element.addEventListener("focusin", onFocusIn);
+    element.addEventListener("focusout", onFocusOut);
+    return () => {
+      element.removeEventListener("focusin", onFocusIn);
+      element.removeEventListener("focusout", onFocusOut);
+    };
+  }, []);
+
+  // The dwell is timed to the length of the copy, so the 25-word Atelier
+  // slide is not torn away mid-sentence. `manualStep` is a bump on any
+  // deliberate choice, which restarts the clock even when the visitor
+  // re-picks the slide already showing.
+  useEffect(() => {
+    if (!autoAdvance) return;
+    const timer = window.setTimeout(() => {
+      setIndex((current) => nextIndex(current, list.length));
+    }, readMsFor(active.body));
+    return () => window.clearTimeout(timer);
+  }, [autoAdvance, index, list, active.body, manualStep]);
 
   function chooseMode(next: "now" | "ahead") {
     setMode(next);
     setIndex(0);
+    setManualStep((step) => step + 1);
+  }
+
+  function chooseSlide(next: number) {
+    setIndex(next);
+    setManualStep((step) => step + 1);
   }
 
   return (
-    <section className="relative bg-cream">
+    <section
+      ref={heroRef}
+      className="relative bg-cream"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:gap-6 lg:px-8 lg:py-16">
         <div className="relative z-10 max-w-xl lg:row-start-1">
-          <div className="flex gap-2" role="tablist" aria-label="What is happening">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === "now"}
-              onClick={() => chooseMode("now")}
-              className={`min-h-11 rounded-full px-4 text-sm font-semibold ${
-                mode === "now" ? "bg-ink text-cream" : "bg-mist text-ink"
-              }`}
-            >
-              Now
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === "ahead"}
-              onClick={() => chooseMode("ahead")}
-              className={`min-h-11 rounded-full px-4 text-sm font-semibold ${
-                mode === "ahead" ? "bg-ink text-cream" : "bg-mist text-ink"
-              }`}
-            >
-              Ahead
-            </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex gap-2" role="tablist" aria-label="What is happening">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === "now"}
+                onClick={() => chooseMode("now")}
+                className={`min-h-11 rounded-full px-4 text-sm font-semibold ${
+                  mode === "now" ? "bg-ink text-cream" : "bg-mist text-ink"
+                }`}
+              >
+                Now
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === "ahead"}
+                onClick={() => chooseMode("ahead")}
+                className={`min-h-11 rounded-full px-4 text-sm font-semibold ${
+                  mode === "ahead" ? "bg-ink text-cream" : "bg-mist text-ink"
+                }`}
+              >
+                Ahead
+              </button>
+            </div>
+
+            {/* Required by WCAG 2.2.2: this copy changes on a timer for more
+                than five seconds, so the visitor needs a way to stop it. A
+                silent looping video does not need this, but auto-updating
+                information does. With reduced motion there is nothing running
+                to stop, so the control is left off entirely. */}
+            {!reducedMotion && (
+              <button
+                type="button"
+                onClick={() => setPaused((stopped) => !stopped)}
+                className="min-h-11 rounded-full px-3 text-sm font-semibold text-ink/60 underline decoration-ink/25 underline-offset-4 transition-colors hover:text-ink"
+              >
+                {paused ? "Play" : "Pause"}
+              </button>
+            )}
           </div>
 
           <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto">
@@ -240,7 +332,8 @@ export function Hero() {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setIndex(i)}
+                aria-current={i === index ? "true" : undefined}
+                onClick={() => chooseSlide(i)}
                 className={`min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold ${
                   i === index ? "bg-bark text-cream" : "text-ink/70"
                 }`}
