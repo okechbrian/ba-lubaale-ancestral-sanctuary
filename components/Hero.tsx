@@ -10,7 +10,8 @@ import { WavyRule } from "@/components/editorial";
  * The first frame paints at once; the rest ramp in and out on the
  * per-layer keyframes declared in globals.css. Costs no JavaScript and
  * no extra bytes. Reduced-motion visitors get one still and no cycle.
- * The cycle now plays inside the curved panel, not as a full-bleed screen.
+ * The cycle plays inside the curved panel. On a phone the film sits
+ * between the name and the request, and the seal stays inside the frame.
  */
 const HERO_CYCLE = "36s linear infinite";
 
@@ -77,98 +78,107 @@ function Frames({ reducedMotion }: { reducedMotion: boolean }) {
   );
 }
 
+function Seal() {
+  return (
+    <div className="absolute bottom-3 right-3 z-20 h-20 w-20 sm:bottom-5 sm:right-5 sm:h-32 sm:w-32">
+      <svg viewBox="0 0 120 120" className="h-full w-full drop-shadow-sm" aria-hidden="true">
+        <circle cx="60" cy="60" r="58" fill="#E8A06A" />
+        <circle
+          cx="60"
+          cy="60"
+          r="49"
+          fill="none"
+          stroke="#1A1814"
+          strokeWidth="0.7"
+          strokeDasharray="1.5 2.2"
+        />
+        <path
+          id="hero-seal"
+          d="M60,60 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0"
+          fill="none"
+        />
+        <text
+          fill="#1A1814"
+          fontSize="7"
+          letterSpacing="1.6"
+          fontFamily="ui-sans-serif, system-ui, sans-serif"
+        >
+          <textPath href="#hero-seal">
+            PRIVATE · SCREENED · ONE HOUSEHOLD ·
+          </textPath>
+        </text>
+        <path
+          d="M60 70c0-8 6-12 6-18a6 6 0 0 0-12 0c0 6 6 10 6 18z"
+          fill="none"
+          stroke="#8B2E14"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
+  );
+}
+
 export function Hero() {
   const reducedMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden bg-cream">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-6 lg:px-8 lg:py-16">
-        <div className="relative z-10 max-w-xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-bark">
+    <section className="relative bg-cream">
+      <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:gap-6 lg:px-8 lg:py-16">
+        <div className="relative z-10 max-w-xl lg:col-start-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-bark sm:text-[11px] sm:tracking-[0.22em]">
             Ssese Islands · Lake Victoria · Uganda
           </p>
-          <h1 className="mt-4 font-display text-5xl font-semibold leading-[0.92] tracking-tight text-ink sm:text-7xl">
+          <h1 className="mt-3 font-display text-5xl font-semibold leading-[0.92] tracking-tight text-ink sm:text-7xl">
             Ba Lubaale
             <span className="mt-2 block text-[0.62em] font-medium leading-none">
               Ancestral Sanctuary
             </span>
           </h1>
-          <h2 className="mt-4 font-display text-2xl text-bark sm:text-3xl">
+          <h2 className="mt-3 font-display text-2xl text-bark sm:text-3xl">
             Kiwamirembe
           </h2>
-          <WavyRule />
-          <p className="mt-6 max-w-sm text-lg leading-relaxed text-ink/75">
+          <WavyRule className="hidden sm:block" />
+        </div>
+
+        <div className="relative lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-16 top-8 hidden h-[88%] w-36 rounded-[100%] bg-cream lg:block"
+          />
+          <div className="relative h-64 overflow-hidden rounded-[1.75rem] bg-bark sm:h-auto sm:min-h-[32rem] lg:rounded-bl-[7.5rem] lg:rounded-tr-[2.25rem]">
+            <div className="absolute inset-2 overflow-hidden rounded-[1.35rem] bg-dusk sm:inset-4 lg:rounded-bl-[6.5rem]">
+              <Frames reducedMotion={reducedMotion} />
+            </div>
+            <Seal />
+          </div>
+        </div>
+
+        <div className="relative z-10 max-w-xl lg:col-start-1">
+          <p className="max-w-sm text-base leading-relaxed text-ink/75 sm:text-lg">
             A living ancestral sanctuary of cave, craft, herd, and lake.
           </p>
-          <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/50">
+          <p className="mt-3 hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/50 sm:block">
             The Weaver&apos;s Sanctuary & Sacred Caves
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-6">
+          <div className="mt-6 flex flex-col items-stretch gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
             <Link
               href="/apply"
-              className="inline-flex items-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember"
+              className="inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember"
             >
               Request an Immersion
               <span aria-hidden="true">→</span>
             </Link>
             <a
               href="#land-gateways"
-              className="text-sm font-semibold text-ink underline decoration-bark/50 underline-offset-4 transition-colors hover:text-bark"
+              className="text-center text-sm font-semibold text-ink underline decoration-bark/50 underline-offset-4 transition-colors hover:text-bark sm:text-left"
             >
               Enter the Land
             </a>
           </div>
-          <p className="mt-6 text-xs tracking-wide text-ink/45">
+          <p className="mt-4 text-xs tracking-wide text-ink/45">
             Private. Screened. One household at a time.
           </p>
-        </div>
-
-        <div className="relative">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -left-16 top-8 hidden h-[88%] w-36 rounded-[100%] bg-cream lg:block"
-          />
-          <div className="relative min-h-[26rem] overflow-hidden rounded-[2.25rem] bg-bark sm:min-h-[32rem] lg:rounded-bl-[7.5rem] lg:rounded-tr-[2.25rem]">
-            <div className="absolute inset-3 overflow-hidden rounded-[1.7rem] bg-dusk sm:inset-4 lg:rounded-bl-[6.5rem]">
-              <Frames reducedMotion={reducedMotion} />
-            </div>
-          </div>
-          <div className="absolute -bottom-3 right-3 z-20 h-28 w-28 sm:right-6 sm:h-32 sm:w-32">
-            <svg viewBox="0 0 120 120" className="h-full w-full drop-shadow-sm" aria-hidden="true">
-              <circle cx="60" cy="60" r="58" fill="#E8A06A" />
-              <circle
-                cx="60"
-                cy="60"
-                r="49"
-                fill="none"
-                stroke="#1A1814"
-                strokeWidth="0.7"
-                strokeDasharray="1.5 2.2"
-              />
-              <path
-                id="hero-seal"
-                d="M60,60 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0"
-                fill="none"
-              />
-              <text
-                fill="#1A1814"
-                fontSize="7"
-                letterSpacing="1.6"
-                fontFamily="ui-sans-serif, system-ui, sans-serif"
-              >
-                <textPath href="#hero-seal">
-                  PRIVATE · SCREENED · ONE HOUSEHOLD ·
-                </textPath>
-              </text>
-              <path
-                d="M60 70c0-8 6-12 6-18a6 6 0 0 0-12 0c0 6 6 10 6 18z"
-                fill="none"
-                stroke="#8B2E14"
-                strokeWidth="1.6"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
         </div>
       </div>
     </section>

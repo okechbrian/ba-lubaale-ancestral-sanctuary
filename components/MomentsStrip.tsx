@@ -51,9 +51,32 @@ export function MomentsStrip({ moments }: { moments: Moment[] }) {
           />
         )}
 
+        {/* Phone: a row the person slides. A drifting strip is hard to tap. */}
+        <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:hidden">
+          {moments.map((m, i) => (
+            <button
+              key={`${m.src}-hand-${i}`}
+              type="button"
+              onClick={() => openLightbox(i)}
+              className="w-44 shrink-0 snap-start text-left"
+            >
+              <div className="relative aspect-square overflow-hidden rounded-[1.2rem]">
+                <Image
+                  src={m.src}
+                  alt={m.alt}
+                  width={224}
+                  height={224}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <p className="mt-2 text-center text-xs text-ink/60">{m.caption}</p>
+            </button>
+          ))}
+        </div>
+
         <div
           ref={stripRef}
-          className="mt-12 flex gap-4"
+          className="mt-12 hidden gap-4 md:flex"
           style={
             reducedMotion
               ? undefined

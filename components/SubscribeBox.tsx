@@ -100,12 +100,12 @@ export function SubscribeBox() {
                 setEmail(e.target.value);
                 if (state.kind === "error") setState({ kind: "idle" });
               }}
-              className="w-full rounded-full border border-ink/15 bg-cream px-4 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-bark focus:outline-none"
+              className="min-h-11 w-full rounded-full border border-ink/15 bg-cream px-4 py-2.5 text-sm text-ink placeholder:text-ink/40 focus:border-bark focus:outline-none"
             />
             <button
               type="submit"
               disabled={state.kind === "busy"}
-              className="rounded-full bg-bark px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-ember disabled:opacity-50"
+              className="min-h-11 w-full rounded-full bg-bark px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-ember disabled:opacity-50 sm:w-auto"
             >
               {state.kind === "busy" ? "Sending…" : "Subscribe"}
             </button>
