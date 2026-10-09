@@ -80,12 +80,12 @@ export function HomeQuickJump() {
 
   return (
     <div
-      className="sticky z-30 border-b border-ink/10 bg-cream/95 py-3 backdrop-blur-md"
+      className="sticky z-30 border-b border-mist/70 bg-cream/90 py-2.5 backdrop-blur-md"
       style={{ top: `${headerHeight}px` }}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <span className="hidden text-[11px] font-semibold uppercase tracking-[0.16em] text-bark md:inline-block">
-          Explore
+        <span className="hidden text-xs font-semibold uppercase tracking-wider text-bark md:inline-block">
+          Explore Sanctuary:
         </span>
         <div className="flex w-full items-center justify-start gap-1.5 overflow-x-auto no-scrollbar md:w-auto md:justify-end">
           {navAnchors.map((item) => {
@@ -95,10 +95,10 @@ export function HomeQuickJump() {
                 key={item.id}
                 href={`#${item.id}`}
                 onClick={(e) => scrollToSection(e, item.id)}
-                className={`whitespace-nowrap px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors ${
+                className={`whitespace-nowrap rounded-full px-3.5 py-1 text-xs font-medium transition-all ${
                   isActive
-                    ? "text-bark underline decoration-bark underline-offset-4"
-                    : "text-ink/60 hover:text-ink"
+                    ? "bg-canopy text-cream shadow-sm"
+                    : "text-ink/75 hover:bg-mist/80 hover:text-ink"
                 }`}
               >
                 {item.label}

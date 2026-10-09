@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { site, navigationGroups } from "@/content/site";
@@ -332,18 +333,17 @@ export function Header() {
 
         <Link
           href="/"
-          className="group text-center leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm lg:justify-self-center"
+          className="group shrink-0 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-bark lg:justify-self-center"
           aria-label="Ba Lubaale Ancestral Sanctuary Kiwamirembe Home"
         >
-          <span className="block font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-            BA LUBAALE
-          </span>
-          <span className="mt-1 block text-[10px] font-medium uppercase tracking-[0.16em] text-bark sm:hidden">
-            Kiwamirembe
-          </span>
-          <span className="mt-1 hidden text-[9px] font-medium uppercase tracking-[0.22em] text-bark sm:block">
-            {site.subtitle}
-          </span>
+          <Image
+            src="/images/logo-lockup.png"
+            alt=""
+            width={1461}
+            height={251}
+            priority
+            className="h-8 w-auto sm:h-10 lg:h-12"
+          />
         </Link>
 
         <div className="ml-auto flex items-center justify-end gap-4 lg:ml-0">
@@ -402,15 +402,17 @@ export function Header() {
           <div className="flex items-center justify-between border-b border-mist/70 px-4 py-3 sm:px-6">
             <Link
               href="/"
-              className="flex flex-col leading-tight"
+              className="shrink-0"
               onClick={() => setMobileOpen(false)}
+              aria-label="Ba Lubaale Ancestral Sanctuary Kiwamirembe Home"
             >
-              <span className="font-display text-lg font-semibold tracking-wide text-ink">
-                BA LUBAALE
-              </span>
-              <span className="text-[10px] tracking-widest text-bark uppercase">
-                {site.subtitle}
-              </span>
+              <Image
+                src="/images/logo-lockup.png"
+                alt=""
+                width={1461}
+                height={251}
+                className="h-8 w-auto"
+              />
             </Link>
 
             <button
