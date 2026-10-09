@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatFireDate, nextFireSaturday } from "@/lib/fire-circle/date";
+import { SLIDE_MS, nextIndex, shouldAutoAdvance } from "@/lib/hero-slides";
 import { useReducedMotion } from "@/components/useReducedMotion";
 import { WavyRule } from "@/components/editorial";
 
@@ -198,8 +199,52 @@ export function Hero() {
   const nextFire = formatFireDate(nextFireSaturday());
   const [mode, setMode] = useState<"now" | "ahead">("now");
   const [index, setIndex] = useState(0);
-  const list = slides(nextFire)[mode];
+  const [hovered, setHovered] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Memoised so the timer effect can depend on `list` without restarting on
+  // every render: slides(nextFire)[mode] hands back a fresh array each time,
+  // which would reset the clock forever and the copy would never move.
+  const list = useMemo(() => slides(nextFire)[mode], [mode, nextFire]);
   const active = list[Math.min(index, list.length - 1)];
+
+  const autoAdvance = shouldAutoAdvance({
+    length: list.length,
+    reducedMotion,
+    hovered,
+    visible,
+  });
+
+  // No point rotating copy nobody can see: stop while the hero is scrolled
+  // away, and while the tab sits in the background.
+  useEffect(() => {
+    const element = sectionRef.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0.25 },
+    );
+    observer.observe(element);
+    const onVisibility = () => setVisible(document.visibilityState === "visible");
+    onVisibility();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+
+  // Moves the copy on its own, exactly as clicking the next pill would. A
+  // setTimeout chain rather than setInterval, so a hold stops the clock
+  // outright instead of leaving a backlog of callbacks to fire at once.
+  useEffect(() => {
+    if (!autoAdvance) return;
+    const timer = window.setTimeout(() => {
+      setIndex((current) => nextIndex(current, list.length));
+    }, SLIDE_MS);
+    return () => window.clearTimeout(timer);
+  }, [autoAdvance, index, list]);
 
   function chooseMode(next: "now" | "ahead") {
     setMode(next);
@@ -207,7 +252,12 @@ export function Hero() {
   }
 
   return (
-    <section className="relative bg-cream">
+    <section
+      ref={sectionRef}
+      className="relative bg-cream"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:gap-6 lg:px-8 lg:py-16">
         <div className="relative z-10 max-w-xl lg:row-start-1">
           <div className="flex gap-2" role="tablist" aria-label="What is happening">
@@ -250,11 +300,21 @@ export function Hero() {
             ))}
           </div>
 
-          <h1 className="mt-6 font-display text-4xl font-semibold leading-none text-ink sm:text-6xl">
+          {/* aria-hidden because this copy now rewrites itself every six
+              seconds: without it a screen reader announces the whole slide
+              again on every tick. The pills above remain the way to reach a
+              specific slide deliberately. */}
+          <h1
+            aria-hidden="true"
+            className="mt-6 font-display text-4xl font-semibold leading-none text-ink sm:text-6xl"
+          >
             {active.title}
           </h1>
           <WavyRule />
-          <p className="mt-4 max-w-md text-base leading-relaxed text-ink/75 sm:text-lg">
+          <p
+            aria-hidden="true"
+            className="mt-4 max-w-md text-base leading-relaxed text-ink/75 sm:text-lg"
+          >
             {active.body}
           </p>
           {/* Locked in DECISIONS.md #1 / MASTER_PROMPT: the poetic subtitle, which
