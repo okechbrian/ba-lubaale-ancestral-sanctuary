@@ -69,15 +69,15 @@ function Mark({ name }: { name: (typeof items)[number]["icon"] }) {
 export function ValueStrip() {
   return (
     <section className="border-y border-ink/10 bg-mist" aria-label="The house">
-      <ul className="mx-auto grid max-w-6xl grid-cols-2 lg:grid-cols-4">
+      <ul className="mx-auto flex max-w-6xl flex-col sm:grid sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item, i) => (
           <li
             key={item.title}
-            className={`flex items-center gap-3 px-5 py-5 sm:px-7 ${
-              i > 0 ? "lg:border-l lg:border-ink/10" : ""
-            } ${i % 2 === 1 ? "border-l border-ink/10 lg:border-l" : ""} ${
-              i >= 2 ? "border-t border-ink/10 lg:border-t-0" : ""
-            }`}
+            className={`flex items-center gap-4 px-5 py-4 sm:px-7 ${
+              i > 0 ? "max-sm:border-t max-sm:border-ink/10" : ""
+            } ${i % 2 === 1 ? "sm:border-l sm:border-ink/10" : ""} ${
+              i >= 2 ? "sm:max-lg:border-t sm:max-lg:border-ink/10" : ""
+            } ${i > 0 ? "lg:border-l lg:border-ink/10" : ""}`}
           >
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-bark/30 text-bark">
               <Mark name={item.icon} />

@@ -93,17 +93,17 @@ export function ThreeActsStepper() {
               key={act.num}
               type="button"
               onClick={() => setActiveStep(index)}
-              className={`flex flex-col items-center sm:items-start text-center sm:text-left transition-all p-3 rounded-lg ${
+              className={`flex min-h-12 flex-col items-center justify-center rounded-lg p-2 text-center transition-all sm:items-start sm:p-3 sm:text-left ${
                 isActive
                   ? "bg-cream/10 border-b-2 border-bark-soft"
                   : "hover:bg-cream/5 opacity-70 hover:opacity-100"
               }`}
             >
-              <span className="font-display text-2xl sm:text-4xl text-bark-soft font-bold">
-                Act {act.num}
+              <span className="font-display text-xl font-bold text-bark-soft sm:text-4xl">
+                {act.num}
               </span>
               <span
-                className={`mt-1 font-display text-sm sm:text-lg font-semibold ${
+                className={`mt-1 hidden font-display text-sm font-semibold sm:block sm:text-lg ${
                   isActive ? "text-cream" : "text-cream/80"
                 }`}
               >

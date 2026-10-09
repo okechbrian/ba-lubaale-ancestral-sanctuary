@@ -48,9 +48,9 @@ export default async function HomePage() {
       <HomeQuickJump />
 
       {/* ─── Section 1b: Teaching line ─── */}
-      <section className="bg-cream pb-4 pt-16 sm:pt-20">
+      <section className="bg-cream pb-4 pt-10 sm:pt-20">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 text-center sm:px-6 lg:px-8">
-          <p className="font-display text-3xl leading-snug text-ink sm:text-4xl">
+          <p className="font-display text-2xl leading-snug text-ink sm:text-4xl">
             This ground is where the Lubaale of Ssese can be approached, and
             where the teaching is lived.
           </p>
@@ -72,10 +72,10 @@ export default async function HomePage() {
             alt="Queen Nalubaale outdoors in a brown headwrap and gold collar"
             width={320}
             height={400}
-            className="aspect-[4/5] w-full rounded-[2rem] object-cover"
+            className="hidden aspect-[4/5] w-full rounded-[2rem] object-cover sm:block"
           />
           <blockquote>
-            <p className="font-display text-3xl leading-snug text-ink sm:text-4xl">
+            <p className="font-display text-2xl leading-snug text-ink sm:text-4xl">
               &ldquo;I listen to the wave upon the shore, the breath within your
               chest, and the stories carried in the roots of this land. Welcome
               home to yourself.&rdquo;
@@ -97,7 +97,7 @@ export default async function HomePage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bark">
               The land
             </p>
-            <h2 className="mt-3 font-display text-5xl font-semibold leading-[0.95] text-ink sm:text-6xl">
+            <h2 className="mt-3 font-display text-4xl font-semibold leading-[0.95] text-ink sm:text-6xl">
               The Land.
             </h2>
             <WavyRule />
@@ -114,7 +114,7 @@ export default async function HomePage() {
               Enter the land
             </Link>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:col-span-8">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:col-span-8">
             {/* Cave */}
             <Link href="/the-cave#cave" className="group flex flex-col">
               <div className="rounded-[1.6rem] bg-canopy p-3">
@@ -123,11 +123,11 @@ export default async function HomePage() {
                   alt="Mossed rock mouth of Nalubaale Cave seen from the water"
                   width={480}
                   height={600}
-                  className="aspect-[4/5] w-full rounded-[1.15rem] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="aspect-square w-full rounded-[1.1rem] object-cover transition-transform duration-500 group-hover:scale-[1.02] sm:aspect-[4/5] sm:rounded-[1.15rem]"
                 />
               </div>
-              <div className="mt-3 flex items-center justify-between px-1">
-                <h3 className="font-display text-xl text-ink">Cave</h3>
+              <div className="mt-3 flex items-center justify-between gap-2 px-0.5">
+                <h3 className="min-w-0 font-display text-base leading-tight text-ink sm:text-xl">Cave</h3>
                 <CircleGo />
               </div>
             </Link>
@@ -140,11 +140,11 @@ export default async function HomePage() {
                   alt="The Lake House on stilts over Lake Victoria, framed by mango trees"
                   width={480}
                   height={600}
-                  className="aspect-[4/5] w-full rounded-[1.15rem] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="aspect-square w-full rounded-[1.1rem] object-cover transition-transform duration-500 group-hover:scale-[1.02] sm:aspect-[4/5] sm:rounded-[1.15rem]"
                 />
               </div>
-              <div className="mt-3 flex items-center justify-between px-1">
-                <h3 className="font-display text-xl text-ink">Lake House</h3>
+              <div className="mt-3 flex items-center justify-between gap-2 px-0.5">
+                <h3 className="min-w-0 font-display text-base leading-tight text-ink sm:text-xl">Lake House</h3>
                 <CircleGo />
               </div>
             </Link>
@@ -157,11 +157,11 @@ export default async function HomePage() {
                   alt="Buttress roots of an ancient tree in the sanctuary forest"
                   width={480}
                   height={600}
-                  className="aspect-[4/5] w-full rounded-[1.15rem] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="aspect-square w-full rounded-[1.1rem] object-cover transition-transform duration-500 group-hover:scale-[1.02] sm:aspect-[4/5] sm:rounded-[1.15rem]"
                 />
               </div>
-              <div className="mt-3 flex items-center justify-between px-1">
-                <h3 className="font-display text-xl text-ink">Forest Spring</h3>
+              <div className="mt-3 flex items-center justify-between gap-2 px-0.5">
+                <h3 className="min-w-0 font-display text-base leading-tight text-ink sm:text-xl">Forest Spring</h3>
                 <CircleGo />
               </div>
             </Link>
@@ -174,11 +174,11 @@ export default async function HomePage() {
                   alt="Free-roaming goats in the sanctuary compound"
                   width={480}
                   height={600}
-                  className="aspect-[4/5] w-full rounded-[1.15rem] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="aspect-square w-full rounded-[1.1rem] object-cover transition-transform duration-500 group-hover:scale-[1.02] sm:aspect-[4/5] sm:rounded-[1.15rem]"
                 />
               </div>
-              <div className="mt-3 flex items-center justify-between px-1">
-                <h3 className="font-display text-xl text-ink">Herd & Fire</h3>
+              <div className="mt-3 flex items-center justify-between gap-2 px-0.5">
+                <h3 className="min-w-0 font-display text-base leading-tight text-ink sm:text-xl">Herd & Fire</h3>
                 <CircleGo />
               </div>
             </Link>
@@ -223,7 +223,7 @@ export default async function HomePage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cream/80">
               The atelier
             </p>
-            <h2 className="mt-3 font-display text-5xl font-semibold leading-[0.95]">
+            <h2 className="mt-3 font-display text-4xl font-semibold leading-[0.95] sm:text-5xl">
               Craft as Healing.
             </h2>
             <WavyRule className="text-cream!" />
@@ -232,6 +232,10 @@ export default async function HomePage() {
               the fire, intention leaves the mouth and enters the object that
               goes home.
             </p>
+            <p className="mt-4 text-cream/90 lg:hidden">
+              You do not only speak the intention. You weave it, sew it, and
+              carry it home.
+            </p>
             <Link
               href="/atelier"
               className="mt-8 text-sm font-semibold underline decoration-cream/50 underline-offset-4"
@@ -239,15 +243,15 @@ export default async function HomePage() {
               Visit the Atelier
             </Link>
           </div>
-          <div className="grid gap-3 bg-mist p-4 sm:grid-cols-3 lg:col-span-5 lg:grid-cols-1 lg:p-8">
+          <div className="grid grid-cols-2 gap-3 bg-mist p-4 lg:col-span-5 lg:grid-cols-1 lg:p-8">
             <Image
               src="/images/host-measuring-bark.jpg"
               alt="Mama Nalubaale measuring bark cloth with tape in the banana grove"
               width={800}
               height={520}
-              className="aspect-[4/3] w-full rounded-[1.4rem] object-cover sm:col-span-2 lg:col-span-1 lg:aspect-[16/10]"
+              className="col-span-2 aspect-[4/3] w-full rounded-[1.4rem] object-cover lg:col-span-1 lg:aspect-[16/10]"
             />
-            <div className="grid grid-cols-2 gap-3 sm:col-span-1 sm:grid-cols-1 lg:grid-cols-2">
+            <div className="col-span-2 grid grid-cols-2 gap-3 lg:col-span-1">
               <Image
                 src="/images/bark-dresses-stand.jpg"
                 alt="Finished bark-cloth dresses hanging on a stand among banana trees"
@@ -264,7 +268,7 @@ export default async function HomePage() {
               />
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center bg-canopy px-8 py-14 text-center text-cream lg:col-span-3">
+          <div className="hidden flex-col items-center justify-center bg-canopy px-8 py-14 text-center text-cream lg:col-span-3 lg:flex">
             <svg viewBox="0 0 160 160" className="h-40 w-40" aria-hidden="true">
               <circle cx="80" cy="80" r="74" fill="none" stroke="currentColor" strokeWidth="1" />
               <path
@@ -304,13 +308,13 @@ export default async function HomePage() {
             alt="Queen Nalubaale, a seer, healer, and master artisan"
             width={360}
             height={440}
-            className="aspect-[4/5] w-full rounded-[2rem] object-cover"
+            className="mx-auto aspect-[4/5] w-56 rounded-[2rem] object-cover sm:w-full"
           />
           <div className="max-w-md">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bark">
               Mama Nalubaale
             </p>
-            <h2 className="mt-3 font-display text-5xl font-semibold leading-none text-ink">
+            <h2 className="mt-3 font-display text-4xl font-semibold leading-none text-ink sm:text-5xl">
               Queen Nalubaale
             </h2>
             <WavyRule />
@@ -367,7 +371,7 @@ export default async function HomePage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bark">
             Stays
           </p>
-          <h2 className="mt-3 text-center font-display text-5xl font-semibold text-ink">
+          <h2 className="mt-3 text-center font-display text-4xl font-semibold text-ink sm:text-5xl">
             Immersions.
           </h2>
           <WavyRule className="mx-auto" />
@@ -484,7 +488,7 @@ export default async function HomePage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cream/80">
             One evening a month
           </p>
-          <h2 className="mt-3 font-display text-5xl font-semibold">
+          <h2 className="mt-3 font-display text-4xl font-semibold sm:text-5xl">
             The fire circle
           </h2>
           <WavyRule className="mx-auto text-cream!" />
@@ -501,7 +505,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/fire-circle#request"
-            className="mt-8 inline-flex items-center gap-3 rounded-full bg-cream px-6 py-3 text-sm font-semibold text-bark transition-colors hover:bg-mist"
+            className="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-cream px-6 py-3 text-sm font-semibold text-bark transition-colors hover:bg-mist sm:w-auto"
           >
             Request a seat
             <span aria-hidden="true">→</span>
@@ -515,16 +519,16 @@ export default async function HomePage() {
           <p className="text-cream">
             Ready to sit with what needs sitting with?
           </p>
-          <div className="flex gap-4">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <Link
               href="/apply"
-              className="rounded-full bg-cream px-6 py-2.5 text-sm font-semibold text-canopy transition-colors hover:bg-mist"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-cream px-6 py-2.5 text-sm font-semibold text-canopy transition-colors hover:bg-mist sm:w-auto"
             >
               Request Immersion
             </Link>
             <Link
               href="/prepare"
-              className="rounded-full border border-cream/40 px-6 py-2.5 text-sm font-semibold text-cream transition-colors hover:border-cream"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-cream/40 px-6 py-2.5 text-sm font-semibold text-cream transition-colors hover:border-cream sm:w-auto"
             >
               How to Prepare
             </Link>
@@ -599,7 +603,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/apply"
-            className="mt-8 inline-flex items-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember"
+            className="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-bark px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-ember sm:w-auto"
           >
             Request an Immersion
           </Link>

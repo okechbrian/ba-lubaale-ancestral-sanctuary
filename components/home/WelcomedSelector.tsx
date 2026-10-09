@@ -95,7 +95,7 @@ export function WelcomedSelector() {
         <button
           type="button"
           onClick={() => setActiveTab("all")}
-          className={`rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+          className={`rounded-full px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all min-h-11 ${
             activeTab === "all"
               ? "bg-canopy text-cream shadow-sm"
               : "border border-mist bg-cream text-ink/75 hover:bg-mist/60"
@@ -106,7 +106,7 @@ export function WelcomedSelector() {
         <button
           type="button"
           onClick={() => setActiveTab("individual")}
-          className={`rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+          className={`rounded-full px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all min-h-11 ${
             activeTab === "individual"
               ? "bg-canopy text-cream shadow-sm"
               : "border border-mist bg-cream text-ink/75 hover:bg-mist/60"
@@ -117,7 +117,7 @@ export function WelcomedSelector() {
         <button
           type="button"
           onClick={() => setActiveTab("household")}
-          className={`rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+          className={`rounded-full px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all min-h-11 ${
             activeTab === "household"
               ? "bg-canopy text-cream shadow-sm"
               : "border border-mist bg-cream text-ink/75 hover:bg-mist/60"
@@ -128,7 +128,7 @@ export function WelcomedSelector() {
         <button
           type="button"
           onClick={() => setActiveTab("group")}
-          className={`rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+          className={`rounded-full px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all min-h-11 ${
             activeTab === "group"
               ? "bg-canopy text-cream shadow-sm"
               : "border border-mist bg-cream text-ink/75 hover:bg-mist/60"

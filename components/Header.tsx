@@ -338,7 +338,10 @@ export function Header() {
           <span className="block font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
             BA LUBAALE
           </span>
-          <span className="mt-1 block text-[9px] font-medium uppercase tracking-[0.22em] text-bark">
+          <span className="mt-1 block text-[10px] font-medium uppercase tracking-[0.16em] text-bark sm:hidden">
+            Kiwamirembe
+          </span>
+          <span className="mt-1 hidden text-[9px] font-medium uppercase tracking-[0.22em] text-bark sm:block">
             {site.subtitle}
           </span>
         </Link>
@@ -366,7 +369,7 @@ export function Header() {
 
           <button
             type="button"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-mist focus:outline-none focus-visible:ring-2 focus-visible:ring-bark lg:hidden"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-mist focus:outline-none focus-visible:ring-2 focus-visible:ring-bark lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}

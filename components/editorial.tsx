@@ -20,7 +20,7 @@ export function CircleGo() {
   return (
     <span
       aria-hidden="true"
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bark text-cream transition-transform duration-300 group-hover:scale-105"
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-bark text-cream transition-transform duration-300 group-hover:scale-105"
     >
       <svg
         viewBox="0 0 20 20"
