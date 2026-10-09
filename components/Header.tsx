@@ -94,7 +94,7 @@ export function Header() {
         scrolled ? "shadow-sm" : ""
       }`}
     >
-      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:px-8">
         {/* Desktop nav, left */}
         <nav
           ref={navRef}
@@ -332,7 +332,7 @@ export function Header() {
 
         <Link
           href="/"
-          className="group justify-self-center text-center leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm"
+          className="group text-center leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-bark rounded-sm lg:justify-self-center"
           aria-label="Ba Lubaale Ancestral Sanctuary Kiwamirembe Home"
         >
           <span className="block font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
@@ -346,7 +346,7 @@ export function Header() {
           </span>
         </Link>
 
-        <div className="flex items-center justify-end gap-4">
+        <div className="ml-auto flex items-center justify-end gap-4 lg:ml-0">
           <div className="hidden items-center gap-5 lg:flex">
             <Link
               href="/stories"
@@ -447,7 +447,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`block rounded-md py-2 px-3 font-display text-lg font-medium transition-colors ${
+                    className={`block min-h-12 rounded-md px-3 py-3 font-display text-lg font-medium transition-colors ${
                       pathname === item.href
                         ? "bg-mist text-bark"
                         : "text-ink hover:bg-mist/50"
@@ -473,7 +473,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`block rounded-md py-2 px-3 font-display text-lg font-medium transition-colors ${
+                    className={`block min-h-12 rounded-md px-3 py-3 font-display text-lg font-medium transition-colors ${
                       pathname === item.href
                         ? "bg-mist text-bark"
                         : "text-ink hover:bg-mist/50"
@@ -488,7 +488,7 @@ export function Header() {
                 <Link
                   href="/stories"
                   onClick={() => setMobileOpen(false)}
-                  className={`block rounded-md py-2 px-3 font-display text-lg font-medium transition-colors ${
+                  className={`block min-h-12 rounded-md px-3 py-3 font-display text-lg font-medium transition-colors ${
                     pathname === "/stories"
                       ? "bg-mist text-bark"
                       : "text-ink hover:bg-mist/50"
@@ -513,7 +513,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`block rounded-md py-2 px-3 font-display text-lg font-medium transition-colors ${
+                    className={`block min-h-12 rounded-md px-3 py-3 font-display text-lg font-medium transition-colors ${
                       pathname === item.href
                         ? "bg-mist text-bark"
                         : "text-ink hover:bg-mist/50"
