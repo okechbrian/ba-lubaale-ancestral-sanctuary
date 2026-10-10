@@ -10,6 +10,21 @@ type NumField = {
   value: number;
 };
 
+/**
+ * The seven fields that make up the single `stay_prices` database key. They are
+ * stored and written as one unit, so any change to them sends the whole block;
+ * everything else is its own key and is written on its own.
+ */
+const STAY_PRICE_FIELDS = [
+  "essential.solo",
+  "essential.couple",
+  "master.solo",
+  "master.couple",
+  "buyout.base",
+  "buyout.extraGuest",
+  "buyout.maxGuests",
+] as const;
+
 function fieldsFrom(settings: Settings): NumField[] {
   const p = settings.stayPrices;
   return [
@@ -26,7 +41,19 @@ function fieldsFrom(settings: Settings): NumField[] {
   ];
 }
 
-export default function SettingsForm({ settings }: { settings: Settings }) {
+/**
+ * `disabled` is set when the page could not read the stored settings. The form
+ * is then never rendered, but the prop keeps the guarantee explicit at the
+ * component boundary rather than relying on the caller alone: a caller that
+ * forgot to gate would otherwise be able to write defaults over real prices.
+ */
+export default function SettingsForm({
+  settings,
+  disabled = false,
+}: {
+  settings: Settings;
+  disabled?: boolean;
+}) {
   const router = useRouter();
   const initial = fieldsFrom(settings);
   const [values, setValues] = useState<Record<string, string>>(
@@ -45,25 +72,41 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (disabled) return;
     setBusy(true);
     setMsg(null);
     const num = (name: string) => Number(values[name]);
-    const payload: { settings: Record<string, unknown> } = {
-      settings: {
-        stay_prices: {
-          essential: { solo: num("essential.solo"), couple: num("essential.couple") },
-          master: { solo: num("master.solo"), couple: num("master.couple") },
-          buyout: {
-            base: num("buyout.base"),
-            extraGuest: num("buyout.extraGuest"),
-            maxGuests: num("buyout.maxGuests"),
-          },
+    const payload: { settings: Record<string, unknown> } = { settings: {} };
+    // Only send what the owner actually changed.
+    //
+    // This form used to submit all five settings keys every time, so the save
+    // rewrote the four fields nobody had touched. Combined with a read that
+    // falls back to defaults when the database hiccups, that turned one
+    // transient blip into a silent overwrite of real prices. Sending a partial
+    // payload closes that at the source: an untouched field is never written,
+    // whatever the form was filled with.
+    const changed = (name: string) =>
+      Number(values[name]) !== initial.find((f) => f.name === name)?.value;
+
+    // Only the seven price fields decide the stay_prices block. Checking
+    // `initial` as a whole would let an edit to, say, the UGX rate drag the
+    // entire price table into the payload again — which is the very thing this
+    // partial save exists to prevent.
+    if (STAY_PRICE_FIELDS.some(changed)) {
+      payload.settings.stay_prices = {
+        essential: { solo: num("essential.solo"), couple: num("essential.couple") },
+        master: { solo: num("master.solo"), couple: num("master.couple") },
+        buyout: {
+          base: num("buyout.base"),
+          extraGuest: num("buyout.extraGuest"),
+          maxGuests: num("buyout.maxGuests"),
         },
-        deposit_percent: num("depositPercent"),
-        ugx_rate: num("ugxRate"),
-        hold_days: num("holdDays"),
-      },
-    };
+      };
+    }
+    if (changed("depositPercent")) payload.settings.deposit_percent = num("depositPercent");
+    if (changed("ugxRate")) payload.settings.ugx_rate = num("ugxRate");
+    if (changed("holdDays")) payload.settings.hold_days = num("holdDays");
+
     if (Object.values(values).some((v) => !Number.isFinite(Number(v)) || Number(v) <= 0)) {
       setMsg({ ok: false, text: "All values must be positive numbers." });
       setBusy(false);
@@ -81,7 +124,20 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
       setBusy(false);
       return;
     }
-    payload.settings.voucher_amounts_usd = [...new Set(voucherAmounts)];
+    const cleanedVouchers = [...new Set(voucherAmounts)];
+    const initialVouchers = [...new Set(settings.voucherAmountsUsd)].sort((a, b) => a - b);
+    const vouchersChanged =
+      cleanedVouchers.length !== initialVouchers.length ||
+      cleanedVouchers.some((n, i) => n !== initialVouchers[i]);
+    if (vouchersChanged) {
+      payload.settings.voucher_amounts_usd = cleanedVouchers;
+    }
+
+    if (Object.keys(payload.settings).length === 0) {
+      setMsg({ ok: true, text: "Nothing changed — nothing was written." });
+      setBusy(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/admin/settings", {
@@ -182,13 +238,13 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
       <div className="flex items-center gap-4">
         <button
           type="submit"
-          disabled={busy}
+          disabled={busy || disabled}
           className="rounded-md bg-lake px-6 py-2.5 text-sm font-semibold text-cream hover:bg-lake/80 disabled:opacity-60"
         >
           {busy ? "Saving..." : "Save settings"}
         </button>
         {msg && (
-          <p className={`text-sm ${msg.ok ? "text-canopy" : "text-ember"}`}>
+          <p role="status" className={`text-sm ${msg.ok ? "text-canopy" : "text-ember"}`}>
             {msg.text}
           </p>
         )}
