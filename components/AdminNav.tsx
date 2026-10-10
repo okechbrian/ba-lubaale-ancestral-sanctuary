@@ -39,6 +39,12 @@ export default function AdminNav() {
           <Link
             key={tab.href}
             href={tab.href}
+            // Prefetching an admin tab while signed out makes middleware
+            // redirect that RSC request to /admin/login, and the cached
+            // redirect is what a post-login router.push() would serve instead
+            // of the real page. Admin is low-traffic and owner-only, so
+            // prefetching buys nothing here.
+            prefetch={false}
             className={`rounded px-3 py-1.5 text-sm ${
               active
                 ? "bg-cream font-semibold text-ink"

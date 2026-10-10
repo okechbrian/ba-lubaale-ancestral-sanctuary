@@ -51,6 +51,13 @@ export default function AdminLoginPage() {
       if (rem !== null) setRemaining(Number(rem));
 
       if (res.ok) {
+        // refresh() then push(), never push() alone. The session cookie is set,
+        // but the client router cache may already hold the /admin redirect that
+        // middleware produced for the prefetches AdminNav fired while we were
+        // logged out. Serving that cached redirect is what left a successful
+        // sign-in sitting on this page until a manual refresh. Logout has
+        // always done both for the same reason.
+        router.refresh();
         router.push("/admin");
         return;
       }
