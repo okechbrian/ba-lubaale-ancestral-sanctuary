@@ -1,6 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
+import { getSettings } from "@/lib/db/settings";
+
+// Re-render every minute so a price change in /admin/settings reaches this page
+// without a deploy, matching the CMS-driven pages. Not force-dynamic: this is a
+// public page that should stay cacheable.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Immersions",
@@ -8,7 +14,23 @@ export const metadata: Metadata = {
     "Three-day, five-day, and whole-island immersions, which are private, screened, and limited to one household at a time.",
 };
 
-export default function ImmersionsPage() {
+/**
+ * Prices are read from the database, never written into this file.
+ *
+ * They used to be hardcoded JSX literals, which meant the page visitors read to
+ * decide was the one page /admin/settings could not change: editing a price
+ * moved the checkout maths and /vouchers but left the advertised figure stale.
+ * If the database does not answer, `getSettings` falls back to the in-code
+ * defaults, so the page always shows a number — and that number is the same one
+ * the checkout will charge.
+ */
+function usd(amount: number): string {
+  return `USD ${amount.toLocaleString("en-US")}`;
+}
+
+export default async function ImmersionsPage() {
+  const { stayPrices } = await getSettings();
+
   return (
     <>
       <section className="relative flex min-h-[50vh] items-end overflow-hidden">
@@ -55,10 +77,11 @@ export default function ImmersionsPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-display text-2xl text-ink">
-                    USD 2,200 <span className="text-sm text-ink/60">solo</span>
+                    {usd(stayPrices.essential.solo)}{" "}
+                    <span className="text-sm text-ink/60">solo</span>
                   </p>
                   <p className="font-display text-xl text-ink">
-                    USD 3,600{" "}
+                    {usd(stayPrices.essential.couple)}{" "}
                     <span className="text-sm text-ink/60">couple</span>
                   </p>
                 </div>
@@ -83,10 +106,11 @@ export default function ImmersionsPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-display text-2xl text-ink">
-                    USD 4,500 <span className="text-sm text-ink/60">solo</span>
+                    {usd(stayPrices.master.solo)}{" "}
+                    <span className="text-sm text-ink/60">solo</span>
                   </p>
                   <p className="font-display text-xl text-ink">
-                    USD 7,200{" "}
+                    {usd(stayPrices.master.couple)}{" "}
                     <span className="text-sm text-ink/60">couple</span>
                   </p>
                 </div>
@@ -113,11 +137,12 @@ export default function ImmersionsPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-display text-2xl text-ink">
-                    USD 10,000{" "}
+                    {usd(stayPrices.buyout.base)}{" "}
                     <span className="text-sm text-ink/60">up to 4 guests</span>
                   </p>
                   <p className="text-sm text-ink/60">
-                    + USD 1,500 per extra guest (max 8)
+                    + {usd(stayPrices.buyout.extraGuest)} per extra guest (max{" "}
+                    {stayPrices.buyout.maxGuests})
                   </p>
                 </div>
               </div>

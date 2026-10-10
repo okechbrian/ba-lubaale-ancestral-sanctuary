@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 import { isAdminRequest } from "@/lib/admin/session";
 import { DatabaseNotConfiguredError } from "@/lib/db/client";
 import { recordAudit } from "@/lib/db/audit";
@@ -36,6 +37,14 @@ export async function POST(request: Request): Promise<Response> {
       action: "settings_saved",
       details: parsed.data.settings,
     });
+    // The pages that display these numbers are cached for 60s. Without an
+    // explicit invalidation the owner saves a new price, is told "Saved", and
+    // the public page keeps showing the old figure until the window lapses —
+    // which reads as the save having failed. The checkout routes are dynamic
+    // and read straight from the database, so they were never stale.
+    revalidatePath("/immersions");
+    revalidatePath("/policies");
+    revalidatePath("/vouchers");
     return Response.json({ ok: true });
   } catch (err) {
     if (err instanceof DatabaseNotConfiguredError) {

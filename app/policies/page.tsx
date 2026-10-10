@@ -1,4 +1,9 @@
 import type { Metadata } from "next";
+import { getSettings } from "@/lib/db/settings";
+
+// Same reasoning as /immersions: a policy figure the owner can change in
+// /admin/settings must not be frozen into this file. Re-render every minute.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Policies",
@@ -6,7 +11,14 @@ export const metadata: Metadata = {
     "Deposits, cancellation, payments, safety, and sanctuary rules.",
 };
 
-export default function PoliciesPage() {
+export default async function PoliciesPage() {
+  // The deposit percentage was written out four times as a literal "50%", so a
+  // change in /admin/settings moved the actual charge and left the published
+  // policy contradicting it. It is now read from the same place the checkout
+  // reads it from.
+  const { depositPercent } = await getSettings();
+  const pct = `${depositPercent}%`;
+
   return (
     <>
       {/* Hero */}
@@ -33,11 +45,11 @@ export default function PoliciesPage() {
               <strong>Day sessions:</strong> 100% at booking.
             </p>
             <p>
-              <strong>3–5 day retreats:</strong> 50% non-refundable to lock
+              <strong>3–5 day retreats:</strong> {pct} non-refundable to lock
               dates; balance 14 days before the boat.
             </p>
             <p>
-              <strong>Whole-island buyouts:</strong> 50% non-refundable; balance
+              <strong>Whole-island buyouts:</strong> {pct} non-refundable; balance
               30 days before the boat.
             </p>
           </div>
@@ -69,10 +81,11 @@ export default function PoliciesPage() {
               12-month credit toward a future stay.
             </p>
             <p>
-              <strong>14–29 days before arrival:</strong> 50% of total retained.
+              <strong>14–29 days before arrival:</strong> {pct} of total
+              retained.
             </p>
             <p>
-              <strong>Less than 14 days:</strong> Non-refundable. 50% credit
+              <strong>Less than 14 days:</strong> Non-refundable. {pct} credit
               only for documented medical emergency.
             </p>
             <p>
