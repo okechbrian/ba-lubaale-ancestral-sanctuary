@@ -121,6 +121,8 @@ function ImageField({
       } else {
         setUploadErr(uploadErrorMessage(result.reason));
       }
+    } catch {
+      setUploadErr("Upload failed — network error.");
     } finally {
       setBusy(false);
     }
@@ -398,6 +400,10 @@ export default function ContentEditor({
       } else {
         setMsg({ kind: "err", text: `Save failed (${body.error ?? res.status}).` });
       }
+    } catch {
+      // try/finally with no catch cleared the spinner and said nothing, so a
+      // failed save looked exactly like a click that did nothing.
+      setMsg({ kind: "err", text: "Network error — nothing was saved." });
     } finally {
       setBusy(false);
     }
@@ -424,6 +430,8 @@ export default function ContentEditor({
               : `Reset failed (${body.error ?? res.status}).`,
         });
       }
+    } catch {
+      setMsg({ kind: "err", text: "Network error — nothing was changed." });
     } finally {
       setBusy(false);
     }
