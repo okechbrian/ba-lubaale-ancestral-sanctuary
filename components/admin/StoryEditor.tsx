@@ -64,6 +64,8 @@ export default function StoryEditor({ initial }: { initial?: StoryDraft }) {
       }
       set("cover_image", result.publicUrl);
       setMsg({ ok: true, text: "Cover uploaded." });
+    } catch {
+      setMsg({ ok: false, text: "Upload failed — network error." });
     } finally {
       setUploading(false);
     }
@@ -95,20 +97,29 @@ export default function StoryEditor({ initial }: { initial?: StoryDraft }) {
         issues?: { path: string; message: string }[];
         story?: { id: string; slug: string };
       };
-      if (!res.ok) {
+      if (res.ok) {
+        // The API returns the saved story, id included. It used to be typed
+        // and then ignored, so a brand-new story kept `id === undefined`:
+        // the Delete button never appeared, and a second save POSTed a CREATE
+        // again, which the server rejected with `duplicate_slug` — surfaced as
+        // "Save failed (duplicate_slug)." Storing the id fixes both, because
+        // the next save is an UPSERT rather than a second create.
+        if (body.story?.id) {
+          setDraft((d) => ({ ...d, id: body.story!.id }));
+        }
+        setMsg({
+          ok: true,
+          text: draft.published ? "Published." : "Saved as a draft.",
+        });
+        router.refresh();
+      } else {
         if (Array.isArray(body.issues) && body.issues.length > 0) setIssues(body.issues);
         else
           setMsg({
             ok: false,
             text: body.message ?? `Save failed (${body.error ?? res.status}).`,
           });
-        return;
       }
-      setMsg({
-        ok: true,
-        text: draft.published ? "Published." : "Saved as a draft.",
-      });
-      router.refresh();
     } catch {
       setMsg({ ok: false, text: "Network error — nothing was saved." });
     } finally {
@@ -128,7 +139,13 @@ export default function StoryEditor({ initial }: { initial?: StoryDraft }) {
         setMsg({ ok: false, text: "Delete failed." });
         return;
       }
+      // refresh() as well as push(): the client router cache still holds the
+      // list containing the deleted story, so pushing alone left the row on
+      // screen and the owner deleted the same story twice.
       router.push("/admin/stories");
+      router.refresh();
+    } catch {
+      setMsg({ ok: false, text: "Network error — nothing was deleted." });
     } finally {
       setBusy(false);
     }
@@ -282,7 +299,11 @@ export default function StoryEditor({ initial }: { initial?: StoryDraft }) {
           </button>
         )}
         {msg && (
-          <p className={`text-sm ${msg.ok ? "text-canopy" : "text-ember"}`}>
+          <p
+            role="status"
+            aria-live="polite"
+            className={`text-sm ${msg.ok ? "text-canopy" : "text-ember"}`}
+          >
             {msg.text}
           </p>
         )}
