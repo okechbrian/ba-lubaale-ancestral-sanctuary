@@ -14,7 +14,16 @@ export default defineConfig({
     ],
   },
   test: {
+    // `node` stays the default so the 39 existing suites (including the
+    // integrity tests that talk to a real Postgres) keep running exactly as
+    // they did. Component tests opt into a DOM per FILE with
+    //
+    //   // @vitest-environment jsdom
+    //
+    // on the first line. Vitest 5 removed `environmentMatchGlobs`, so a
+    // per-file docblock is the supported way to mix both environments in one
+    // project; a global flip to jsdom would risk every existing suite.
     environment: "node",
-    include: ["tests/**/*.test.ts"],
+    include: ["tests/**/*.test.{ts,tsx}"],
   },
 });
